@@ -1,0 +1,18 @@
+args: --naos-filter floating.special
+exit code: 1
+--- stdout
+RUN: floating.special
+floating.c:LINE: error: -0.0 ~= 1.0
+  left:  -0
+  right: 1
+  tolerance: 0.5
+floating.c:LINE: error: INFINITY ~= -INFINITY
+  left:  inf
+  right: -inf
+  tolerance: 1
+floating.c:LINE: error: 1.0 ~= 2.0
+  left:  1
+  right: 2
+  tolerance: nan
+FAIL: floating.special (3 failures)
+--- stderr

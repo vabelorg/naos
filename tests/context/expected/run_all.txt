@@ -1,0 +1,163 @@
+args: 
+exit code: 1
+--- stdout
+RUN: note.in_loop
+note.c:LINE: error: i < 3
+  left:  3
+  right: 3
+  note: i=3 of loop
+note.c:LINE: error: i < 3
+  left:  4
+  right: 3
+  note: i=4 of loop
+FAIL: note.in_loop (2 failures)
+RUN: note.used_up_by_pass
+note.c:LINE: error: 0
+FAIL: note.used_up_by_pass (1 failure)
+RUN: note.replaced
+note.c:LINE: error: 0
+  note: second-note
+note.c:LINE: error: 0
+FAIL: note.replaced (2 failures)
+RUN: note.on_require
+note.c:LINE: error: "a" == "b"
+  left:  "a"
+  right: "b"
+  first difference: offset 0, left 0x61, right 0x62
+  note: before require
+FAIL: note.on_require (1 failure)
+RUN: note.on_fail
+note.c:LINE: error: explicit failure
+  note: context 42
+FAIL: note.on_fail (1 failure)
+RUN: note.on_skip
+note.c:LINE: skip: not applicable
+  note: why skipped
+SKIP: note.on_skip
+RUN: note.cut_short
+note.c:LINE: error: 0
+  note: 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000...
+FAIL: note.cut_short (1 failure)
+RUN: note.with_double
+note.c:LINE: error: 1.0 ~= 2.0
+  left:  1
+  right: 2
+  tolerance: 0.5
+  note: double-note
+FAIL: note.with_double (1 failure)
+RUN: note.with_mem
+note.c:LINE: error: expected == actual
+  left size:  3
+  right size: 3
+  first difference: offset 1, left 0x02, right 0xFF
+  note: mem-note
+FAIL: note.with_mem (1 failure)
+RUN: note_reset.leaves_note
+PASS: note_reset.leaves_note
+RUN: note_reset.fails_without_note
+note.c:LINE: error: 0
+FAIL: note_reset.fails_without_note (1 failure)
+RUN: note_before_teardown.leaves_note
+note.c:LINE: error: 1 == 2
+teardown-ran
+FAIL: note_before_teardown.leaves_note (1 failure)
+RUN: trace.nested
+trace.c:LINE: error: i < 2
+  left:  2
+  right: 2
+  note: inner note
+trace.c:LINE: note: i=2
+trace.c:LINE: note: outer
+FAIL: trace.nested (1 failure)
+RUN: trace.popped
+trace.c:LINE: error: 0
+FAIL: trace.popped (1 failure)
+RUN: trace.left_by_jump
+trace.c:LINE: error: 1 == value
+  left:  1
+  right: 2
+trace.c:LINE: note: helper value=2
+FAIL: trace.left_by_jump (1 failure)
+RUN: trace.missing_pop
+trace.c:LINE: error: NAOS_TRACE_PUSH without NAOS_TRACE_POP: forgotten
+FAIL: trace.missing_pop (1 failure)
+RUN: trace.missing_pop_nested
+trace.c:LINE: error: NAOS_TRACE_PUSH without NAOS_TRACE_POP: inner-forgotten
+  note: missing-pop-note
+trace.c:LINE: note: outer-forgotten
+FAIL: trace.missing_pop_nested (1 failure)
+RUN: trace.pop_without_push
+trace.c:LINE: error: NAOS_TRACE_POP without NAOS_TRACE_PUSH
+trace.c:LINE: error: 0
+  note: kept-note
+FAIL: trace.pop_without_push (2 failures)
+RUN: trace.too_deep
+trace.c:LINE: error: NAOS_TRACE_PUSH beyond 16 levels
+trace.c:LINE: error: NAOS_TRACE_PUSH beyond 16 levels
+trace.c:LINE: error: 0
+  traces: 2 innermost not kept
+trace.c:LINE: note: level 15
+trace.c:LINE: note: level 14
+trace.c:LINE: note: level 13
+trace.c:LINE: note: level 12
+trace.c:LINE: note: level 11
+trace.c:LINE: note: level 10
+trace.c:LINE: note: level 9
+trace.c:LINE: note: level 8
+trace.c:LINE: note: level 7
+trace.c:LINE: note: level 6
+trace.c:LINE: note: level 5
+trace.c:LINE: note: level 4
+trace.c:LINE: note: level 3
+trace.c:LINE: note: level 2
+trace.c:LINE: note: level 1
+trace.c:LINE: note: level 0
+FAIL: trace.too_deep (3 failures)
+RUN: trace.too_deep_with_note
+trace.c:LINE: error: NAOS_TRACE_PUSH beyond 16 levels
+trace.c:LINE: error: 1.0 ~= 2.0
+  left:  1
+  right: 2
+  tolerance: 0.5
+  note: deep-note
+  traces: 1 innermost not kept
+trace.c:LINE: note: level 15
+trace.c:LINE: note: level 14
+trace.c:LINE: note: level 13
+trace.c:LINE: note: level 12
+trace.c:LINE: note: level 11
+trace.c:LINE: note: level 10
+trace.c:LINE: note: level 9
+trace.c:LINE: note: level 8
+trace.c:LINE: note: level 7
+trace.c:LINE: note: level 6
+trace.c:LINE: note: level 5
+trace.c:LINE: note: level 4
+trace.c:LINE: note: level 3
+trace.c:LINE: note: level 2
+trace.c:LINE: note: level 1
+trace.c:LINE: note: level 0
+FAIL: trace.too_deep_with_note (2 failures)
+RUN: trace.on_skip
+trace.c:LINE: skip: not applicable
+trace.c:LINE: note: skip-trace
+SKIP: trace.on_skip
+RUN: trace_phases.pops_setup_trace
+trace.c:LINE: error: 0
+trace.c:LINE: note: setup-trace
+trace.c:LINE: error: 1 == 2
+teardown-ran
+FAIL: trace_phases.pops_setup_trace (2 failures)
+RUN: trace_phases.jumps_with_trace
+trace.c:LINE: error: 1 == 2
+trace.c:LINE: note: body-trace
+trace.c:LINE: note: setup-trace
+trace.c:LINE: error: 1 == 2
+teardown-ran
+FAIL: trace_phases.jumps_with_trace (2 failures)
+RUN: trace_teardown.body
+body-ran
+trace.c:LINE: error: NAOS_TRACE_PUSH without NAOS_TRACE_POP: teardown-trace
+FAIL: trace_teardown.body (1 failure)
+SUMMARY: 1 passed, 21 failed, 2 skipped
+--- stderr

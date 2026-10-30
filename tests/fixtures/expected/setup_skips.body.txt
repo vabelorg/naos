@@ -1,0 +1,8 @@
+args: --naos-filter setup_skips.body
+exit code: 77
+--- stdout
+RUN: setup_skips.body
+fixtures.c:LINE: skip: not applicable
+teardown-ran
+SKIP: setup_skips.body
+--- stderr

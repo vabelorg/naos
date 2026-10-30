@@ -1,0 +1,9 @@
+args: --naos-filter require.int_eq_stops
+exit code: 1
+--- stdout
+RUN: require.int_eq_stops
+require.c:LINE: error: 1 == 2
+  left:  1
+  right: 2
+FAIL: require.int_eq_stops (1 failure)
+--- stderr

@@ -1,0 +1,18 @@
+args: --naos-filter comparison.unknown
+exit code: 1
+--- stdout
+RUN: comparison.unknown
+comparison.c:LINE: error: int
+  left:  1
+  right: 1
+comparison.c:LINE: error: uint
+  left:  1
+  right: 1
+comparison.c:LINE: error: str
+  left:  "a"
+  right: "a"
+comparison.c:LINE: error: str_lt
+  left:  "a"
+  right: "b"
+FAIL: comparison.unknown (4 failures)
+--- stderr

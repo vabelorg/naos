@@ -1,0 +1,10 @@
+args: --naos-filter string.eq
+exit code: 1
+--- stdout
+RUN: string.eq
+string.c:LINE: error: "abc" == "abd"
+  left:  "abc"
+  right: "abd"
+  first difference: offset 2, left 0x63, right 0x64
+FAIL: string.eq (1 failure)
+--- stderr

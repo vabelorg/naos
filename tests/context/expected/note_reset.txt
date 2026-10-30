@@ -1,0 +1,10 @@
+args: --naos-filter note_reset.*
+exit code: 1
+--- stdout
+RUN: note_reset.leaves_note
+PASS: note_reset.leaves_note
+RUN: note_reset.fails_without_note
+note.c:LINE: error: 0
+FAIL: note_reset.fails_without_note (1 failure)
+SUMMARY: 1 passed, 1 failed, 0 skipped
+--- stderr

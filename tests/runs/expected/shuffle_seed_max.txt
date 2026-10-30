@@ -1,0 +1,12 @@
+args: --naos-shuffle --naos-random-seed 99999 --naos-filter a.*
+exit code: 0
+--- stdout
+RANDOM SEED: 99999
+RUN: a.t2
+PASS: a.t2
+RUN: a.t3
+PASS: a.t3
+RUN: a.t1
+PASS: a.t1
+SUMMARY: 3 passed, 0 failed, 0 skipped
+--- stderr

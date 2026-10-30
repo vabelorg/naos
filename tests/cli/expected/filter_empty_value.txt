@@ -1,0 +1,6 @@
+args: --naos-filter=
+exit code: 2
+--- stdout
+--- stderr
+naos: --naos-filter needs a pattern, not an empty one
+usage: PROG [--naos-filter <patterns>] [--naos-list] [--naos-shuffle] [--naos-random-seed <n>] [--naos-repeat <n>] [--naos-fail-fast] [--help] [args...]

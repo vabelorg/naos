@@ -1,0 +1,6 @@
+args: --naos-filter=parser.empty=x
+exit code: 2
+--- stdout
+--- stderr
+naos: no test matches: parser.empty=x
+usage: PROG [--naos-filter <patterns>] [--naos-list] [--naos-shuffle] [--naos-random-seed <n>] [--naos-repeat <n>] [--naos-fail-fast] [--help] [args...]

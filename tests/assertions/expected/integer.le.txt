@@ -1,0 +1,9 @@
+args: --naos-filter integer.le
+exit code: 1
+--- stdout
+RUN: integer.le
+integer.c:LINE: error: -4 <= -5
+  left:  -4
+  right: -5
+FAIL: integer.le (1 failure)
+--- stderr

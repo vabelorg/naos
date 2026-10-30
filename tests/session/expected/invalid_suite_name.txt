@@ -1,0 +1,5 @@
+args: invalid_suite_name
+exit code: 2
+--- stdout
+--- stderr
+naos: suite #0 has an invalid name (only letters, digits and '_'): a-b

@@ -1,0 +1,5 @@
+args: --naos-filter -parser.*:writer.slow_* --naos-list
+exit code: 0
+--- stdout
+writer.empty
+--- stderr

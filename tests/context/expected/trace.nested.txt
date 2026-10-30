@@ -1,0 +1,12 @@
+args: --naos-filter trace.nested
+exit code: 1
+--- stdout
+RUN: trace.nested
+trace.c:LINE: error: i < 2
+  left:  2
+  right: 2
+  note: inner note
+trace.c:LINE: note: i=2
+trace.c:LINE: note: outer
+FAIL: trace.nested (1 failure)
+--- stderr

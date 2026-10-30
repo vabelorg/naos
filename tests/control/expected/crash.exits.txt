@@ -1,0 +1,5 @@
+args: --naos-filter crash.exits
+exit code: 3
+--- stdout
+RUN: crash.exits
+--- stderr

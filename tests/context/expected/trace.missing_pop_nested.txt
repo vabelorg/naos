@@ -1,0 +1,9 @@
+args: --naos-filter trace.missing_pop_nested
+exit code: 1
+--- stdout
+RUN: trace.missing_pop_nested
+trace.c:LINE: error: NAOS_TRACE_PUSH without NAOS_TRACE_POP: inner-forgotten
+  note: missing-pop-note
+trace.c:LINE: note: outer-forgotten
+FAIL: trace.missing_pop_nested (1 failure)
+--- stderr

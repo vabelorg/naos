@@ -1,0 +1,7 @@
+args: --naos-filter fail.from_helper
+exit code: 1
+--- stdout
+RUN: fail.from_helper
+fail.c:LINE: error: helper failure
+FAIL: fail.from_helper (1 failure)
+--- stderr

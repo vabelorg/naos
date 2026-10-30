@@ -1,0 +1,10 @@
+args: --naos-filter check.in_helper_goes_on
+exit code: 1
+--- stdout
+RUN: check.in_helper_goes_on
+check.c:LINE: error: 1 == value
+  left:  1
+  right: 2
+reached-after-helper
+FAIL: check.in_helper_goes_on (1 failure)
+--- stderr

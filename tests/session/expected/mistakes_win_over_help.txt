@@ -1,0 +1,26 @@
+args: many --help
+exit code: 2
+--- stdout
+usage: PROG [--naos-filter <patterns>] [--naos-list] [--naos-shuffle] [--naos-random-seed <n>] [--naos-repeat <n>] [--naos-fail-fast] [--help] [args...]
+
+options (anywhere on the command line):
+  --naos-filter <patterns>  run only the tests whose name <suite>.<test> matches
+                            '*' matches any string, '?' any one character;
+                            patterns are separated by ':', and those after '-' exclude:
+                            parser.*:writer.*-*.slow_*
+  --naos-list               print the test names, one per line, without running them;
+                            the order of registration, whatever the options below
+  --naos-shuffle            run the suites, and the tests of each suite, in a random order
+  --naos-random-seed <n>    seed of that order, 1 to 99999; 0 or none chooses one from the time
+  --naos-repeat <n>         run the tests n times; with --naos-shuffle, the seed goes up by 1
+                            each time
+  --naos-fail-fast          stop at the first failing test, leaving the other tests and
+                            iterations not run
+  --help                    print this help without running any test
+an option that takes a value also takes it after '=': --naos-filter=<patterns>.
+the other args are left in argv for the program.
+--- stderr
+naos: duplicate test name: duplicate_test.same_name
+naos: test #0 of dotted_test has an invalid name (only letters, digits and '_'): a.b
+naos: setup of setup_twice is set twice
+naos: duplicate suite name: valid

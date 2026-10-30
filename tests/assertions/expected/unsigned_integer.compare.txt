@@ -1,0 +1,21 @@
+args: --naos-filter unsigned_integer.compare
+exit code: 1
+--- stdout
+RUN: unsigned_integer.compare
+unsigned_integer.c:LINE: error: 8u != 8u
+  left:  8
+  right: 8
+unsigned_integer.c:LINE: error: UINTMAX_MAX < 0u
+  left:  18446744073709551615
+  right: 0
+unsigned_integer.c:LINE: error: 10u <= 9u
+  left:  10
+  right: 9
+unsigned_integer.c:LINE: error: 0u > UINTMAX_MAX
+  left:  0
+  right: 18446744073709551615
+unsigned_integer.c:LINE: error: 11u >= 12u
+  left:  11
+  right: 12
+FAIL: unsigned_integer.compare (5 failures)
+--- stderr

@@ -1,0 +1,9 @@
+args: --slow
+exit code: 0
+--- stdout
+RUN: quick.adds
+PASS: quick.adds
+RUN: slow.sums_a_million
+PASS: slow.sums_a_million
+SUMMARY: 2 passed, 0 failed, 0 skipped
+--- stderr

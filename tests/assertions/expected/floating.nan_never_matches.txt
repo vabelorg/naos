@@ -1,0 +1,10 @@
+args: --naos-filter floating.nan_never_matches
+exit code: 1
+--- stdout
+RUN: floating.nan_never_matches
+floating.c:LINE: error: NAN ~= NAN
+  left:  nan
+  right: nan
+  tolerance: 1
+FAIL: floating.nan_never_matches (1 failure)
+--- stderr

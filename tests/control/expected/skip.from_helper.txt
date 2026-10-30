@@ -1,0 +1,7 @@
+args: --naos-filter skip.from_helper
+exit code: 77
+--- stdout
+RUN: skip.from_helper
+skip.c:LINE: skip: helper skip
+SKIP: skip.from_helper
+--- stderr

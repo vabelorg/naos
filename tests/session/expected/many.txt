@@ -1,0 +1,8 @@
+args: many
+exit code: 2
+--- stdout
+--- stderr
+naos: duplicate test name: duplicate_test.same_name
+naos: test #0 of dotted_test has an invalid name (only letters, digits and '_'): a.b
+naos: setup of setup_twice is set twice
+naos: duplicate suite name: valid

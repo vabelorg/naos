@@ -1,0 +1,9 @@
+args: --naos-filter trace.pop_without_push
+exit code: 1
+--- stdout
+RUN: trace.pop_without_push
+trace.c:LINE: error: NAOS_TRACE_POP without NAOS_TRACE_PUSH
+trace.c:LINE: error: 0
+  note: kept-note
+FAIL: trace.pop_without_push (2 failures)
+--- stderr

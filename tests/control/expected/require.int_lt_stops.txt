@@ -1,0 +1,9 @@
+args: --naos-filter require.int_lt_stops
+exit code: 1
+--- stdout
+RUN: require.int_lt_stops
+require.c:LINE: error: 2 < 1
+  left:  2
+  right: 1
+FAIL: require.int_lt_stops (1 failure)
+--- stderr

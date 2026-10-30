@@ -1,0 +1,7 @@
+args: --naos-list
+exit code: 0
+--- stdout
+strbuf.starts_empty
+strbuf.append_joins
+strbuf.append_grows
+--- stderr

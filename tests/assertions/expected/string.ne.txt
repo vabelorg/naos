@@ -1,0 +1,9 @@
+args: --naos-filter string.ne
+exit code: 1
+--- stdout
+RUN: string.ne
+string.c:LINE: error: "abc" != "abc"
+  left:  "abc"
+  right: "abc"
+FAIL: string.ne (1 failure)
+--- stderr

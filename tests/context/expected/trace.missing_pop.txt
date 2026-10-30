@@ -1,0 +1,7 @@
+args: --naos-filter trace.missing_pop
+exit code: 1
+--- stdout
+RUN: trace.missing_pop
+trace.c:LINE: error: NAOS_TRACE_PUSH without NAOS_TRACE_POP: forgotten
+FAIL: trace.missing_pop (1 failure)
+--- stderr

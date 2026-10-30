@@ -1,0 +1,8 @@
+args: --naos-filter crash.exits_after_failure
+exit code: 3
+--- stdout
+RUN: crash.exits_after_failure
+crash.c:LINE: error: 1 == 2
+  left:  1
+  right: 2
+--- stderr

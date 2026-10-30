@@ -1,0 +1,19 @@
+args: --naos-repeat 2 --naos-filter mixed.fails
+exit code: 1
+--- stdout
+ITERATION: 1 of 2
+RUN: mixed.fails
+failing.c:LINE: error: 1 == 2
+  left:  1
+  right: 2
+FAIL: mixed.fails (1 failure)
+ITERATION FAILED: 1 of 2
+ITERATION: 2 of 2
+RUN: mixed.fails
+failing.c:LINE: error: 1 == 2
+  left:  1
+  right: 2
+FAIL: mixed.fails (1 failure)
+ITERATION FAILED: 2 of 2
+REPEAT: 2 of 2 iterations failed
+--- stderr

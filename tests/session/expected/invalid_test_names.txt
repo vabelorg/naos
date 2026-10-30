@@ -1,0 +1,11 @@
+args: invalid_test_names
+exit code: 2
+--- stdout
+--- stderr
+naos: test #0 of invalid_test_names has an invalid name (only letters, digits and '_'): a-b
+naos: test #1 of invalid_test_names has an invalid name (only letters, digits and '_'): a:b
+naos: test #2 of invalid_test_names has an invalid name (only letters, digits and '_'): a*
+naos: test #3 of invalid_test_names has an invalid name (only letters, digits and '_'): a?
+naos: test #4 of invalid_test_names has an invalid name (only letters, digits and '_'): a b
+naos: test #5 of invalid_test_names has an invalid name (only letters, digits and '_'): (empty)
+naos: test #6 of invalid_test_names has an invalid name (only letters, digits and '_'): (null)

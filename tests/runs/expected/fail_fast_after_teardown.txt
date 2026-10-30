@@ -1,0 +1,11 @@
+args: --naos-fail-fast --naos-filter teardown_fails.*:mixed.passes
+exit code: 1
+--- stdout
+RUN: teardown_fails.body
+body-ran
+failing.c:LINE: error: 1 == 2
+teardown-ran
+FAIL: teardown_fails.body (1 failure)
+FAIL FAST: stopped at the first failure; 1 not run
+SUMMARY: 0 passed, 1 failed, 0 skipped
+--- stderr

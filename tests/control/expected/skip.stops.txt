@@ -1,0 +1,7 @@
+args: --naos-filter skip.stops
+exit code: 77
+--- stdout
+RUN: skip.stops
+skip.c:LINE: skip: not applicable
+SKIP: skip.stops
+--- stderr

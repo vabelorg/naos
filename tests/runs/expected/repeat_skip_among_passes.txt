@@ -1,0 +1,25 @@
+args: --naos-repeat 2 --naos-filter skips.*
+exit code: 0
+--- stdout
+ITERATION: 1 of 2
+RUN: skips.skip_one
+failing.c:LINE: skip: not applicable
+SKIP: skips.skip_one
+RUN: skips.skip_two
+failing.c:LINE: skip: not applicable either
+SKIP: skips.skip_two
+RUN: skips.passes
+PASS: skips.passes
+SUMMARY: 1 passed, 0 failed, 2 skipped
+ITERATION: 2 of 2
+RUN: skips.skip_one
+failing.c:LINE: skip: not applicable
+SKIP: skips.skip_one
+RUN: skips.skip_two
+failing.c:LINE: skip: not applicable either
+SKIP: skips.skip_two
+RUN: skips.passes
+PASS: skips.passes
+SUMMARY: 1 passed, 0 failed, 2 skipped
+REPEAT: 0 of 2 iterations failed
+--- stderr

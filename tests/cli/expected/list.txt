@@ -1,0 +1,9 @@
+args: --naos-list
+exit code: 0
+--- stdout
+parser.empty
+parser.nested
+parser.slow_big
+writer.empty
+writer.slow_small
+--- stderr

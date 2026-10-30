@@ -1,0 +1,8 @@
+args: --naos-filter check.false_goes_on
+exit code: 1
+--- stdout
+RUN: check.false_goes_on
+check.c:LINE: error: !(done)
+reached-after-check
+FAIL: check.false_goes_on (1 failure)
+--- stderr

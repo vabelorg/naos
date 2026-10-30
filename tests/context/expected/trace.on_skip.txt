@@ -1,0 +1,8 @@
+args: --naos-filter trace.on_skip
+exit code: 77
+--- stdout
+RUN: trace.on_skip
+trace.c:LINE: skip: not applicable
+trace.c:LINE: note: skip-trace
+SKIP: trace.on_skip
+--- stderr

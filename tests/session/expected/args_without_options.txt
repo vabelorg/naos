@@ -1,0 +1,6 @@
+args: first --naos-filter own_main.sees_args_without_options second
+exit code: 0
+--- stdout
+RUN: own_main.sees_args_without_options
+PASS: own_main.sees_args_without_options
+--- stderr

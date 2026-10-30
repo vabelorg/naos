@@ -1,0 +1,7 @@
+args: --naos-filter trace.popped
+exit code: 1
+--- stdout
+RUN: trace.popped
+trace.c:LINE: error: 0
+FAIL: trace.popped (1 failure)
+--- stderr

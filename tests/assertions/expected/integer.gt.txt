@@ -1,0 +1,9 @@
+args: --naos-filter integer.gt
+exit code: 1
+--- stdout
+RUN: integer.gt
+integer.c:LINE: error: 6 > 6
+  left:  6
+  right: 6
+FAIL: integer.gt (1 failure)
+--- stderr

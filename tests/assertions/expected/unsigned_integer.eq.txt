@@ -1,0 +1,9 @@
+args: --naos-filter unsigned_integer.eq
+exit code: 1
+--- stdout
+RUN: unsigned_integer.eq
+unsigned_integer.c:LINE: error: 1u == 2u
+  left:  1
+  right: 2
+FAIL: unsigned_integer.eq (1 failure)
+--- stderr

@@ -1,0 +1,87 @@
+args: --naos-filter -crash.*
+exit code: 1
+--- stdout
+RUN: pass.passes
+PASS: pass.passes
+RUN: check.goes_on
+check.c:LINE: error: 1 == 2
+reached-after-check
+FAIL: check.goes_on (1 failure)
+RUN: check.false_goes_on
+check.c:LINE: error: !(done)
+reached-after-check
+FAIL: check.false_goes_on (1 failure)
+RUN: check.in_helper_goes_on
+check.c:LINE: error: 1 == value
+  left:  1
+  right: 2
+reached-after-helper
+FAIL: check.in_helper_goes_on (1 failure)
+RUN: require.stops
+require.c:LINE: error: 1 == 2
+FAIL: require.stops (1 failure)
+RUN: require.false_stops
+require.c:LINE: error: !(done)
+FAIL: require.false_stops (1 failure)
+RUN: require.int_eq_stops
+require.c:LINE: error: 1 == 2
+  left:  1
+  right: 2
+FAIL: require.int_eq_stops (1 failure)
+RUN: require.int_lt_stops
+require.c:LINE: error: 2 < 1
+  left:  2
+  right: 1
+FAIL: require.int_lt_stops (1 failure)
+RUN: require.uint_ge_stops
+require.c:LINE: error: 1u >= 2u
+  left:  1
+  right: 2
+FAIL: require.uint_ge_stops (1 failure)
+RUN: require.leaves_helper
+require.c:LINE: error: 1 == value
+  left:  1
+  right: 2
+FAIL: require.leaves_helper (1 failure)
+RUN: require.leaves_nested_helpers
+require.c:LINE: error: 1 == value
+  left:  1
+  right: 2
+FAIL: require.leaves_nested_helpers (1 failure)
+RUN: require.as_expression
+require.c:LINE: error: 1 == 2
+FAIL: require.as_expression (1 failure)
+RUN: fail.stops
+fail.c:LINE: error: explicit failure
+FAIL: fail.stops (1 failure)
+RUN: fail.no_message
+fail.c:LINE: error: (no message)
+FAIL: fail.no_message (1 failure)
+RUN: fail.from_helper
+fail.c:LINE: error: helper failure
+FAIL: fail.from_helper (1 failure)
+RUN: fail.ends_value_helper
+fail.c:LINE: error: not found
+FAIL: fail.ends_value_helper (1 failure)
+RUN: skip.stops
+skip.c:LINE: skip: not applicable
+SKIP: skip.stops
+RUN: skip.from_helper
+skip.c:LINE: skip: helper skip
+SKIP: skip.from_helper
+RUN: skip.failure_wins
+skip.c:LINE: error: 0
+skip.c:LINE: skip: too late
+FAIL: skip.failure_wins (1 failure)
+RUN: skips.skipped_one
+results.c:LINE: skip: not applicable
+SKIP: skips.skipped_one
+RUN: skips.skipped_two
+results.c:LINE: skip: not applicable either
+SKIP: skips.skipped_two
+RUN: skips.passed
+PASS: skips.passed
+RUN: last.passes_after_failures
+PASS: last.passes_after_failures
+SUMMARY: 3 passed, 16 failed, 4 skipped
+--- stderr

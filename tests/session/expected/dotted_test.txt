@@ -1,0 +1,5 @@
+args: dotted_test
+exit code: 2
+--- stdout
+--- stderr
+naos: test #0 of dotted_test has an invalid name (only letters, digits and '_'): a.b

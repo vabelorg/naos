@@ -1,0 +1,26 @@
+args: --naos-filter trace.too_deep
+exit code: 1
+--- stdout
+RUN: trace.too_deep
+trace.c:LINE: error: NAOS_TRACE_PUSH beyond 16 levels
+trace.c:LINE: error: NAOS_TRACE_PUSH beyond 16 levels
+trace.c:LINE: error: 0
+  traces: 2 innermost not kept
+trace.c:LINE: note: level 15
+trace.c:LINE: note: level 14
+trace.c:LINE: note: level 13
+trace.c:LINE: note: level 12
+trace.c:LINE: note: level 11
+trace.c:LINE: note: level 10
+trace.c:LINE: note: level 9
+trace.c:LINE: note: level 8
+trace.c:LINE: note: level 7
+trace.c:LINE: note: level 6
+trace.c:LINE: note: level 5
+trace.c:LINE: note: level 4
+trace.c:LINE: note: level 3
+trace.c:LINE: note: level 2
+trace.c:LINE: note: level 1
+trace.c:LINE: note: level 0
+FAIL: trace.too_deep (3 failures)
+--- stderr

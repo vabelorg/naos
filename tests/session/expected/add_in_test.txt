@@ -1,0 +1,6 @@
+args: add_in_test
+exit code: 2
+--- stdout
+RUN: add_in_test.adds_suite
+--- stderr
+naos: NAOS_ADD_SUITE after naos_run() has started; the order is naos_init(), NAOS_ADD_SUITE, naos_run()

@@ -1,0 +1,5 @@
+args: add_in_suite
+exit code: 2
+--- stdout
+--- stderr
+naos: NAOS_ADD_SUITE after naos_run() has started; the order is naos_init(), NAOS_ADD_SUITE, naos_run()

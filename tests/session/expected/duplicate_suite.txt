@@ -1,0 +1,5 @@
+args: duplicate_suite
+exit code: 2
+--- stdout
+--- stderr
+naos: duplicate suite name: valid

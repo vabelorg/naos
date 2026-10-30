@@ -1,0 +1,5 @@
+args: --naos-filter ?riter.*_small --naos-list
+exit code: 0
+--- stdout
+writer.slow_small
+--- stderr

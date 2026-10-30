@@ -1,0 +1,8 @@
+args: --naos-filter body_and_teardown_require.fatal_body
+exit code: 1
+--- stdout
+RUN: body_and_teardown_require.fatal_body
+fixtures.c:LINE: error: 1 == 2
+fixtures.c:LINE: error: 3 == 4
+FAIL: body_and_teardown_require.fatal_body (2 failures)
+--- stderr

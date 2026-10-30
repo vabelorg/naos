@@ -1,0 +1,10 @@
+args: --naos-filter memory.byte
+exit code: 1
+--- stdout
+RUN: memory.byte
+memory.c:LINE: error: expected == actual
+  left size:  3
+  right size: 3
+  first difference: offset 1, left 0x02, right 0xFF
+FAIL: memory.byte (1 failure)
+--- stderr

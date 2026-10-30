@@ -1,0 +1,66 @@
+# Publishes a release when its pull request, opened by release-pr.yml from a branch
+# release/v<version>, is merged: tags the merge commit v<version> and creates the GitHub release,
+# its notes the section of the version in CHANGELOG.md. See docs/development/release.md.
+
+name: Release
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency: release
+
+jobs:
+  publish:
+    if: >-
+      github.event.pull_request.merged &&
+      startsWith(github.event.pull_request.head.ref, 'release/v') &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    env:
+      HEAD_REF: ${{ github.event.pull_request.head.ref }}
+      COMMIT: ${{ github.event.pull_request.merge_commit_sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: 0
+
+      - name: Check the version
+        run: |
+          VERSION="${HEAD_REF#release/v}"
+          header=$(for c in MAJOR MINOR PATCH; do
+            sed -n "s/^#define NAOS_VERSION_$c \([0-9]*\)\$/\1/p" include/naos/version.h
+          done | paste -sd.)
+          if [ "$header" != "$VERSION" ]; then
+            echo "::error::include/naos/version.h has $header, the branch $HEAD_REF"
+            exit 1
+          fi
+          if git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null; then
+            echo "::error::The tag v$VERSION exists already"
+            exit 1
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "v$VERSION" -m "Naos $VERSION" "$COMMIT"
+          git push origin "v$VERSION"
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cmake -D ROOT=. -D VERSION="$VERSION" -D OUTPUT="$RUNNER_TEMP/notes.md" \
+            -P scripts/release-notes.cmake
+          gh release create "v$VERSION" --verify-tag --title "Naos $VERSION" \
+            --notes-file "$RUNNER_TEMP/notes.md"
+
+      - name: Delete the release branch
+        run: git push origin --delete "$HEAD_REF" || true

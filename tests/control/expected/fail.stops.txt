@@ -1,0 +1,7 @@
+args: --naos-filter fail.stops
+exit code: 1
+--- stdout
+RUN: fail.stops
+fail.c:LINE: error: explicit failure
+FAIL: fail.stops (1 failure)
+--- stderr
