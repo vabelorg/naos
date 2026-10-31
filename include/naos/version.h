@@ -16,7 +16,7 @@
 NAOS_BEGIN_DECLS
 
 #define NAOS_VERSION_MAJOR 0
-#define NAOS_VERSION_MINOR 0
+#define NAOS_VERSION_MINOR 1
 #define NAOS_VERSION_PATCH 0
 
 /* Formats a version as "MAJOR.MINOR.PATCH"; each argument is macro-expanded first. */

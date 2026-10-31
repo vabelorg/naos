@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-31
+
 ### Added
 
 - Tests in plain C99 or C++11, with no dependency besides the standard C library.
@@ -16,3 +18,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `--naos-shuffle` and `--naos-repeat` to find tests that depend on their order or fail only sometimes.
 - `naos_add_executable()` to register each test with CTest, which runs each one in its own process, in parallel and with a time limit.
 - Installation with `FetchContent`, `add_subdirectory()`, `find_package()`, or the sources alone.
+
+[Unreleased]: https://github.com/vabelorg/naos/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/vabelorg/naos/releases/tag/v0.1.0
