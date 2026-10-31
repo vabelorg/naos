@@ -1,0 +1,9 @@
+args: --naos-filter integer.eq
+exit code: 1
+--- stdout
+RUN: integer.eq
+integer.c:LINE: error: -1 == 2
+  left:  -1
+  right: 2
+FAIL: integer.eq (1 failure)
+--- stderr

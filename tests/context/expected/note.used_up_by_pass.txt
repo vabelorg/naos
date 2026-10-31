@@ -1,0 +1,7 @@
+args: --naos-filter note.used_up_by_pass
+exit code: 1
+--- stdout
+RUN: note.used_up_by_pass
+note.c:LINE: error: 0
+FAIL: note.used_up_by_pass (1 failure)
+--- stderr

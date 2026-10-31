@@ -1,0 +1,5 @@
+args: --naos-list
+exit code: 0
+--- stdout
+own_main.sees_args_without_options
+--- stderr

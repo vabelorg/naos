@@ -1,0 +1,8 @@
+args: --naos-filter note.on_fail
+exit code: 1
+--- stdout
+RUN: note.on_fail
+note.c:LINE: error: explicit failure
+  note: context 42
+FAIL: note.on_fail (1 failure)
+--- stderr

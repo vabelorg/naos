@@ -1,0 +1,10 @@
+args: --naos-filter floating.near
+exit code: 1
+--- stdout
+RUN: floating.near
+floating.c:LINE: error: 1.0 ~= 1.5
+  left:  1
+  right: 1.5
+  tolerance: 0.25
+FAIL: floating.near (1 failure)
+--- stderr

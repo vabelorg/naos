@@ -1,0 +1,9 @@
+args: --naos-filter integer.ge
+exit code: 1
+--- stdout
+RUN: integer.ge
+integer.c:LINE: error: INTMAX_MIN >= 7
+  left:  -9223372036854775808
+  right: 7
+FAIL: integer.ge (1 failure)
+--- stderr

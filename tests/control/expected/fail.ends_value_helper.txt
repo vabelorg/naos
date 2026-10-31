@@ -1,0 +1,7 @@
+args: --naos-filter fail.ends_value_helper
+exit code: 1
+--- stdout
+RUN: fail.ends_value_helper
+fail.c:LINE: error: not found
+FAIL: fail.ends_value_helper (1 failure)
+--- stderr

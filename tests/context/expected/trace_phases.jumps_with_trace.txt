@@ -1,0 +1,11 @@
+args: --naos-filter trace_phases.jumps_with_trace
+exit code: 1
+--- stdout
+RUN: trace_phases.jumps_with_trace
+trace.c:LINE: error: 1 == 2
+trace.c:LINE: note: body-trace
+trace.c:LINE: note: setup-trace
+trace.c:LINE: error: 1 == 2
+teardown-ran
+FAIL: trace_phases.jumps_with_trace (2 failures)
+--- stderr

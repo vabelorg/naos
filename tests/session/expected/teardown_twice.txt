@@ -1,0 +1,5 @@
+args: teardown_twice
+exit code: 2
+--- stdout
+--- stderr
+naos: teardown of teardown_twice is set twice

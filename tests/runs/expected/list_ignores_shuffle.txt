@@ -1,0 +1,15 @@
+args: --naos-list --naos-shuffle --naos-random-seed 1 --naos-repeat 2
+exit code: 0
+--- stdout
+a.t1
+a.t2
+a.t3
+b.t1
+b.t2
+b.t3
+c.t1
+c.t2
+c.t3
+dependent.first
+dependent.second
+--- stderr

@@ -1,0 +1,14 @@
+args: --naos-filter note.in_loop
+exit code: 1
+--- stdout
+RUN: note.in_loop
+note.c:LINE: error: i < 3
+  left:  3
+  right: 3
+  note: i=3 of loop
+note.c:LINE: error: i < 3
+  left:  4
+  right: 3
+  note: i=4 of loop
+FAIL: note.in_loop (2 failures)
+--- stderr

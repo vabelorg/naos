@@ -1,0 +1,8 @@
+args: --naos-filter note.on_skip
+exit code: 77
+--- stdout
+RUN: note.on_skip
+note.c:LINE: skip: not applicable
+  note: why skipped
+SKIP: note.on_skip
+--- stderr

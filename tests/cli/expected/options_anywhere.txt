@@ -1,0 +1,6 @@
+args: first --naos-filter parser.empty second
+exit code: 0
+--- stdout
+RUN: parser.empty
+PASS: parser.empty
+--- stderr

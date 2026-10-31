@@ -1,0 +1,11 @@
+args: --naos-filter note.on_require
+exit code: 1
+--- stdout
+RUN: note.on_require
+note.c:LINE: error: "a" == "b"
+  left:  "a"
+  right: "b"
+  first difference: offset 0, left 0x61, right 0x62
+  note: before require
+FAIL: note.on_require (1 failure)
+--- stderr

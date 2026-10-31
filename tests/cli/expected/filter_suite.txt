@@ -1,0 +1,9 @@
+args: --naos-filter writer.*
+exit code: 0
+--- stdout
+RUN: writer.empty
+PASS: writer.empty
+RUN: writer.slow_small
+PASS: writer.slow_small
+SUMMARY: 2 passed, 0 failed, 0 skipped
+--- stderr

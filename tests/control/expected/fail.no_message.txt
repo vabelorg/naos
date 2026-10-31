@@ -1,0 +1,7 @@
+args: --naos-filter fail.no_message
+exit code: 1
+--- stdout
+RUN: fail.no_message
+fail.c:LINE: error: (no message)
+FAIL: fail.no_message (1 failure)
+--- stderr

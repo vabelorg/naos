@@ -1,0 +1,13 @@
+args: --naos-filter skips.*
+exit code: 0
+--- stdout
+RUN: skips.skipped_one
+results.c:LINE: skip: not applicable
+SKIP: skips.skipped_one
+RUN: skips.skipped_two
+results.c:LINE: skip: not applicable either
+SKIP: skips.skipped_two
+RUN: skips.passed
+PASS: skips.passed
+SUMMARY: 1 passed, 0 failed, 2 skipped
+--- stderr

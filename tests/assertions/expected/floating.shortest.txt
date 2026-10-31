@@ -1,0 +1,14 @@
+args: --naos-filter floating.shortest
+exit code: 1
+--- stdout
+RUN: floating.shortest
+floating.c:LINE: error: 0.1 ~= 0.2
+  left:  0.1
+  right: 0.2
+  tolerance: 0.05
+floating.c:LINE: error: third ~= 100.0
+  left:  0.3333333333333333
+  right: 100
+  tolerance: 0.001
+FAIL: floating.shortest (2 failures)
+--- stderr

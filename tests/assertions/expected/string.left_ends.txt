@@ -1,0 +1,10 @@
+args: --naos-filter string.left_ends
+exit code: 1
+--- stdout
+RUN: string.left_ends
+string.c:LINE: error: "ab" == "abc"
+  left:  "ab"
+  right: "abc"
+  first difference: offset 2, end of left
+FAIL: string.left_ends (1 failure)
+--- stderr

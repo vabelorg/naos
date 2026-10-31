@@ -1,0 +1,14 @@
+args: --naos-fail-fast --naos-repeat 3 --naos-filter mixed.fails:mixed.passes_too
+exit code: 1
+--- stdout
+ITERATION: 1 of 3
+RUN: mixed.fails
+failing.c:LINE: error: 1 == 2
+  left:  1
+  right: 2
+FAIL: mixed.fails (1 failure)
+FAIL FAST: stopped at the first failure; 5 not run
+SUMMARY: 0 passed, 1 failed, 0 skipped
+ITERATION FAILED: 1 of 3
+REPEAT: 1 of 3 iterations failed, 2 not run
+--- stderr

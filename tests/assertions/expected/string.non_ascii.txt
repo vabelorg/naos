@@ -1,0 +1,10 @@
+args: --naos-filter string.non_ascii
+exit code: 1
+--- stdout
+RUN: string.non_ascii
+string.c:LINE: error: "\xE3\x81\x82" == "\xFF"
+  left:  "\xE3\x81\x82"
+  right: "\xFF"
+  first difference: offset 0, left 0xE3, right 0xFF
+FAIL: string.non_ascii (1 failure)
+--- stderr

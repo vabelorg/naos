@@ -1,0 +1,15 @@
+args: 
+exit code: 0
+--- stdout
+RUN: parser.empty
+PASS: parser.empty
+RUN: parser.nested
+PASS: parser.nested
+RUN: parser.slow_big
+PASS: parser.slow_big
+RUN: writer.empty
+PASS: writer.empty
+RUN: writer.slow_small
+PASS: writer.slow_small
+SUMMARY: 5 passed, 0 failed, 0 skipped
+--- stderr

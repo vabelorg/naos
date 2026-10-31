@@ -1,0 +1,7 @@
+args: --naos-filter parser.* --naos-list
+exit code: 0
+--- stdout
+parser.empty
+parser.nested
+parser.slow_big
+--- stderr

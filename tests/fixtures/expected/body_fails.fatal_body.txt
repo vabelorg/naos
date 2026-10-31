@@ -1,0 +1,8 @@
+args: --naos-filter body_fails.fatal_body
+exit code: 1
+--- stdout
+RUN: body_fails.fatal_body
+fixtures.c:LINE: error: 1 == 2
+teardown-ran
+FAIL: body_fails.fatal_body (1 failure)
+--- stderr

@@ -1,0 +1,7 @@
+args: --naos-filter require.false_stops
+exit code: 1
+--- stdout
+RUN: require.false_stops
+require.c:LINE: error: !(done)
+FAIL: require.false_stops (1 failure)
+--- stderr

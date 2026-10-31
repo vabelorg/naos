@@ -1,0 +1,9 @@
+args: --naos-filter require.uint_ge_stops
+exit code: 1
+--- stdout
+RUN: require.uint_ge_stops
+require.c:LINE: error: 1u >= 2u
+  left:  1
+  right: 2
+FAIL: require.uint_ge_stops (1 failure)
+--- stderr

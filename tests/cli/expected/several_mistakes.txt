@@ -1,0 +1,7 @@
+args: --naos-unknown --naos-repeat 0
+exit code: 2
+--- stdout
+--- stderr
+naos: unknown option: --naos-unknown
+naos: --naos-repeat takes 1 or more: 0
+usage: PROG [--naos-filter <patterns>] [--naos-list] [--naos-shuffle] [--naos-random-seed <n>] [--naos-repeat <n>] [--naos-fail-fast] [--help] [args...]

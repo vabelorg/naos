@@ -1,0 +1,5 @@
+args: setup_twice
+exit code: 2
+--- stdout
+--- stderr
+naos: setup of setup_twice is set twice

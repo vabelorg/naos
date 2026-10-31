@@ -1,0 +1,6 @@
+args: --naos-filter *.empty --naos-list
+exit code: 0
+--- stdout
+parser.empty
+writer.empty
+--- stderr

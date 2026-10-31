@@ -1,0 +1,8 @@
+args: --naos-filter trace_teardown.body
+exit code: 1
+--- stdout
+RUN: trace_teardown.body
+body-ran
+trace.c:LINE: error: NAOS_TRACE_PUSH without NAOS_TRACE_POP: teardown-trace
+FAIL: trace_teardown.body (1 failure)
+--- stderr

@@ -1,0 +1,8 @@
+args: --naos-filter setup_fails.body
+exit code: 1
+--- stdout
+RUN: setup_fails.body
+fixtures.c:LINE: error: 1 == 2
+teardown-ran
+FAIL: setup_fails.body (1 failure)
+--- stderr

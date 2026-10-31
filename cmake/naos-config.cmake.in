@@ -1,0 +1,9 @@
+# Copyright (c) 2026 The Naos Authors
+# SPDX-License-Identifier: MIT
+
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/naos-targets.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/Naos.cmake")
+
+check_required_components(naos)

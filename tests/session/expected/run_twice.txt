@@ -1,0 +1,6 @@
+args: run-twice --naos-list
+exit code: 2
+--- stdout
+own_main.sees_args_without_options
+--- stderr
+naos: naos_run() after naos_run() has started; the order is naos_init(), NAOS_ADD_SUITE, naos_run()

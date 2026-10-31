@@ -1,0 +1,10 @@
+args: --naos-filter trace.left_by_jump
+exit code: 1
+--- stdout
+RUN: trace.left_by_jump
+trace.c:LINE: error: 1 == value
+  left:  1
+  right: 2
+trace.c:LINE: note: helper value=2
+FAIL: trace.left_by_jump (1 failure)
+--- stderr

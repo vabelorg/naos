@@ -1,0 +1,18 @@
+args: --naos-filter memory.null_with_size
+exit code: 1
+--- stdout
+RUN: memory.null_with_size
+memory.c:LINE: error: none == bytes
+  left size:  2
+  right size: 2
+  invalid: left is NULL with non-zero size
+memory.c:LINE: error: bytes == none
+  left size:  2
+  right size: 2
+  invalid: right is NULL with non-zero size
+memory.c:LINE: error: none == none
+  left size:  2
+  right size: 2
+  invalid: left and right are NULL with non-zero size
+FAIL: memory.null_with_size (3 failures)
+--- stderr

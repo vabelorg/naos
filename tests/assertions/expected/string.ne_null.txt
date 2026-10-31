@@ -1,0 +1,9 @@
+args: --naos-filter string.ne_null
+exit code: 1
+--- stdout
+RUN: string.ne_null
+string.c:LINE: error: none != none
+  left:  (null)
+  right: (null)
+FAIL: string.ne_null (1 failure)
+--- stderr

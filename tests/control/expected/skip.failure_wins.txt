@@ -1,0 +1,8 @@
+args: --naos-filter skip.failure_wins
+exit code: 1
+--- stdout
+RUN: skip.failure_wins
+skip.c:LINE: error: 0
+skip.c:LINE: skip: too late
+FAIL: skip.failure_wins (1 failure)
+--- stderr

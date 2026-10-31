@@ -1,0 +1,6 @@
+args: no_begin
+exit code: 2
+--- stdout
+--- stderr
+naos: suite #0 calls naos_add_test before naos_begin_suite
+naos: suite #0 does not call naos_begin_suite

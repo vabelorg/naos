@@ -1,0 +1,11 @@
+args: --naos-shuffle --naos-random-seed 2 --naos-filter dependent.*
+exit code: 1
+--- stdout
+RANDOM SEED: 2
+RUN: dependent.second
+shuffle.c:LINE: error: first_ran
+FAIL: dependent.second (1 failure)
+RUN: dependent.first
+PASS: dependent.first
+SUMMARY: 1 passed, 1 failed, 0 skipped
+--- stderr

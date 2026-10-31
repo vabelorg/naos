@@ -1,0 +1,14 @@
+args: --naos-repeat 3 --naos-filter a.t1
+exit code: 0
+--- stdout
+ITERATION: 1 of 3
+RUN: a.t1
+PASS: a.t1
+ITERATION: 2 of 3
+RUN: a.t1
+PASS: a.t1
+ITERATION: 3 of 3
+RUN: a.t1
+PASS: a.t1
+REPEAT: 0 of 3 iterations failed
+--- stderr

@@ -1,0 +1,55 @@
+args: --naos-shuffle --naos-random-seed 1 --naos-repeat 2
+exit code: 0
+--- stdout
+ITERATION: 1 of 2
+RANDOM SEED: 1
+RUN: c.t3
+PASS: c.t3
+RUN: c.t1
+PASS: c.t1
+RUN: c.t2
+PASS: c.t2
+RUN: a.t2
+PASS: a.t2
+RUN: a.t3
+PASS: a.t3
+RUN: a.t1
+PASS: a.t1
+RUN: b.t2
+PASS: b.t2
+RUN: b.t1
+PASS: b.t1
+RUN: b.t3
+PASS: b.t3
+RUN: dependent.first
+PASS: dependent.first
+RUN: dependent.second
+PASS: dependent.second
+SUMMARY: 11 passed, 0 failed, 0 skipped
+ITERATION: 2 of 2
+RANDOM SEED: 2
+RUN: b.t2
+PASS: b.t2
+RUN: b.t3
+PASS: b.t3
+RUN: b.t1
+PASS: b.t1
+RUN: c.t3
+PASS: c.t3
+RUN: c.t1
+PASS: c.t1
+RUN: c.t2
+PASS: c.t2
+RUN: dependent.second
+PASS: dependent.second
+RUN: dependent.first
+PASS: dependent.first
+RUN: a.t2
+PASS: a.t2
+RUN: a.t1
+PASS: a.t1
+RUN: a.t3
+PASS: a.t3
+SUMMARY: 11 passed, 0 failed, 0 skipped
+REPEAT: 0 of 2 iterations failed
+--- stderr

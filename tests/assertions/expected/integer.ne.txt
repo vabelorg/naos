@@ -1,0 +1,9 @@
+args: --naos-filter integer.ne
+exit code: 1
+--- stdout
+RUN: integer.ne
+integer.c:LINE: error: 3 != 3
+  left:  3
+  right: 3
+FAIL: integer.ne (1 failure)
+--- stderr

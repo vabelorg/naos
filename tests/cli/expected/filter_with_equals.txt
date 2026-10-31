@@ -1,0 +1,9 @@
+args: --naos-filter=parser.*-*.slow_*
+exit code: 0
+--- stdout
+RUN: parser.empty
+PASS: parser.empty
+RUN: parser.nested
+PASS: parser.nested
+SUMMARY: 2 passed, 0 failed, 0 skipped
+--- stderr

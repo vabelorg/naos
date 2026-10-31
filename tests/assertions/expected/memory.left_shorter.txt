@@ -1,0 +1,10 @@
+args: --naos-filter memory.left_shorter
+exit code: 1
+--- stdout
+RUN: memory.left_shorter
+memory.c:LINE: error: bytes == bytes
+  left size:  2
+  right size: 3
+  first difference: offset 2, end of left
+FAIL: memory.left_shorter (1 failure)
+--- stderr

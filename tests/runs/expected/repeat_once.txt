@@ -1,0 +1,6 @@
+args: --naos-repeat 1 --naos-filter a.t1
+exit code: 0
+--- stdout
+RUN: a.t1
+PASS: a.t1
+--- stderr

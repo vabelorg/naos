@@ -1,0 +1,7 @@
+args: --naos-filter require.as_expression
+exit code: 1
+--- stdout
+RUN: require.as_expression
+require.c:LINE: error: 1 == 2
+FAIL: require.as_expression (1 failure)
+--- stderr

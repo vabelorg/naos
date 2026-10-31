@@ -1,0 +1,11 @@
+args: --naos-filter note.with_double
+exit code: 1
+--- stdout
+RUN: note.with_double
+note.c:LINE: error: 1.0 ~= 2.0
+  left:  1
+  right: 2
+  tolerance: 0.5
+  note: double-note
+FAIL: note.with_double (1 failure)
+--- stderr

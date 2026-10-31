@@ -1,0 +1,6 @@
+args: --naos-filter pass.passes
+exit code: 0
+--- stdout
+RUN: pass.passes
+PASS: pass.passes
+--- stderr

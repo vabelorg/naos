@@ -1,0 +1,10 @@
+args: --naos-filter string.escapes
+exit code: 1
+--- stdout
+RUN: string.escapes
+string.c:LINE: error: "a\nb\tc\rd" == "a\"b\\c\x01\x7F"
+  left:  "a\nb\tc\rd"
+  right: "a\"b\\c\x01\x7F"
+  first difference: offset 1, left 0x0A, right 0x22
+FAIL: string.escapes (1 failure)
+--- stderr

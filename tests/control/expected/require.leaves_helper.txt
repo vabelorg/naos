@@ -1,0 +1,9 @@
+args: --naos-filter require.leaves_helper
+exit code: 1
+--- stdout
+RUN: require.leaves_helper
+require.c:LINE: error: 1 == value
+  left:  1
+  right: 2
+FAIL: require.leaves_helper (1 failure)
+--- stderr

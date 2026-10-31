@@ -1,0 +1,10 @@
+args: --naos-filter string.trailing_space
+exit code: 1
+--- stdout
+RUN: string.trailing_space
+string.c:LINE: error: "abc " == "abc"
+  left:  "abc "
+  right: "abc"
+  first difference: offset 3, end of right
+FAIL: string.trailing_space (1 failure)
+--- stderr

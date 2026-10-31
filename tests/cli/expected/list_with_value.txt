@@ -1,0 +1,6 @@
+args: --naos-list=1
+exit code: 2
+--- stdout
+--- stderr
+naos: --naos-list does not take a value: --naos-list=1
+usage: PROG [--naos-filter <patterns>] [--naos-list] [--naos-shuffle] [--naos-random-seed <n>] [--naos-repeat <n>] [--naos-fail-fast] [--help] [args...]

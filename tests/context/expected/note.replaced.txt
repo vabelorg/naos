@@ -1,0 +1,9 @@
+args: --naos-filter note.replaced
+exit code: 1
+--- stdout
+RUN: note.replaced
+note.c:LINE: error: 0
+  note: second-note
+note.c:LINE: error: 0
+FAIL: note.replaced (2 failures)
+--- stderr

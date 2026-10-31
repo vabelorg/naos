@@ -1,0 +1,7 @@
+args: --naos-filter require.stops
+exit code: 1
+--- stdout
+RUN: require.stops
+require.c:LINE: error: 1 == 2
+FAIL: require.stops (1 failure)
+--- stderr

@@ -1,0 +1,12 @@
+args: --naos-filter integer.macro_argument_as_written
+exit code: 1
+--- stdout
+RUN: integer.macro_argument_as_written
+integer.c:LINE: error: EXPECTED_COUNT == count
+  left:  16
+  right: 3
+integer.c:LINE: error: EXPECTED_COUNT < count
+  left:  16
+  right: 3
+FAIL: integer.macro_argument_as_written (2 failures)
+--- stderr

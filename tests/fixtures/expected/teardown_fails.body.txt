@@ -1,0 +1,9 @@
+args: --naos-filter teardown_fails.body
+exit code: 1
+--- stdout
+RUN: teardown_fails.body
+body-ran
+fixtures.c:LINE: error: 1 == 2
+teardown-ran
+FAIL: teardown_fails.body (1 failure)
+--- stderr

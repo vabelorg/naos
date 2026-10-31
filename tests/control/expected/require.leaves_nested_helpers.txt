@@ -1,0 +1,9 @@
+args: --naos-filter require.leaves_nested_helpers
+exit code: 1
+--- stdout
+RUN: require.leaves_nested_helpers
+require.c:LINE: error: 1 == value
+  left:  1
+  right: 2
+FAIL: require.leaves_nested_helpers (1 failure)
+--- stderr

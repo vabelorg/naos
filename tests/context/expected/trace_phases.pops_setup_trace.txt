@@ -1,0 +1,10 @@
+args: --naos-filter trace_phases.pops_setup_trace
+exit code: 1
+--- stdout
+RUN: trace_phases.pops_setup_trace
+trace.c:LINE: error: 0
+trace.c:LINE: note: setup-trace
+trace.c:LINE: error: 1 == 2
+teardown-ran
+FAIL: trace_phases.pops_setup_trace (2 failures)
+--- stderr

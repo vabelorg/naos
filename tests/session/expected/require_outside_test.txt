@@ -1,0 +1,6 @@
+args: require-outside
+exit code: 2
+--- stdout
+own_main.c:LINE: error: 1 == 2
+--- stderr
+naos: NAOS_REQUIRE_*, NAOS_FAIL or NAOS_SKIP outside a running test

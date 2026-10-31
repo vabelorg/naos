@@ -1,0 +1,7 @@
+args: --naos-filter boolean.false_fails
+exit code: 1
+--- stdout
+RUN: boolean.false_fails
+boolean.c:LINE: error: !(done)
+FAIL: boolean.false_fails (1 failure)
+--- stderr

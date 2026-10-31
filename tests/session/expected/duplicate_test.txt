@@ -1,0 +1,5 @@
+args: duplicate_test
+exit code: 2
+--- stdout
+--- stderr
+naos: duplicate test name: duplicate_test.same_name
