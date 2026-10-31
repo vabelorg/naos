@@ -77,10 +77,10 @@ naos_discover_tests(<target>
 `cmake --install` の後は、`find_package(naos)` で Naos が見つかり、`naos::naos` と上の関数が使えます。
 
 ```cmake
-find_package(naos 0.0 REQUIRED)
+find_package(naos 0.1 REQUIRED)
 ```
 
-1.0 より前は、バージョンを指定すると同じマイナーバージョンだけを受け付けます。`find_package(naos 0.0)` は 0.0.x だけです。1.0 以後は同じメジャーバージョンを受け付けます。
+1.0 より前は、バージョンを指定すると同じマイナーバージョンだけを受け付けます。`find_package(naos 0.1)` は 0.1.x だけです。1.0 以後は同じメジャーバージョンを受け付けます。
 
 インストールされるファイル（インストール先からの相対パス）です。
 

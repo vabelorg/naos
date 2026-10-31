@@ -12,7 +12,7 @@ if(NOT TARGET naos::naos)
     include(FetchContent)
     FetchContent_Declare(naos
         GIT_REPOSITORY https://github.com/vabelorg/naos.git
-        GIT_TAG v0.0.0
+        GIT_TAG v0.1.0
     )
     FetchContent_MakeAvailable(naos)
 endif()

@@ -71,7 +71,7 @@ With CMake, `FetchContent` is the simplest way:
 include(FetchContent)
 FetchContent_Declare(naos
     GIT_REPOSITORY https://github.com/vabelorg/naos.git
-    GIT_TAG v0.0.0
+    GIT_TAG v0.1.0
 )
 FetchContent_MakeAvailable(naos)
 ```
@@ -103,7 +103,7 @@ The whole map is in [docs/](docs/README.md).
 
 ## Status
 
-Naos is before 1.0: a new minor version may break compatibility, and `find_package(naos 0.0)` accepts 0.0.x only. What changes in each version is in the [changelog](CHANGELOG.md).
+Naos is before 1.0: a new minor version may break compatibility, and `find_package(naos 0.1)` accepts 0.1.x only. What changes in each version is in the [changelog](CHANGELOG.md).
 
 ## Contributing
 

@@ -77,10 +77,10 @@ The tests are listed after each build of the executable, by running it with `--n
 After `cmake --install`, `find_package(naos)` finds Naos and gives `naos::naos` and the functions above.
 
 ```cmake
-find_package(naos 0.0 REQUIRED)
+find_package(naos 0.1 REQUIRED)
 ```
 
-Before 1.0, a version asks for the same minor version: `find_package(naos 0.0)` accepts 0.0.x only. From 1.0 on, it asks for the same major version.
+Before 1.0, a version asks for the same minor version: `find_package(naos 0.1)` accepts 0.1.x only. From 1.0 on, it asks for the same major version.
 
 The installed files, under the install prefix:
 
