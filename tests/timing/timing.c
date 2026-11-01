@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: MIT
  *
  * Tests for the times of the result lines and SUMMARY: tests that keep the processor busy for a
- * known time, in the body, or in setup and teardown, so that the time shown must be at least that.
+ * known time, in the body, or in setup and teardown, so that the time shown must be at least half of
+ * it (see CMakeLists.txt).
  */
 
 #include <naos/naos.h>
@@ -12,7 +13,8 @@
 
 /*
  * Keeps the processor busy for milliseconds of the processor time of clock(). The wall-clock time of
- * a single thread is never less than its processor time, so the test takes at least that long.
+ * a single thread is about as long, but not always as long: a system that counts processor time by
+ * ticks, as virtual machines may, can count a little ahead.
  */
 static void stay_busy(long milliseconds)
 {
@@ -29,19 +31,19 @@ static void stay_busy(long milliseconds)
 
 NAOS_TEST(passes)
 {
-    stay_busy(50);
+    stay_busy(100);
 }
 
 NAOS_TEST(fails)
 {
-    stay_busy(50);
-    NAOS_FAIL("after 50 ms");
+    stay_busy(100);
+    NAOS_FAIL("after 100 ms");
 }
 
 NAOS_TEST(skips)
 {
-    stay_busy(50);
-    NAOS_SKIP("after 50 ms");
+    stay_busy(100);
+    NAOS_SKIP("after 100 ms");
 }
 
 NAOS_SUITE(timing,
@@ -52,12 +54,12 @@ NAOS_SUITE(timing,
 
 NAOS_SETUP(busy_setup)
 {
-    stay_busy(30);
+    stay_busy(60);
 }
 
 NAOS_TEARDOWN(busy_teardown)
 {
-    stay_busy(30);
+    stay_busy(60);
 }
 
 NAOS_TEST(between)

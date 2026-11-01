@@ -3,12 +3,15 @@
 #
 # The times of the result lines and SUMMARY. They change from run to run, so the golden cases of the
 # other subjects show them as N ms; here regexes check that they are measured: a test that keeps the
-# processor busy for a known time shows at least that time.
+# processor busy for a known time shows at least half of it. Not all of it: the test counts processor
+# time, which a system counting it by ticks, as a virtual machine may, can count ahead of the clock,
+# and the time shown is rounded down.
 
 set(exe naos_selftest_timing)
 naos_selftest_program(${exe} timing.c)
 
-# At least 50 ms, and at least 60 ms for a test whose setup and teardown take 30 ms each.
+# A test busy for 100 ms shows at least 50 ms, and one whose setup and teardown are busy for 60 ms each
+# at least 60 ms.
 set(at_least_50 "([5-9][0-9]|[1-9][0-9][0-9]+) ms")
 set(at_least_60 "([6-9][0-9]|[1-9][0-9][0-9]+) ms")
 set(at_least_150 "(1[5-9][0-9]|[2-9][0-9][0-9]|[1-9][0-9][0-9][0-9]+) ms")

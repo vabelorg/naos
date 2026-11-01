@@ -19,7 +19,7 @@ Naos の自己テストについて、何を確かめるか、出力をどう照
 | `runs/` | `--naos-shuffle`、`--naos-repeat`、`--naos-fail-fast` | 同上 |
 | `report/` | `--naos-output` の JUnit XML のファイル | 出力とファイルを照合する |
 | `quiet/` | `--naos-quiet` が標準出力から省くもの、および JUnit XML のファイルが変わらないこと | 出力とファイルを照合する |
-| `timing/` | 結果の行と `SUMMARY:` の時間を測っていること。setup と teardown を含む | 正規表現。決まった時間だけプロセッサを使い続けるテストが、少なくともその時間を示す |
+| `timing/` | 結果の行と `SUMMARY:` の時間を測っていること。setup と teardown を含む | 正規表現。決まった時間だけプロセッサを使い続けるテストが、少なくともその半分の時間を示す |
 | `discovery/` | テストの列挙に失敗したときの `NaosDiscover.cmake` のメッセージ | 同上 |
 | `no_cmake/` | CMake を使わないビルド（[インストール](../getting-started/installation.md#cmake-を使わない場合)のとおり） | ビルドして実行する |
 | `examples/` | `examples/` のプロジェクトと、文書がそこから引用する出力 | テストが通ること、出力の照合 |
