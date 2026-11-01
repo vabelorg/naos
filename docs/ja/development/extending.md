@@ -4,10 +4,23 @@
 
 ## 出力の行を足す・変える
 
-すべての行の形は `report.c` にだけ書きます。出力の形式は公開 API の一部なので、次も行います。
+標準出力のすべての行の形は `human.c` にだけ書きます。実行でどの行を書くかも、そこで決めます。これらの行は人向けで、読みやすくするために変えてかまいません。ただし[互換を保つもの](../reference/output.md#互換を保つもの)（診断の行の始まり、`--naos-list` の名前、終了コード）は除きます。
 
 1. [出力](../reference/output.md)を直す。
 2. 自己テストの期待する出力を `NAOS_UPDATE_EXPECTED=1` で書き直し、差分を確かめる（[テスト](testing.md#ケースを足す)）。
+3. 変更履歴の `Changed` に項目を足す。互換を保つものを変えるときは `**BREAKING**:` で始める。
+
+## JUnit XML のファイルを変える
+
+ファイルは `xml.c` が書きます。形式は互換を保つので、属性、プロパティ、要素、失敗の行は足してかまいませんが、[JUnit XML](../reference/xml.md) に書いたものは、バージョンが許さない限り変えたり消したりしません（[変更履歴](changelog.md)）。リファレンスと `tests/report/` の期待する出力を直します。
+
+## 出力の形式を足す
+
+形式は 1 つの書き手です。`naos_writer_t`（`writer.h`）の関数の表を、`xml.c` のように専用のファイルに書きます。
+
+1. 形式を `naos_format_t`（`report.h`）に、名前を `options.c` の `take_output()` と `--naos-output` のヘルプに足し、`naos_report_begin()`（`report.c`）でその書き手を有効にする。
+2. イベントは `writer.h` に書いた順に届く。診断は値、メモ、trace を含めて丸ごと届く。イベントが借りるものは、その呼び出しの間だけ有効。
+3. `tests/report/` に `OUTPUT_FILE` を使ったケースを足し（[テスト](testing.md#出力を照合するケース)）、リファレンスにページを足し、[コマンドライン](../reference/command-line.md)を直す。
 
 ## アサーションを足す
 
@@ -16,7 +29,7 @@
 3. 引数の文字列化は公開マクロの側で行う。補助マクロに渡してから `#` を使うと、引数のマクロが展開されてしまう。
 4. 失敗は `naos_diagnostic_begin()` → `naos_diagnostic_add*()` → `naos_diagnostic_end()` で書く。
 5. 失敗の出力のために `tests/assertions/` にファイルを、`tests/api/check.c` にテストを足す。
-6. [アサーション](../reference/assertions.md)と、[出力](../reference/output.md)の詳細の行の表を直す。
+6. [アサーション](../reference/assertions.md)と、[JUnit XML](../reference/xml.md#値)の値の表を直す。
 
 ## コマンドラインのオプションを足す
 

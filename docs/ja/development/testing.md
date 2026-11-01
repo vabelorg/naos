@@ -17,6 +17,7 @@ Naos の自己テストについて、何を確かめるか、出力をどう照
 | `fixtures/` | setup と teardown | 同上 |
 | `context/` | メモと trace | 同上 |
 | `runs/` | `--naos-shuffle`、`--naos-repeat`、`--naos-fail-fast` | 同上 |
+| `report/` | `--naos-output` の JUnit XML のファイル | 出力とファイルを照合する |
 | `discovery/` | テストの列挙に失敗したときの `NaosDiscover.cmake` のメッセージ | 同上 |
 | `no_cmake/` | CMake を使わないビルド（[インストール](../getting-started/installation.md#cmake-を使わない場合)のとおり） | ビルドして実行する |
 | `examples/` | `examples/` のプロジェクトと、文書がそこから引用する出力 | テストが通ること、出力の照合 |
@@ -53,6 +54,8 @@ FAIL: integer.eq (1 failure)
 期待する出力に出ていない行は、出てはいけない行です（正規表現の `REJECT` を並べる必要はありません）。テストが通ってはいけない場所の後に `reached-...` を出力しておくと、それが期待する出力にないことで確かめられます。
 
 出力が実行や環境で変わるもの（ポインタの値、時刻から選ぶ種、`long` の幅で変わる数、テストを足すと伸びる出力）だけは、**正規表現**で照合します（`naos_expect_match`）。
+
+`--naos-output` の XML のように実行ファイルが書くファイルを照合するケースは、`naos_expect` に `OUTPUT_FILE <name>` を渡します。引数の中の `{output}` が、ビルドディレクトリのそのファイルを表します。ファイルは実行の前に消し、実行の後に 3 つ目の部分 `--- output` として照合します（書かれなかったときは `[no file]`）。場所も同じように置き換えます（`file="<file>" line="LINE"`）。`xmllint` が見つかる環境では、ファイルが整形式の XML であることも確かめます。CI は Linux で `xmllint` をインストールします。
 
 ## ケースを足す
 

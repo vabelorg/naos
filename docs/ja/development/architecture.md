@@ -7,9 +7,9 @@ Naos 自体を保守・拡張する人向けに、ソースの置き方とモジ
 何を Naos に入れるかは、個々の機能より先に、次の原則で決めます。
 
 - **導入しやすさが最優先**: 標準 C ライブラリ以外に依存しない、コンパイラ拡張を使わない。このどちらかを損なう機能は入れません。
-- **出力は契約**: 出力の行は人が読み、ツールが解析するので、形を安定させて文書にします（[出力](../reference/output.md)）。
+- **人向けの出力とツール向けの出力を分ける**: 標準出力は人が読むためのもので、読みやすくするためにどのバージョンでも変わることがあります。ツールは `--naos-output` の JUnit XML のファイルを読み、その形式を契約とします（[JUnit XML](../reference/xml.md)）。標準出力のうち安定させるのは、ツールがそれなしでは動かないものだけです。エディタが読む診断の行の始まり、CTest への登録が読む `--naos-list` の名前、終了コードです（[出力](../reference/output.md#互換を保つもの)）。
 - **公開 API は文書にあるものだけ**: 公開して互換を保つのは、[リファレンス](../reference/README.md)に載せたものだけです。
-- **責務を絞る**: プロセスの分離、並列実行、時間制限、レポートの形式は呼び出し側（CTest、スクリプト、CI）に任せます。
+- **責務を絞る**: プロセスの分離、並列実行、時間制限は呼び出し側（CTest、スクリプト、CI）に任せます。レポートの形式は、Naos だけが知る結果（各失敗の場所と値）のために 1 つだけ書き、ほかの形式ははっきり必要になったときにだけ足します。
 
 ## ディレクトリ
 
@@ -44,8 +44,10 @@ Naos 自体を保守・拡張する人向けに、ソースの置き方とモジ
 | `test.c` | 1 つのテストの実行（setup・本体・teardown と `setjmp` / `longjmp`） |
 | `diagnostic.c` | 1 つの診断（始め → 詳細を溜める → 終わり）と、テストの結果の集計 |
 | `context.c` | 診断に添えるメモ（`NAOS_NOTE`）と trace のスタック。出力はしない |
-| `report.c` | 出力のすべての行の形（標準出力）と、Naos 自身のメッセージ（標準エラー出力） |
-| `value.c` | 詳細の行の値の表記（文字列のエスケープ、double の最短表記） |
+| `report.c` | 実行のイベント（テストの開始、診断、テストの終了など）を、有効なすべての書き手に伝える。`--naos-list` の名前と、Naos 自身のメッセージ（標準エラー出力）も書く。イベントと書き手の関数は `writer.h` で宣言する |
+| `human.c` | 人間向けの出力の書き手。標準出力のすべての行の形と、実行でどの行を書くか |
+| `xml.c` | `--naos-output xml:<path>` の JUnit XML のファイルの書き手。テストの実行中は結果を貯め、最後にファイル全体を書く |
+| `value.c` | 値の表記（文字列のエスケープ、double の最短表記） |
 
 依存は一方向に保ち、循環させません。矢印の先は使われる側です。`report` は何かを出力するモジュール（`session`・`suite`・`options`・`runner` など）のどれからも、登録されたスイート（`suite_internal.h`）はそれを読むモジュール（`runner`・`filter`・`test`）から使われるので、図ではそれらの矢印を省いています。すべての依存は `src/CMakeLists.txt` の依存のコメントにあります。
 
@@ -58,7 +60,7 @@ flowchart LR
   runner --> test --> diagnostic
   test --> context
   diagnostic --> context
-  diagnostic --> report --> value
+  diagnostic --> report --> human & xml --> value
   control --> test & diagnostic & context
   check --> diagnostic & value
 ```
@@ -67,7 +69,8 @@ flowchart LR
 
 - **登録**: `NAOS_TEST`・`NAOS_SETUP`・`NAOS_TEARDOWN` は、役割を名前に含む関数 `naos_gen_<役割>_<name>` を定義します。`NAOS_ADD_TEST`・`NAOS_SET_SETUP`・`NAOS_SET_TEARDOWN` は自分の役割の関数しか受け付けないので、取り違えるとコンパイルできません。`NAOS_SUITE` は、ビルダー（`naos_begin_suite`・`naos_add_test`・`naos_set_*`）にテストを登録する関数 `naos_gen_suite_<name>` を定義します。`NAOS_ADD_SUITE` はこの関数を `naos_add_suite` に渡し、`naos_run()` がそれらを呼んでスイートを集め、テストを実行する前にすべてを検査します。
 - **停止**: `test.c` は setup・本体・teardown を `setjmp` の下で実行します。停止（`naos_stop`）は、マクロをどの関数の中で使っていても、この `setjmp` の位置まで一気に戻ります。
-- **診断**: 失敗はすべて `naos_diagnostic_begin()` → `naos_diagnostic_add*()` → `naos_diagnostic_end()` を通ります。ここで `context.c` のメモと trace を添え、`report.c` を通して出力します。
+- **診断**: 失敗はすべて `naos_diagnostic_begin()` → `naos_diagnostic_add*()` → `naos_diagnostic_end()` を通ります。ここで `context.c` のメモと trace を添え、終わりに診断の全体を `report.c` を通して書き手に伝えます。
+- **書き手**: 実行が書くものはすべて `report.c` を通ります。`report.c` は各イベントを、有効なすべての書き手に同じ順で伝えます。何がいつ起きたかはテストを実行するモジュールが決め、それをどう見せ、どれを書くかは書き手だけが決めます。そのため、出力ごとにほかの出力と関係なく変えられます。
 - **書式付きの出力**: `src/` の書式付きの出力はすべて `format.h` を通ります。`format.h` は C ライブラリのうち C99 に従う関数を選びます（MinGW では `__mingw_` の関数）。`naos/export.h` の `NAOS_PRINTF_FORMAT` は Naos の printf 形式の関数を同じ書式で宣言するので、コンパイラのチェックと Naos の出力が一致します。
 - **状態**: 共有する可変状態は各モジュールの `static` 変数（`g_` 接頭辞）に閉じ、`extern` 変数にはしません。例外は `naos_init` 以後読むだけのオプションで、`naos_options_get()` で読みます。
 - **列挙**: `naos_add_executable()` は、ビルド後に `NaosDiscover.cmake` を実行する `POST_BUILD` のコマンドを足します。このスクリプトは `<exe> --naos-list` を実行し、出力の 1 行を 1 件のテストとして登録する CTest のファイルを書きます。パラメータはファイル経由で渡すので、リストをエスケープする必要はありません。列挙に失敗したときは、テストが 0 件のまま黙って進めず、ビルドを失敗させて原因と対処をメッセージに出します（[トラブルシューティング](../guides/troubleshooting.md#cmake-と-ctest)）。
