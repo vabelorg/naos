@@ -47,6 +47,7 @@ Naos 自体を保守・拡張する人向けに、ソースの置き方とモジ
 | `report.c` | 実行のイベント（テストの開始、診断、テストの終了など）を、有効なすべての書き手に伝える。`--naos-list` の名前と、Naos 自身のメッセージ（標準エラー出力）も書く。イベントと書き手の関数は `writer.h` で宣言する |
 | `human.c` | 人間向けの出力の書き手。標準出力のすべての行の形と、実行でどの行を書くか |
 | `xml.c` | `--naos-output xml:<path>` の JUnit XML のファイルの書き手。テストの実行中は結果を貯め、最後にファイル全体を書く |
+| `text.c` | 足すにつれて伸びるテキスト。書いたものを後まで貯める書き手が使う |
 | `value.c` | 値の表記（文字列のエスケープ、double の最短表記） |
 
 依存は一方向に保ち、循環させません。矢印の先は使われる側です。`report` は何かを出力するモジュール（`session`・`suite`・`options`・`runner` など）のどれからも、登録されたスイート（`suite_internal.h`）はそれを読むモジュール（`runner`・`filter`・`test`）から使われるので、図ではそれらの矢印を省いています。すべての依存は `src/CMakeLists.txt` の依存のコメントにあります。
@@ -61,6 +62,7 @@ flowchart LR
   test --> context
   diagnostic --> context
   diagnostic --> report --> xml --> human --> value
+  xml & human --> text
   report --> human
   control --> test & diagnostic & context
   check --> diagnostic & value

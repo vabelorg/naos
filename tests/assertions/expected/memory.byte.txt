@@ -7,4 +7,5 @@ memory.c:LINE: error: expected == actual
   right size: 3
   first difference: offset 1, left 0x02, right 0xFF
 FAIL: memory.byte (1 failure)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr

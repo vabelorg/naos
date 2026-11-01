@@ -22,6 +22,7 @@ typedef struct naos_options
     unsigned long random_seed; /* 0 until given, or when given as 0: chosen at run */
     long repeat;
     int fail_fast;
+    int quiet;
     naos_format_t output_format; /* NAOS_FORMAT_NONE without --naos-output */
     const char *output_path;     /* NULL without --naos-output */
     int help_requested;

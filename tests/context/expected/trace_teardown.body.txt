@@ -5,4 +5,5 @@ RUN: trace_teardown.body
 body-ran
 trace.c:LINE: error: NAOS_TRACE_PUSH without NAOS_TRACE_POP: teardown-trace
 FAIL: trace_teardown.body (1 failure)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr

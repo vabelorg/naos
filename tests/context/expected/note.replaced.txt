@@ -6,4 +6,5 @@ note.c:LINE: error: 0
   note: second-note
 note.c:LINE: error: 0
 FAIL: note.replaced (2 failures)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr

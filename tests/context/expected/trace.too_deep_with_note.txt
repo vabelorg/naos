@@ -26,4 +26,5 @@ trace.c:LINE: note: level 2
 trace.c:LINE: note: level 1
 trace.c:LINE: note: level 0
 FAIL: trace.too_deep_with_note (2 failures)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr

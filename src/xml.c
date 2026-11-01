@@ -15,31 +15,15 @@
 #include "xml.h"
 
 #include <ctype.h>
-#include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <naos/export.h>
-
 #include "format.h"
 #include "human.h"
+#include "text.h"
 #include "value.h"
-
-/* Size of the first allocation of a text; each next one doubles it. */
-#define NAOS_TEXT_FIRST_SIZE 256
-
-/* Size of what add_format() formats: a number of any %d, %ld, %lu or %zu, with a few chars around it. */
-#define NAOS_NUMBER_SIZE 48
-
-/* A text that grows as it is added to; malloc. */
-typedef struct naos_text
-{
-    char *data;
-    size_t length;
-    size_t capacity;
-} naos_text_t;
 
 /* The test cases of one suite in one round: g_cases from start to end. */
 typedef struct naos_xml_suite
@@ -53,15 +37,17 @@ typedef struct naos_xml_suite
 
 static FILE *g_file = NULL;
 static const char *g_program = NULL;
+
+/* Memory ran out for the suites or the name of the program; each text keeps its own failed. */
 static int g_out_of_memory = 0;
 
 /* The <testcase> elements of the tests that have ended. */
-static naos_text_t g_cases = { NULL, 0, 0 };
+static naos_text_t g_cases = NAOS_TEXT_EMPTY;
 
 /* What the running test has so far: its location, its <failure> elements and the message of its skip. */
-static naos_text_t g_location = { NULL, 0, 0 };
-static naos_text_t g_failures = { NULL, 0, 0 };
-static naos_text_t g_skip = { NULL, 0, 0 };
+static naos_text_t g_location = NAOS_TEXT_EMPTY;
+static naos_text_t g_failures = NAOS_TEXT_EMPTY;
+static naos_text_t g_skip = NAOS_TEXT_EMPTY;
 static int g_has_location = 0;
 static int g_has_skip = 0;
 
@@ -71,93 +57,6 @@ static size_t g_suite_count = 0;
 static size_t g_suite_capacity = 0;
 static int g_suite_open = 0;
 static naos_round_t g_round;
-
-static void add_format(naos_text_t *text, const char *format, ...) NAOS_PRINTF_FORMAT(2, 3);
-
-/* Makes room for more chars in text. Returns 0, and from then on adds nothing, when memory runs out. */
-static int reserve(naos_text_t *text, size_t more)
-{
-    size_t capacity;
-    char *data;
-
-    if (g_out_of_memory != 0)
-    {
-        return 0;
-    }
-
-    if (more <= (text->capacity - text->length))
-    {
-        return 1;
-    }
-
-    capacity = (text->capacity == 0) ? NAOS_TEXT_FIRST_SIZE : text->capacity;
-    while ((capacity - text->length) < more)
-    {
-        if (capacity > (SIZE_MAX / 2))
-        {
-            g_out_of_memory = 1;
-
-            return 0;
-        }
-
-        capacity *= 2;
-    }
-
-    data = (char *)realloc(text->data, capacity);
-    if (data == NULL)
-    {
-        g_out_of_memory = 1;
-
-        return 0;
-    }
-
-    text->data = data;
-    text->capacity = capacity;
-
-    return 1;
-}
-
-/* bytes may be NULL when length is 0, as the data of a text nothing was added to: memcpy may not be called then. */
-static void add_bytes(naos_text_t *text, const char *bytes, size_t length)
-{
-    if (length == 0)
-    {
-        return;
-    }
-
-    if (reserve(text, length) != 0)
-    {
-        memcpy(text->data + text->length, bytes, length);
-        text->length += length;
-    }
-}
-
-/* Adds markup, or any text that holds nothing to escape. */
-static void add(naos_text_t *text, const char *markup)
-{
-    add_bytes(text, markup, strlen(markup));
-}
-
-/* Adds numbers formatted as printf does; the result is shorter than NAOS_NUMBER_SIZE. */
-static void add_format(naos_text_t *text, const char *format, ...)
-{
-    char buffer[NAOS_NUMBER_SIZE];
-    va_list args;
-
-    va_start(args, format);
-    naos_vsnprintf(buffer, sizeof(buffer), format, args);
-    va_end(args);
-
-    add(text, buffer);
-}
-
-static void release(naos_text_t *text)
-{
-    free(text->data);
-    text->data = NULL;
-    text->length = 0;
-    text->capacity = 0;
-}
 
 /*
  * Length of the UTF-8 sequence that bytes starts with, from 1 to 4, or 0 when it is not one that
@@ -266,18 +165,18 @@ static void add_escaped(naos_text_t *text, const char *value, int in_attribute)
         length = utf8_sequence(byte);
         if (reference != NULL)
         {
-            add(text, reference);
+            naos_text_add(text, reference);
             length = 1;
         }
         else if ((length == 0) || ((*byte < 0x20) && (*byte != '\n') && (*byte != '\t')))
         {
             naos_snprintf(escape, sizeof(escape), "\\x%02X", (unsigned int)*byte);
-            add(text, escape);
+            naos_text_add(text, escape);
             length = 1;
         }
         else
         {
-            add_bytes(text, (const char *)byte, length);
+            naos_text_add_bytes(text, (const char *)byte, length);
         }
 
         byte += length;
@@ -302,7 +201,7 @@ static void add_program_name(naos_text_t *text, const char *program)
 
     if (program == NULL)
     {
-        add(text, "naos");
+        naos_text_add(text, "naos");
         return;
     }
 
@@ -381,52 +280,52 @@ static void open_suite(const char *name)
 /* Adds the counts of tally as the attributes of <testsuites> or <testsuite>. */
 static void add_counts(naos_text_t *text, const naos_tally_t *tally)
 {
-    add_format(text, " tests=\"%zu\"", tally->passed + tally->failed + tally->skipped);
-    add_format(text, " failures=\"%zu\"", tally->failed);
-    add(text, " errors=\"0\"");
-    add_format(text, " skipped=\"%zu\"", tally->skipped);
+    naos_text_add_format(text, " tests=\"%zu\"", tally->passed + tally->failed + tally->skipped);
+    naos_text_add_format(text, " failures=\"%zu\"", tally->failed);
+    naos_text_add(text, " errors=\"0\"");
+    naos_text_add_format(text, " skipped=\"%zu\"", tally->skipped);
 }
 
 /* Adds one suite of one round: its counts, the round it ran in when there are several or shuffled, and its test cases. */
 static void add_suite(naos_text_t *text, const naos_xml_suite_t *suite)
 {
-    add(text, "  <testsuite name=\"");
+    naos_text_add(text, "  <testsuite name=\"");
     add_escaped(text, suite->name, 1);
-    add(text, "\"");
+    naos_text_add(text, "\"");
     add_counts(text, &suite->tally);
-    add(text, ">\n");
+    naos_text_add(text, ">\n");
 
     if ((suite->round.repeat > 1) || (suite->round.shuffled != 0))
     {
-        add(text, "    <properties>\n");
+        naos_text_add(text, "    <properties>\n");
         if (suite->round.repeat > 1)
         {
-            add(text, "      <property name=\"iteration\"");
-            add_format(text, " value=\"%ld\"/>\n", suite->round.index);
+            naos_text_add(text, "      <property name=\"iteration\"");
+            naos_text_add_format(text, " value=\"%ld\"/>\n", suite->round.index);
         }
 
         if (suite->round.shuffled != 0)
         {
-            add(text, "      <property name=\"random_seed\"");
-            add_format(text, " value=\"%lu\"/>\n", suite->round.seed);
+            naos_text_add(text, "      <property name=\"random_seed\"");
+            naos_text_add_format(text, " value=\"%lu\"/>\n", suite->round.seed);
         }
-        add(text, "    </properties>\n");
+        naos_text_add(text, "    </properties>\n");
     }
 
     /* NULL + 0 is undefined too, so the test cases are added only when there are some. */
     if (suite->end > suite->start)
     {
-        add_bytes(text, g_cases.data + suite->start, suite->end - suite->start);
+        naos_text_add_bytes(text, g_cases.data + suite->start, suite->end - suite->start);
     }
-    add(text, "  </testsuite>\n");
+    naos_text_add(text, "  </testsuite>\n");
 }
 
 static void release_all(void)
 {
-    release(&g_cases);
-    release(&g_location);
-    release(&g_failures);
-    release(&g_skip);
+    naos_text_release(&g_cases);
+    naos_text_release(&g_location);
+    naos_text_release(&g_failures);
+    naos_text_release(&g_skip);
     free(g_suites);
     g_suites = NULL;
     g_suite_count = 0;
@@ -477,9 +376,9 @@ static void diagnostic(const naos_diagnostic_record_t *record)
     if (g_has_location == 0)
     {
         g_has_location = 1;
-        add(&g_location, " file=\"");
+        naos_text_add(&g_location, " file=\"");
         add_escaped(&g_location, record->file, 1);
-        add_format(&g_location, "\" line=\"%d\"", record->line);
+        naos_text_add_format(&g_location, "\" line=\"%d\"", record->line);
     }
 
     if (record->kind == NAOS_REPORT_SKIP)
@@ -493,11 +392,11 @@ static void diagnostic(const naos_diagnostic_record_t *record)
         return;
     }
 
-    add(&g_failures, "      <failure type=\"error\" message=\"");
+    naos_text_add(&g_failures, "      <failure type=\"error\" message=\"");
     add_escaped(&g_failures, record->text, 1);
-    add(&g_failures, "\">");
+    naos_text_add(&g_failures, "\">");
     naos_human_put_diagnostic(record, put_failure_text, &g_failures);
-    add(&g_failures, "</failure>\n");
+    naos_text_add(&g_failures, "</failure>\n");
 }
 
 static void test_end(const char *suite_name, const char *test, naos_outcome_t outcome, int failure_count)
@@ -512,29 +411,29 @@ static void test_end(const char *suite_name, const char *test, naos_outcome_t ou
     }
 
     suite = &g_suites[g_suite_count - 1];
-    add(&g_cases, "    <testcase classname=\"");
+    naos_text_add(&g_cases, "    <testcase classname=\"");
     add_escaped(&g_cases, suite_name, 1);
-    add(&g_cases, "\" name=\"");
+    naos_text_add(&g_cases, "\" name=\"");
     add_escaped(&g_cases, test, 1);
-    add(&g_cases, "\"");
-    add_bytes(&g_cases, g_location.data, g_location.length);
+    naos_text_add(&g_cases, "\"");
+    naos_text_add_bytes(&g_cases, g_location.data, g_location.length);
 
     switch (outcome)
     {
     case NAOS_OUTCOME_FAIL:
-        add(&g_cases, ">\n");
-        add_bytes(&g_cases, g_failures.data, g_failures.length);
-        add(&g_cases, "    </testcase>\n");
+        naos_text_add(&g_cases, ">\n");
+        naos_text_add_bytes(&g_cases, g_failures.data, g_failures.length);
+        naos_text_add(&g_cases, "    </testcase>\n");
         suite->tally.failed++;
         break;
     case NAOS_OUTCOME_SKIP:
-        add(&g_cases, ">\n      <skipped message=\"");
-        add_bytes(&g_cases, g_skip.data, g_skip.length);
-        add(&g_cases, "\"/>\n    </testcase>\n");
+        naos_text_add(&g_cases, ">\n      <skipped message=\"");
+        naos_text_add_bytes(&g_cases, g_skip.data, g_skip.length);
+        naos_text_add(&g_cases, "\"/>\n    </testcase>\n");
         suite->tally.skipped++;
         break;
     case NAOS_OUTCOME_PASS:
-        add(&g_cases, "/>\n");
+        naos_text_add(&g_cases, "/>\n");
         suite->tally.passed++;
         break;
     }
@@ -542,10 +441,9 @@ static void test_end(const char *suite_name, const char *test, naos_outcome_t ou
     suite->end = g_cases.length;
 }
 
-static void round_end(const naos_round_t *round, size_t selected, const naos_tally_t *tally, size_t not_run)
+static void round_end(const naos_round_t *round, const naos_tally_t *tally, size_t not_run)
 {
     (void)round;
-    (void)selected;
     (void)tally;
     (void)not_run;
 
@@ -555,7 +453,7 @@ static void round_end(const naos_round_t *round, size_t selected, const naos_tal
 /* Puts the whole file together and writes it at once, then closes it. */
 static int end(long failed_rounds, long repeat, long rounds_not_run)
 {
-    naos_text_t document = { NULL, 0, 0 };
+    naos_text_t document = NAOS_TEXT_EMPTY;
     naos_tally_t total = { 0, 0, 0 };
     size_t i;
     int written;
@@ -571,19 +469,19 @@ static int end(long failed_rounds, long repeat, long rounds_not_run)
         total.skipped += g_suites[i].tally.skipped;
     }
 
-    add(&document, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<testsuites name=\"");
+    naos_text_add(&document, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<testsuites name=\"");
     add_program_name(&document, g_program);
-    add(&document, "\"");
+    naos_text_add(&document, "\"");
     add_counts(&document, &total);
-    add(&document, ">\n");
+    naos_text_add(&document, ">\n");
     for (i = 0; i < g_suite_count; i++)
     {
         add_suite(&document, &g_suites[i]);
     }
-    add(&document, "</testsuites>\n");
+    naos_text_add(&document, "</testsuites>\n");
 
     written = 0;
-    if (g_out_of_memory == 0)
+    if ((g_out_of_memory == 0) && (g_cases.failed == 0) && (g_location.failed == 0) && (g_failures.failed == 0) && (g_skip.failed == 0) && (document.failed == 0))
     {
         written = (fwrite(document.data, 1, document.length, g_file) == document.length) && (fflush(g_file) == 0);
     }
@@ -594,7 +492,7 @@ static int end(long failed_rounds, long repeat, long rounds_not_run)
     }
 
     g_file = NULL;
-    release(&document);
+    naos_text_release(&document);
     release_all();
 
     return written;

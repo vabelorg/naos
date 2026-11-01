@@ -162,7 +162,7 @@ static int end_round(const naos_options_t *options, const naos_round_t *round, s
         not_run = add_saturated(selected - (tally->passed + tally->failed + tally->skipped), multiply_saturated(selected, (size_t)(options->repeat - round->index)));
     }
 
-    naos_report_round_end(round, selected, tally, not_run);
+    naos_report_round_end(round, tally, not_run);
 
     return stopped;
 }
@@ -189,7 +189,7 @@ static int run_rounds(const naos_options_t *options, const naos_suite_t *suites,
         return NAOS_EXIT_FAIL;
     }
 
-    if (naos_report_begin(options->program, options->output_format, options->output_path) == 0)
+    if (naos_report_begin(options->program, options->output_format, options->output_path, options->quiet) == 0)
     {
         free_orders(&orders);
 

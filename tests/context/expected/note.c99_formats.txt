@@ -5,4 +5,5 @@ RUN: note.c99_formats
 note.c:LINE: error: 0
   note: size=42 intmax=-9000000000 uintmax=18446744073709551615
 FAIL: note.c99_formats (1 failure)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr

@@ -4,7 +4,8 @@ Naos でビルドした実行ファイル（以下の `prog`）は、どれも�
 
 ```
 prog [--naos-filter <patterns>] [--naos-shuffle] [--naos-random-seed <n>]
-     [--naos-repeat <n>] [--naos-fail-fast] [--naos-output <format>:<path>] [args...]
+     [--naos-repeat <n>] [--naos-fail-fast] [--naos-quiet]
+     [--naos-output <format>:<path>] [args...]
 prog --naos-list
 prog --help
 ```
@@ -19,6 +20,7 @@ prog --help
 - `--naos-random-seed <n>`: `--naos-shuffle` に使う種で、1〜99999 です。0 か指定なしなら時刻から決めます。範囲外の値や数字以外は使い方エラーです。これだけでは順序は変わりません。
 - `--naos-repeat <n>`: 選ばれたテストを n 回（1 以上）繰り返し実行します。不安定なテストを見つけるのに使います。終了コードは、すべての回を合わせた結果です。`--naos-shuffle` と組み合わせると、回ごとに種を 1 ずつ増やして（99999 の次は 1）順序を変えます。
 - `--naos-fail-fast`: 最初に失敗したテストを teardown まで終えたところで止め、残りのテスト（`--naos-repeat` なら残りの回も）を実行しません。スキップでは止まりません。
+- `--naos-quiet`: 成功したテストとスキップしたテスト、および `ITERATION:` を標準出力から省きます。失敗したテストはこれがないときと同じ形で出力し、実行の最後には集計も出します（[`--naos-quiet` のとき](output.md#--naos-quiet-のとき)）。終了コードと `--naos-output` のファイルは変わりません。
 - `--naos-output <format>:<path>`: 実行の結果を、実行の終わりにファイル `<path>` にも `<format>` で書きます。形式は `xml`（JUnit XML）だけです（[JUnit XML](xml.md)）。値は最初の `:` で分けるので、パスに `:` を含められます（`xml:C:\out\results.xml`）。形式やパスがないとき、未知の形式、2 回の指定は使い方エラーです。
 - `--help`: 使い方を出力し、テストを実行せずに 0 で終了します。
 

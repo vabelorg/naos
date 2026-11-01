@@ -1,0 +1,45 @@
+args: --naos-quiet --naos-repeat 2 --naos-shuffle --naos-random-seed 3 --naos-filter results.*
+exit code: 1
+--- stdout
+RANDOM SEED: 3
+RUN: results.fails_then_skips
+quiet.c:LINE: error: 1 == 2
+  left:  1
+  right: 2
+quiet.c:LINE: skip: later
+FAIL: results.fails_then_skips (1 failure)
+RUN: results.fails_with_trace
+quiet.c:LINE: error: 0
+quiet.c:LINE: note: case 3
+FAIL: results.fails_with_trace (1 failure)
+RUN: results.fails
+quiet.c:LINE: error: "hello\n" == "hello"
+  left:  "hello\n"
+  right: "hello"
+  first difference: offset 5, end of right
+FAIL: results.fails (1 failure)
+printed by the test
+SUMMARY: 2 passed, 3 failed, 1 skipped
+ITERATION FAILED: 1 of 2 (random seed 3)
+RANDOM SEED: 4
+RUN: results.fails_then_skips
+quiet.c:LINE: error: 1 == 2
+  left:  1
+  right: 2
+quiet.c:LINE: skip: later
+FAIL: results.fails_then_skips (1 failure)
+RUN: results.fails_with_trace
+quiet.c:LINE: error: 0
+quiet.c:LINE: note: case 3
+FAIL: results.fails_with_trace (1 failure)
+printed by the test
+RUN: results.fails
+quiet.c:LINE: error: "hello\n" == "hello"
+  left:  "hello\n"
+  right: "hello"
+  first difference: offset 5, end of right
+FAIL: results.fails (1 failure)
+SUMMARY: 2 passed, 3 failed, 1 skipped
+ITERATION FAILED: 2 of 2 (random seed 4)
+REPEAT: 2 of 2 iterations failed
+--- stderr

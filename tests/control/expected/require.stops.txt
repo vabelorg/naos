@@ -4,4 +4,5 @@ exit code: 1
 RUN: require.stops
 require.c:LINE: error: 1 == 2
 FAIL: require.stops (1 failure)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr

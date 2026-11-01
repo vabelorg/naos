@@ -16,7 +16,7 @@ While the tests run, Naos writes only three kinds of lines to standard output. T
 | `PASS: <suite>.<test>` | The test ended with no failure and no skip |
 | `FAIL: <suite>.<test> (<N> failure)` | The test recorded failures; `failures` when N is 2 or more |
 | `SKIP: <suite>.<test>` | The test was skipped and recorded no failure |
-| `SUMMARY: <p> passed, <f> failed, <s> skipped` | At the end of each iteration, when 2 or more tests are selected. After a stop by `--naos-fail-fast`, only the tests run are counted |
+| `SUMMARY: <p> passed, <f> failed, <s> skipped` | At the end of each iteration, even when it ran a single test or none. After a stop by `--naos-fail-fast`, only the tests run are counted |
 | `RANDOM SEED: <seed>` | At the start of each iteration, with `--naos-shuffle` |
 | `ITERATION: <i> of <n>` | Before each iteration, when `--naos-repeat` is 2 or more |
 | `ITERATION FAILED: <i> of <n>` | After an iteration that failed, when `--naos-repeat` is 2 or more; followed by ` (random seed <seed>)` with `--naos-shuffle` |
@@ -24,6 +24,34 @@ While the tests run, Naos writes only three kinds of lines to standard output. T
 | `FAIL FAST: stopped at the first failure; <n> not run` | When `--naos-fail-fast` stopped the run with tests not run |
 
 Within an iteration, the order is `ITERATION:`, `RANDOM SEED:`, each test (from `RUN:` to its result line), `FAIL FAST:`, `SUMMARY:` and `ITERATION FAILED:`; `REPEAT:` comes last. Every diagnostic of the setup, body and teardown of a test comes between its `RUN:` and its result line.
+
+## With `--naos-quiet`
+
+`--naos-quiet` leaves out the tests that need no attention. The lines that are written are the same as without it, in the same order.
+
+| Line | Written with `--naos-quiet` |
+|---|---|
+| `RUN:` | Only for a test that fails, just before its first failure |
+| `PASS:` | No |
+| A test that is skipped: its `RUN:`, `skip` lines and `SKIP:` | No; `SUMMARY:` counts it |
+| `FAIL:`, and every diagnostic of a test that fails | Yes |
+| `SUMMARY:`, `RANDOM SEED:`, `FAIL FAST:`, `ITERATION FAILED:`, `REPEAT:` | Yes |
+| `ITERATION:` | No |
+
+- A test that skips, then fails in teardown, is a `FAIL`: its `skip` line is kept until the test ends, and written before the failure. So a failing test reads the same as without `--naos-quiet`.
+- What a test prints itself is written as it is, but with no `RUN:` line before it to tell which test printed it.
+- `RUN:` is no longer written as each test starts, so a test that ends the process before any failure leaves no line naming it. The file of `--naos-output` is written only when the run ends, so it does not name it either. Under CTest, each test runs in its own process and CTest names the one that ended; otherwise, run the same command again without `--naos-quiet`.
+
+```
+$ prog --naos-quiet
+RUN: text.greeting
+greet_test.c:12: error: greeting == "hello"
+  left:  "hello\n"
+  right: "hello"
+  first difference: offset 5, end of right
+FAIL: text.greeting (1 failure)
+SUMMARY: 497 passed, 1 failed, 2 skipped
+```
 
 ## Diagnostic lines
 

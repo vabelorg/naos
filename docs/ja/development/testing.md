@@ -18,6 +18,7 @@ Naos の自己テストについて、何を確かめるか、出力をどう照
 | `context/` | メモと trace | 同上 |
 | `runs/` | `--naos-shuffle`、`--naos-repeat`、`--naos-fail-fast` | 同上 |
 | `report/` | `--naos-output` の JUnit XML のファイル | 出力とファイルを照合する |
+| `quiet/` | `--naos-quiet` が標準出力から省くもの、および JUnit XML のファイルが変わらないこと | 出力とファイルを照合する |
 | `discovery/` | テストの列挙に失敗したときの `NaosDiscover.cmake` のメッセージ | 同上 |
 | `no_cmake/` | CMake を使わないビルド（[インストール](../getting-started/installation.md#cmake-を使わない場合)のとおり） | ビルドして実行する |
 | `examples/` | `examples/` のプロジェクトと、文書がそこから引用する出力 | テストが通ること、出力の照合 |
@@ -42,6 +43,7 @@ integer.c:LINE: error: -1 == 2
   left:  -1
   right: 2
 FAIL: integer.eq (1 failure)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr
 ```
 

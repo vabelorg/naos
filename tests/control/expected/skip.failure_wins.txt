@@ -5,4 +5,5 @@ RUN: skip.failure_wins
 skip.c:LINE: error: 0
 skip.c:LINE: skip: too late
 FAIL: skip.failure_wins (1 failure)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr

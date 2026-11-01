@@ -15,4 +15,5 @@ comparison.c:LINE: error: str_lt
   left:  "a"
   right: "b"
 FAIL: comparison.unknown (4 failures)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr

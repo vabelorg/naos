@@ -15,10 +15,24 @@
 #include <naos/export.h>
 
 #include "format.h"
+#include "text.h"
 #include "value.h"
 
 /* Size of what put_format() formats: a number with a few chars around it. */
 #define NAOS_HUMAN_NUMBER_SIZE 48
+
+/* --naos-quiet: the tests that pass or skip, and ITERATION:, are left out. */
+static int g_quiet = 0;
+
+/*
+ * The running test, between test_begin and test_end. With --naos-quiet, its RUN line waits for its
+ * first failure, and so do its skips before it, since a failure in teardown may still follow them.
+ */
+static const char *g_suite = NULL;
+static const char *g_test = NULL;
+static int g_in_test = 0;
+static int g_run_written = 0;
+static naos_text_t g_held = NAOS_TEXT_EMPTY;
 
 static void put_format(naos_human_sink_t sink, void *context, const char *format, ...) NAOS_PRINTF_FORMAT(3, 4);
 
@@ -110,6 +124,33 @@ static void put_stdout(void *context, const char *text)
     fputs(text, stdout);
 }
 
+/* The sink that adds the lines to a text, to write them later. */
+static void put_text(void *context, const char *text)
+{
+    naos_text_add((naos_text_t *)context, text);
+}
+
+/* Writes the RUN line of the running test, if not yet written, then the skips held for it. */
+static void write_run(void)
+{
+    if (g_run_written != 0)
+    {
+        return;
+    }
+
+    g_run_written = 1;
+    naos_printf("RUN: %s.%s\n", g_suite, g_test);
+
+    /* data is NULL until something is held, and fwrite may not be given NULL. */
+    if (g_held.length > 0)
+    {
+        fwrite(g_held.data, 1, g_held.length, stdout);
+        g_held.length = 0;
+    }
+
+    fflush(stdout);
+}
+
 /*
  * Whether label is "left" or "left <rest>" and details[0, count) also holds its partner "right" or
  * "right <rest>". Such a label gets one more space so that its value lines up with the partner's.
@@ -151,7 +192,7 @@ static int begin(const char *program, const char *path)
 
 static void round_begin(const naos_round_t *round)
 {
-    if (round->repeat > 1)
+    if ((round->repeat > 1) && (g_quiet == 0))
     {
         naos_printf("ITERATION: %ld of %ld\n", round->index, round->repeat);
     }
@@ -163,11 +204,22 @@ static void round_begin(const naos_round_t *round)
     }
 }
 
-/* Flushed at once, so that the name of the test stays when the process dies in it. */
+/*
+ * The RUN line is flushed at once, so that the name of the test stays when the process dies in it.
+ * With --naos-quiet, it waits for the first failure of the test, if any.
+ */
 static void test_begin(const char *suite, const char *test)
 {
-    naos_printf("RUN: %s.%s\n", suite, test);
-    fflush(stdout);
+    g_suite = suite;
+    g_test = test;
+    g_in_test = 1;
+    g_run_written = 0;
+    g_held.length = 0;
+
+    if (g_quiet == 0)
+    {
+        write_run();
+    }
 }
 
 /*
@@ -211,14 +263,52 @@ void naos_human_put_diagnostic(const naos_diagnostic_record_t *record, naos_huma
     }
 }
 
+/*
+ * With --naos-quiet, a skip before any failure of its test is held, to be written only when a
+ * failure follows. When memory runs out to hold it, it is written at once rather than lost.
+ */
 static void diagnostic(const naos_diagnostic_record_t *record)
 {
+    size_t held;
+
+    if ((g_in_test != 0) && (g_run_written == 0) && (record->kind == NAOS_REPORT_SKIP))
+    {
+        held = g_held.length;
+        naos_human_put_diagnostic(record, put_text, &g_held);
+        if (g_held.failed == 0)
+        {
+            return;
+        }
+
+        g_held.length = held;
+        g_held.failed = 0;
+    }
+
+    /* A diagnostic out of a test, such as a misuse before naos_run(), has no RUN line. */
+    if (g_in_test != 0)
+    {
+        write_run();
+    }
+
     naos_human_put_diagnostic(record, put_stdout, NULL);
     fflush(stdout);
 }
 
+/* With --naos-quiet, a test that passes or skips leaves no line, and its skips held are dropped. */
 static void test_end(const char *suite, const char *test, naos_outcome_t outcome, int failure_count)
 {
+    if ((g_quiet != 0) && (outcome != NAOS_OUTCOME_FAIL))
+    {
+        g_in_test = 0;
+        g_held.length = 0;
+
+        return;
+    }
+
+    /* A failure comes with its diagnostic, which wrote the RUN line; this keeps it before FAIL anyway. */
+    write_run();
+    g_in_test = 0;
+
     switch (outcome)
     {
     case NAOS_OUTCOME_FAIL:
@@ -235,18 +325,15 @@ static void test_end(const char *suite, const char *test, naos_outcome_t outcome
     fflush(stdout);
 }
 
-/* The FAIL FAST, SUMMARY and ITERATION FAILED lines; a summary of a single test would say nothing more. */
-static void round_end(const naos_round_t *round, size_t selected, const naos_tally_t *tally, size_t not_run)
+/* The FAIL FAST, SUMMARY and ITERATION FAILED lines; every round ends with its summary, so that a run always says what happened. */
+static void round_end(const naos_round_t *round, const naos_tally_t *tally, size_t not_run)
 {
     if (not_run > 0)
     {
         naos_printf("FAIL FAST: stopped at the first failure; %zu not run\n", not_run);
     }
 
-    if (selected > 1)
-    {
-        naos_printf("SUMMARY: %zu passed, %zu failed, %zu skipped\n", tally->passed, tally->failed, tally->skipped);
-    }
+    naos_printf("SUMMARY: %zu passed, %zu failed, %zu skipped\n", tally->passed, tally->failed, tally->skipped);
 
     if ((round->repeat > 1) && (tally->failed > 0))
     {
@@ -263,6 +350,8 @@ static void round_end(const naos_round_t *round, size_t selected, const naos_tal
 
 static int end(long failed_rounds, long repeat, long rounds_not_run)
 {
+    naos_text_release(&g_held);
+
     if (repeat > 1)
     {
         naos_printf("REPEAT: %ld of %ld iterations failed", failed_rounds, repeat);
@@ -275,6 +364,11 @@ static int end(long failed_rounds, long repeat, long rounds_not_run)
     }
 
     return 1;
+}
+
+void naos_human_set_quiet(int quiet)
+{
+    g_quiet = quiet;
 }
 
 const naos_writer_t *naos_human_writer(void)

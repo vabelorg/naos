@@ -1,0 +1,12 @@
+args: --naos-quiet --naos-fail-fast --naos-filter results.*
+exit code: 1
+--- stdout
+RUN: results.fails
+quiet.c:LINE: error: "hello\n" == "hello"
+  left:  "hello\n"
+  right: "hello"
+  first difference: offset 5, end of right
+FAIL: results.fails (1 failure)
+FAIL FAST: stopped at the first failure; 4 not run
+SUMMARY: 1 passed, 1 failed, 0 skipped
+--- stderr

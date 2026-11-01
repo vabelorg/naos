@@ -39,11 +39,12 @@ static size_t writer_count(void)
 }
 
 /* The human-readable writer, first in g_writers, writes to stdout and never fails; only the one of --naos-output can. */
-int naos_report_begin(const char *program, naos_format_t format, const char *path)
+int naos_report_begin(const char *program, naos_format_t format, const char *path, int quiet)
 {
     size_t i;
 
     writer_count();
+    naos_human_set_quiet(quiet);
     if (format == NAOS_FORMAT_XML)
     {
         g_writers[g_writer_count] = naos_xml_writer();
@@ -104,13 +105,13 @@ void naos_report_test_result(const char *suite, const char *test, naos_outcome_t
     }
 }
 
-void naos_report_round_end(const naos_round_t *round, size_t selected, const naos_tally_t *tally, size_t not_run)
+void naos_report_round_end(const naos_round_t *round, const naos_tally_t *tally, size_t not_run)
 {
     size_t i;
 
     for (i = 0; i < writer_count(); i++)
     {
-        g_writers[i]->round_end(round, selected, tally, not_run);
+        g_writers[i]->round_end(round, tally, not_run);
     }
 }
 

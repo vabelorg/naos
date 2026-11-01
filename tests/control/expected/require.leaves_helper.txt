@@ -6,4 +6,5 @@ require.c:LINE: error: 1 == value
   left:  1
   right: 2
 FAIL: require.leaves_helper (1 failure)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr

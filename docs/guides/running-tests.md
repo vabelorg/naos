@@ -24,6 +24,22 @@ In a pattern, `*` matches any string and `?` any one character. Separate several
 
 A filter that selects no test is taken for a typo: a usage error, with exit code `2`. `--naos-list` prints the names of every test registered.
 
+## See only what failed
+
+With many tests, the lines of the tests that pass hide the one that failed. `--naos-quiet` writes only the tests that fail, with their diagnostics, and the summary:
+
+```
+$ ./my_tests --naos-quiet
+RUN: parser.nested
+parser_test.c:41: error: depth == 3
+  left:  2
+  right: 3
+FAIL: parser.nested (1 failure)
+SUMMARY: 211 passed, 1 failed, 0 skipped
+```
+
+The tests that are skipped are only counted in the summary. A test that ends the process, such as by a crash, leaves no line naming it: run the same command again without `--naos-quiet` to see which one it was. The lines that are left out are listed in [output](../reference/output.md#with---naos-quiet).
+
 ## Find hidden dependencies
 
 The tests run in registration order, in one process. A test that unknowingly depends on the state an earlier test left behind may pass only thanks to that order. `--naos-shuffle` shuffles the order of the suites and of the tests within each suite, so that such dependencies show up as failures.

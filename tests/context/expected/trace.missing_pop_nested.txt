@@ -6,4 +6,5 @@ trace.c:LINE: error: NAOS_TRACE_PUSH without NAOS_TRACE_POP: inner-forgotten
   note: missing-pop-note
 trace.c:LINE: note: outer-forgotten
 FAIL: trace.missing_pop_nested (1 failure)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr

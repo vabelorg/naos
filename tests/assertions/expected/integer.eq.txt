@@ -6,4 +6,5 @@ integer.c:LINE: error: -1 == 2
   left:  -1
   right: 2
 FAIL: integer.eq (1 failure)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr

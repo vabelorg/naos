@@ -7,4 +7,5 @@ check.c:LINE: error: 1 == value
   right: 2
 reached-after-helper
 FAIL: check.in_helper_goes_on (1 failure)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr

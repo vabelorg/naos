@@ -5,4 +5,5 @@ RUN: note.on_fail
 note.c:LINE: error: explicit failure
   note: context 42
 FAIL: note.on_fail (1 failure)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr

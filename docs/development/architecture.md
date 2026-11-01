@@ -47,6 +47,7 @@ The files form three groups, listed in this order in `src/CMakeLists.txt` and in
 | `report.c` | Tells the events of the run (a test starts, a diagnostic, a test ends, ...) to every writer on, and writes the names of `--naos-list` and the messages of Naos itself (standard error). `writer.h` declares the events and the functions of a writer |
 | `human.c` | The writer of the human-readable output: the form of every line on standard output, and which lines a run writes |
 | `xml.c` | The writer of the JUnit XML file of `--naos-output xml:<path>`: keeps the results while the tests run and writes the whole file at the end |
+| `text.c` | A text that grows as it is added to, for the writers that keep what they write until later |
 | `value.c` | How values are written (escaped strings, shortest doubles) |
 
 Dependencies go one way and never form a cycle. An arrow points at the module used. `report` is used by every module that prints something (`session`, `suite`, `options`, `runner` and others), and the suites as registered (`suite_internal.h`) by every module that reads them (`runner`, `filter`, `test`), so the diagram leaves those arrows out. The dependency comment of `src/CMakeLists.txt` lists them all.
@@ -61,6 +62,7 @@ flowchart LR
   test --> context
   diagnostic --> context
   diagnostic --> report --> xml --> human --> value
+  xml & human --> text
   report --> human
   control --> test & diagnostic & context
   check --> diagnostic & value

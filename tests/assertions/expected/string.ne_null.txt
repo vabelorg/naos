@@ -6,4 +6,5 @@ string.c:LINE: error: none != none
   left:  (null)
   right: (null)
 FAIL: string.ne_null (1 failure)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr

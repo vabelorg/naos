@@ -5,4 +5,5 @@ RUN: note.on_skip
 note.c:LINE: skip: not applicable
   note: why skipped
 SKIP: note.on_skip
+SUMMARY: 0 passed, 0 failed, 1 skipped
 --- stderr
