@@ -7,9 +7,9 @@ How the sources of Naos are laid out and how the modules depend on each other, f
 These decide what goes into Naos, before any feature:
 
 - **Easy to adopt, first**: no dependency besides the standard C library, and no compiler extension. A feature that would cost either of them stays out.
-- **The output is a contract**: its lines are read by people and parsed by tools, so their form stays stable and documented ([output](../reference/output.md)).
+- **One output for people, one for tools**: standard output is written for people, and may change in any version to read better. Tools read the JUnit XML file of `--naos-output`, whose format is a contract ([JUnit XML](../reference/xml.md)). Of standard output, only what tools cannot do without stays stable: the start of a diagnostic line, which editors read, the names of `--naos-list`, which CTest discovery reads, and the exit codes ([output](../reference/output.md#what-is-kept-compatible)).
 - **A documented public API**: only what the [reference](../reference/README.md) documents is public and kept compatible.
-- **A narrow scope**: process isolation, parallel runs, time limits and report formats are left to the caller (CTest, scripts, CI).
+- **A narrow scope**: process isolation, parallel runs and time limits are left to the caller (CTest, scripts, CI). Naos writes one report format, for the results only it knows (where each failure is and its values); others are added only when a clear need for them shows.
 
 ## Directories
 

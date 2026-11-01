@@ -52,12 +52,27 @@ A test case holds the `<failure>` elements when the test failed, one `<skipped>`
 The text of a `<failure>` is lines of `<label>: <value>`, in this order:
 
 1. `file: <file>` and `line: <line>`: where the failure happened
-2. The values of the assertion, with the labels of the [detail lines](output.md#detail-lines), such as `left: <value>` and `right: <value>`; none for `NAOS_FAIL`
+2. The [values](#values) of the assertion, such as `left: <value>` and `right: <value>`; none for `NAOS_FAIL`
 3. `note: <text>`, if a note of `NAOS_NOTE` is there
 4. `traces: <n> innermost not kept`, if more than 16 levels of traces are pushed
 5. `trace: <file>:<line>: <text>` for each trace pushed, the innermost first
 
 The labels are written as they are, with no space added to line up the values. More lines may be added in a later version: a tool should skip the labels it does not know.
+
+## Values
+
+| Assertion | Labels, in order |
+|---|---|
+| `*_INT_*`, `*_UINT_*` | `left`, `right` (decimal) |
+| `*_DOUBLE_NEAR` | `left`, `right`, `tolerance` |
+| `*_STR_EQ` (neither `NULL`) | `left`, `right`, `first difference` |
+| `*_STR_EQ` (one `NULL`), `*_STR_NE` | `left`, `right` |
+| `*_PTR_EQ` | `left`, `right` (`%p`, or `(null)`) |
+| `*_NULL` | `value` (`%p`) |
+| `*_MEM_EQ` | `left size`, `right size`, then `first difference` or `invalid` |
+| `*_TRUE`, `*_FALSE`, `*_NOT_NULL` | none |
+
+`first difference` is `offset N, left 0xXX, right 0xYY`. When one side is the beginning of the other, it is `offset N, end of left` or `end of right`, N being the shorter length.
 
 ## Text
 

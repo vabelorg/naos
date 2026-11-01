@@ -4,10 +4,23 @@ Where each kind of change goes, and what must change with it. Every change to th
 
 ## Add or change an output line
 
-The form of every line is written in `human.c`, and only there; which lines a run writes is decided there too. The output format is part of the public API, so:
+The form of every line of standard output is written in `human.c`, and only there; which lines a run writes is decided there too. These lines are for people and may change to read better, except what [is kept compatible](../reference/output.md#what-is-kept-compatible): the start of a diagnostic line, the names of `--naos-list` and the exit codes.
 
 1. Update [output](../reference/output.md).
 2. Rewrite the expected outputs of the self tests with `NAOS_UPDATE_EXPECTED=1` and check the diff ([testing](testing.md#adding-a-case)).
+3. Add an entry to the changelog under `Changed`. A change to what is kept compatible starts with `**BREAKING**:`.
+
+## Change the JUnit XML file
+
+The file is written by `xml.c`. Its format is kept compatible: add attributes, properties, elements or lines of a failure, but do not change or remove those that [JUnit XML](../reference/xml.md) states, unless the version allows it ([changelog](changelog.md)). Update the reference and the expected outputs of `tests/report/`.
+
+## Add an output format
+
+A format is a writer: a table of the functions of `naos_writer_t` (`writer.h`), in a file of its own, such as `xml.c`.
+
+1. Add the format to `naos_format_t` (`report.h`), its name to `take_output()` of `options.c` and to the help of `--naos-output`, and turn its writer on in `naos_report_begin()` (`report.c`).
+2. The events arrive in the order `writer.h` states. A diagnostic arrives whole, with its values, note and traces; what the event borrows lives only for the call.
+3. Add its cases to `tests/report/` with `OUTPUT_FILE` ([testing](testing.md#cases-compared-with-an-output)), a page to the reference, and update [command line](../reference/command-line.md).
 
 ## Add an assertion
 
@@ -16,7 +29,7 @@ The form of every line is written in `human.c`, and only there; which lines a ru
 3. Stringify the arguments in the public macro itself. Passing them to a helper macro first and stringifying there with `#` would expand the macros in the arguments.
 4. Write the failure with `naos_diagnostic_begin()` → `naos_diagnostic_add*()` → `naos_diagnostic_end()`.
 5. Add a file to `tests/assertions/` for its failure output, and a test to `tests/api/check.c`.
-6. Update [assertions](../reference/assertions.md) and the table of detail lines in [output](../reference/output.md).
+6. Update [assertions](../reference/assertions.md) and the table of values in [JUnit XML](../reference/xml.md#values).
 
 ## Add a command-line option
 

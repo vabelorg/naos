@@ -58,6 +58,13 @@ A CI job configures, builds and runs CTest. `--output-junit` writes a JUnit XML 
   run: ctest --test-dir build -C Debug --output-on-failure --output-junit junit.xml
 ```
 
+CTest's report holds only the result and the whole output of each test. For the location and the values of each failure as data, run the executable directly with `--naos-output xml:<path>`: it writes a JUnit XML file of its own run ([JUnit XML](../reference/xml.md)). Give each executable its own path, since every CTest test of an executable would write the same file:
+
+```yaml
+- name: Test
+  run: ./build/my_tests --naos-output xml:my_tests.xml
+```
+
 To shake out hidden dependencies between tests, a job can also run an executable directly with `--naos-shuffle --naos-repeat 20` ([running tests](running-tests.md#find-hidden-dependencies)). The seed of a failed iteration is in its `ITERATION FAILED` line, to replay the order locally.
 
 ## Open failures in your editor
@@ -101,4 +108,4 @@ Failures are printed like compiler diagnostics, `file:line: error: ...`, so edit
 }
 ```
 
-A tool that reads the output, to collect results in CI for example, should follow [output](../reference/output.md), whose format is kept compatible.
+The start of these lines, `file:line: error: ` and `file:line: note: `, is kept compatible, so a problem matcher keeps working across versions; the rest of standard output is written for people and may change ([output](../reference/output.md#what-is-kept-compatible)). A tool that collects results, in CI for example, should read the [JUnit XML](../reference/xml.md) file of `--naos-output`.

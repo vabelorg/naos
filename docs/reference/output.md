@@ -1,6 +1,6 @@
 # Output
 
-While the tests run, Naos writes only three kinds of lines to standard output, and their format is kept compatible. The output of `--naos-list` and `--help`, and the `naos: ...` messages on standard error, are not part of this format. Whatever the tests print themselves comes in between, as it is.
+While the tests run, Naos writes only three kinds of lines to standard output. They are written for people to read, and this page describes them as the current version writes them: apart from what [is kept compatible](#what-is-kept-compatible), they may change in any version, to read better. A tool that reads the results should read the [JUnit XML](xml.md) file of `--naos-output` instead. The output of `--naos-list` and `--help`, and the `naos: ...` messages on standard error, are not part of this output. Whatever the tests print themselves comes in between, as it is.
 
 | Kind | Form | Content |
 |---|---|---|
@@ -43,43 +43,7 @@ The location is `<file>:<line>: ` (the GCC form). When the library of Naos is bu
 
 ## Detail lines
 
-A detail line is two spaces, a label, a colon, one space and the value. `left` and `left size` get one more space when the same block has `right` or `right size`, so that the two values start at the same column. Other labels are not aligned.
-
-| Assertion | Labels, in order |
-|---|---|
-| `*_INT_*`, `*_UINT_*` | `left`, `right` (decimal) |
-| `*_DOUBLE_NEAR` | `left`, `right`, `tolerance` |
-| `*_STR_EQ` (neither `NULL`) | `left`, `right`, `first difference` |
-| `*_STR_EQ` (one `NULL`), `*_STR_NE` | `left`, `right` |
-| `*_PTR_EQ` | `left`, `right` (`%p`, or `(null)`) |
-| `*_NULL` | `value` (`%p`) |
-| `*_MEM_EQ` | `left size`, `right size`, then `first difference` or `invalid` |
-| `*_TRUE`, `*_FALSE`, `*_NOT_NULL` | none |
-
-`first difference` is `offset N, left 0xXX, right 0xYY`. When one side is the beginning of the other, it is `offset N, end of left` or `end of right`, N being the shorter length.
-
-## Value formats
-
-Strings and doubles are printed the same way on every platform and in every locale. Integers, pointers, the values of memory comparisons, notes, traces, the messages of `NAOS_FAIL` and `NAOS_SKIP`, and the expressions of diagnostic lines are printed as they are, outside these rules.
-
-A **string** is printed in double quotes on one line and never cut short. `NULL` is `(null)`, without quotes. Bytes from 0x80 are escaped, whether they are valid UTF-8 or not.
-
-| Byte | Written as |
-|---|---|
-| 0x0A, 0x09, 0x0D | `\n`, `\t`, `\r` |
-| 0x22, 0x5C | `\"`, `\\` |
-| Other bytes below 0x20, 0x7F, 0x80 to 0xFF | `\x` and two uppercase hexadecimal digits |
-| Other bytes from 0x20 to 0x7E | As they are |
-
-A **double** is written in the shortest decimal form that reads back as the same value. With a decimal exponent from -4 to below 17, no exponent is used; otherwise the form is `<digits>e<sign><exponent>`, with at least two exponent digits. No trailing `0` is written, nor a decimal point with no fraction after it. Negative zero is `-0`, the infinities `inf` and `-inf`, every NaN `nan`. The decimal point is always `.`.
-
-| Value | Written as |
-|---|---|
-| `0.1` | `0.1` |
-| `1.0 / 3.0` | `0.3333333333333333` |
-| `100.0` | `100` |
-| `1e-5` | `1e-05` |
-| `1.5e20` | `1.5e+20` |
+A detail line is two spaces, a label, a colon, one space and the value. The labels and the values are those of a failure in [JUnit XML](xml.md#values): `left`, `right`, `first difference` and the others, with strings and doubles written in the [value formats](xml.md#value-formats). `left` and `left size` get one more space when the same block has `right` or `right size`, so that the two values start at the same column. Other labels are not aligned.
 
 ## Order
 
@@ -90,6 +54,16 @@ A failure or a skip is printed in this order, then standard output is flushed:
 3. `note: <text>`, if a note of `NAOS_NOTE` is there
 4. `traces: <n> innermost not kept`, if more than 16 levels of traces are pushed
 5. A `note` diagnostic line for each trace pushed, the innermost first
+
+## What is kept compatible
+
+Of what an executable writes, only this is kept compatible ([version](version.md)), since tools cannot do without it:
+
+- The start of a diagnostic line: the [location](#diagnostic-lines) in its form, then the kind, `error`, `skip` or `note`, and `: `, as editors read them ([open failures in your editor](../guides/ctest-and-ci.md#open-failures-in-your-editor)). The text after it may change.
+- The names printed by `--naos-list`, one per line ([command line](command-line.md#options)), which the CMake functions of Naos read to register the tests with CTest.
+- The [exit codes](command-line.md#exit-codes).
+
+Everything else on this page, such as the flow lines, the detail lines, the order and the summary, may change in any version. The changelog says when it does.
 
 ## Example
 

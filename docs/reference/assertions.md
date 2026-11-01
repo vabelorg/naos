@@ -77,7 +77,7 @@ geom_test.c:31: error: area ~= expected
   tolerance: 0.001
 ```
 
-Values are printed in the shortest decimal form that reads back as the same `double` (`0.1`, `100`, `1e-05`, `1.5e+20`), or as `-0`, `inf`, `-inf` or `nan`. The decimal point is `.` whatever the locale. See [value formats](output.md#value-formats).
+Values are printed in the shortest decimal form that reads back as the same `double` (`0.1`, `100`, `1e-05`, `1.5e+20`), or as `-0`, `inf`, `-inf` or `nan`. The decimal point is `.` whatever the locale. See [value formats](xml.md#value-formats).
 
 ## Strings
 
@@ -95,7 +95,7 @@ test.c:12: error: name == "alice"
   first difference: offset 4, left 0x69, right 0x65
 ```
 
-- Values are printed in double quotes on one line, with control characters, `"`, `\` and bytes from 0x80 escaped. They are never cut short. `NULL` prints as `(null)`. See [value formats](output.md#value-formats).
+- Values are printed in double quotes on one line, with control characters, `"`, `\` and bytes from 0x80 escaped. They are never cut short. `NULL` prints as `(null)`. See [value formats](xml.md#value-formats).
 - `first difference` gives the position of the first byte that differs. When one value is the beginning of the other, it is `offset N, end of left` or `end of right`. Only `*_STR_EQ` prints it, and only when neither value is `NULL`.
 - To compare buffers that may hold a NUL, use the [memory](#memory) comparison.
 
