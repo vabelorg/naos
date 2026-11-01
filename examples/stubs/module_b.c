@@ -1,9 +1,9 @@
 /*
  * Copyright (c) 2026 The Naos Authors
  * SPDX-License-Identifier: MIT
+ *
+ * The real module_b, linked by the program and never by the tests.
  */
-
-/* The real module_b, linked by the program and never by the tests. */
 
 #include "module_b.h"
 

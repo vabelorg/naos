@@ -2,8 +2,8 @@
  * Copyright (c) 2026 The Naos Authors
  * SPDX-License-Identifier: MIT
  *
- * Naos: C99 test harness.
- * https://github.com/vabelorg/naos
+ * Naos: A test harness for C and C++ with no dependency besides the standard C library.
+ * GitHub: https://github.com/vabelorg/naos
  *
  * Tests are grouped in suites. A suite lists the tests of one source file; a file may hold several
  * suites, but a suite never spans files. A test is named <suite>.<test>.
