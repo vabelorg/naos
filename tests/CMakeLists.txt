@@ -21,6 +21,7 @@
 #   no_cmake/   building without CMake, as docs/getting-started/installation.md describes
 #   examples/   the projects of examples/, and the outputs the documentation quotes from them
 #   docs/       the relative links and anchors of the Markdown files
+#   sources/    the sources of src/: formatted output goes through src/format.h
 #   misuse/     programs that must not compile
 # Not a self test, but configured on its own by CI after installing Naos:
 #   package/    a project using the installed package with find_package(naos <version>)
@@ -31,6 +32,6 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/support/NaosSelftest.cmake)
 naos_selftest_strict(naos)
 
 foreach(subject IN ITEMS
-        api unit cli session assertions control fixtures context runs discovery no_cmake examples docs misuse)
+        api unit cli session assertions control fixtures context runs discovery no_cmake examples docs sources misuse)
     add_subdirectory(${subject})
 endforeach()

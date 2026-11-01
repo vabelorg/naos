@@ -26,6 +26,8 @@ ctest --preset default
 
 `shared` で同じことをすると、共有ビルドを確かめられます。ライブラリや CMake のファイルに触れる変更は、送る前に両方で実行してください。
 
+Windows の MinGW-w64 では、CI と同じく、MSYS2 のシェル（UCRT64 または MINGW64）で、その `gcc`・`cmake`・`ninja` のパッケージを入れ、`CMAKE_GENERATOR=Ninja` にして実行します。
+
 ## 手で実行する
 
 ```sh
@@ -70,4 +72,4 @@ cmake --install build/default --prefix /tmp/naos-install
 
 ## 継続的インテグレーション
 
-`.github/workflows/ci.yml` は、すべての push とプルリクエストを、プリセットを使って Linux（GCC と Clang）、macOS（Clang）、Windows（MSVC）で、それぞれ静的ライブラリと共有ライブラリとしてビルドしてテストします。すべてのジョブが通った変更だけをマージします。
+`.github/workflows/ci.yml` は、すべての push とプルリクエストを、プリセットを使って Linux（GCC と Clang）、macOS（Clang）、Windows（MSVC と、MSYS2 の UCRT64・MINGW64 環境の MinGW-w64 の GCC）で、それぞれ静的ライブラリと共有ライブラリとしてビルドしてテストします。すべてのジョブが通った変更だけをマージします。

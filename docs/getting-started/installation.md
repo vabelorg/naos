@@ -10,7 +10,7 @@ How to bring Naos into a project: with CMake, in one of three ways, or without C
 | C++ compiler | C++11, only for tests written in C++ |
 | CMake | 3.21 or later; optional ([without CMake](#without-cmake)) |
 
-Every change is built and tested on Linux (GCC and Clang), macOS (Clang) and Windows (MSVC), as a static and as a shared library.
+Every change is built and tested on Linux (GCC and Clang), macOS (Clang) and Windows (MSVC, and GCC of MinGW-w64 in the UCRT64 and MINGW64 environments of MSYS2), as a static and as a shared library. Other builds with MinGW-w64, such as cross-compiling for Windows from Linux, are expected to work but are not tested.
 
 ## With CMake
 

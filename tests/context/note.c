@@ -8,6 +8,8 @@
 
 #include <naos/naos.h>
 
+#include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 
 NAOS_TEST(in_loop)
@@ -61,6 +63,16 @@ NAOS_TEST(cut_short)
     NAOS_CHECK_TRUE(0);
 }
 
+/*
+ * The formats of C99 that not every C library knows (the msvcrt of MinGW does not): the declaration
+ * of NAOS_NOTE accepts them and the note shows them.
+ */
+NAOS_TEST(c99_formats)
+{
+    NAOS_NOTE("size=%zu intmax=%jd uintmax=%ju", (size_t)42, (intmax_t)-9000000000, (uintmax_t)UINTMAX_MAX);
+    NAOS_CHECK_TRUE(0);
+}
+
 NAOS_TEST(with_double)
 {
     NAOS_NOTE("double-note");
@@ -84,6 +96,7 @@ NAOS_SUITE(note,
     NAOS_ADD_TEST(on_fail),
     NAOS_ADD_TEST(on_skip),
     NAOS_ADD_TEST(cut_short),
+    NAOS_ADD_TEST(c99_formats),
     NAOS_ADD_TEST(with_double),
     NAOS_ADD_TEST(with_mem)
 )

@@ -21,6 +21,7 @@ The self tests of Naos: what they check, how they compare outputs, and how to ad
 | `no_cmake/` | Building without CMake, as [installation](../getting-started/installation.md#without-cmake) describes | Built and run |
 | `examples/` | The projects of `examples/`, and the outputs the documentation quotes from them | Their tests pass; outputs compared |
 | `docs/` | The relative links and anchors of every Markdown file | `check-links.cmake` |
+| `sources/` | The sources of `src/`: formatted output goes through `format.h` ([coding style](coding-style.md#formatted-output)) | `check-format.cmake` |
 | `misuse/` | Programs that must not compile, such as a teardown named in `NAOS_SET_SETUP` or a setup named in `NAOS_ADD_TEST` | The compiler refuses them and names the mistake |
 
 The helpers are in `tests/support/`: the functions of `NaosSelftest.cmake`, and `check-output.cmake`, which runs one case.

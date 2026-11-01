@@ -10,7 +10,7 @@ Naos をプロジェクトに取り込む方法です。CMake を使う 3 通り
 | C++ コンパイラ | C++11。C++ でテストを書くときだけ |
 | CMake | 3.21 以上。なくてもよい（[CMake を使わない場合](#cmake-を使わない場合)） |
 
-すべての変更は、Linux（GCC と Clang）、macOS（Clang）、Windows（MSVC）で、静的ライブラリと共有ライブラリの両方でビルドしてテストしています。
+すべての変更は、Linux（GCC と Clang）、macOS（Clang）、Windows（MSVC と、MSYS2 の UCRT64・MINGW64 環境の MinGW-w64 の GCC）で、静的ライブラリと共有ライブラリの両方でビルドしてテストしています。Linux から Windows 向けにクロスコンパイルするなど、MinGW-w64 でのほかのビルドも動くはずですが、テストはしていません。
 
 ## CMake を使う場合
 

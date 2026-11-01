@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "format.h"
+
 /* %.16e writes 17 significant digits, which read back to every double. */
 #define MAX_PRECISION 16
 #define MAX_DIGITS (MAX_PRECISION + 1)
@@ -75,7 +77,7 @@ static void format_shortest_scientific(char *scientific, size_t size, double mag
 
     for (precision = 0;; precision++)
     {
-        if (snprintf(scientific, size, "%.*e", precision, magnitude) < 0)
+        if (naos_snprintf(scientific, size, "%.*e", precision, magnitude) < 0)
         {
             scientific[0] = '\0';
         }
@@ -227,19 +229,19 @@ void naos_value_format_double(char *buffer, size_t size, double value)
 
     if (isnan(value))
     {
-        snprintf(buffer, size, "nan");
+        naos_snprintf(buffer, size, "nan");
         return;
     }
 
     if (isinf(value))
     {
-        snprintf(buffer, size, "%s", (value < 0) ? "-inf" : "inf");
+        naos_snprintf(buffer, size, "%s", (value < 0) ? "-inf" : "inf");
         return;
     }
 
     if (value == 0)
     {
-        snprintf(buffer, size, "%s", signbit(value) ? "-0" : "0");
+        naos_snprintf(buffer, size, "%s", signbit(value) ? "-0" : "0");
         return;
     }
 
@@ -263,5 +265,5 @@ void naos_value_format_double(char *buffer, size_t size, double value)
 
     text[length] = '\0';
 
-    snprintf(buffer, size, "%s", text);
+    naos_snprintf(buffer, size, "%s", text);
 }

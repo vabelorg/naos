@@ -8,8 +8,9 @@
 
 #include "context.h"
 
-#include <stdio.h>
 #include <string.h>
+
+#include "format.h"
 
 /*
  * Notes of NAOS_TRACE_PUSH, outermost first. Pushes beyond NAOS_CONTEXT_TRACE_DEPTH are counted in
@@ -38,7 +39,7 @@ static void format_into(char *buffer, size_t size, const char *format, va_list a
         return;
     }
 
-    length = vsnprintf(buffer, size, format, args);
+    length = naos_vsnprintf(buffer, size, format, args);
     if (length < 0)
     {
         buffer[0] = '\0';

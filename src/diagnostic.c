@@ -8,9 +8,8 @@
 
 #include "diagnostic.h"
 
-#include <stdio.h>
-
 #include "context.h"
+#include "format.h"
 
 /* Most detail lines of one diagnostic: values, the note and the count of traces not kept. */
 #define NAOS_DETAIL_COUNT 8
@@ -92,7 +91,7 @@ static void end_with(naos_context_use_t use)
         left_out = naos_context_trace_depth() - naos_context_trace_count();
         if (left_out > 0)
         {
-            snprintf(not_kept, sizeof(not_kept), "%d innermost not kept", left_out);
+            naos_snprintf(not_kept, sizeof(not_kept), "%d innermost not kept", left_out);
             add_detail("traces", NAOS_DETAIL_TEXT, not_kept);
         }
     }
@@ -183,7 +182,7 @@ void naos_diagnostic_check_traces_popped(void)
     }
 
     innermost = naos_context_trace(naos_context_trace_count() - 1);
-    snprintf(message, sizeof(message), "%s%s", prefix, innermost->text);
+    naos_snprintf(message, sizeof(message), "%s%s", prefix, innermost->text);
     naos_diagnostic_begin(NAOS_REPORT_ERROR, innermost->file, innermost->line, message);
     end_with(NAOS_CONTEXT_OUTER);
 }
