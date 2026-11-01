@@ -16,7 +16,7 @@
 | `PASS: <suite>.<test>` | 失敗もスキップもなく終わったとき |
 | `FAIL: <suite>.<test> (<N> failure)` | 失敗を記録したとき。N が 2 以上なら `failures` |
 | `SKIP: <suite>.<test>` | スキップし、失敗を記録しなかったとき |
-| `SUMMARY: <p> passed, <f> failed, <s> skipped` | 選んだテストが 2 つ以上のとき、各回の最後。`--naos-fail-fast` で止めたときは、実行したテストだけを数える |
+| `SUMMARY: <p> passed, <f> failed, <s> skipped` | 各回の最後。実行したテストが 1 つや 0 のときも出る。`--naos-fail-fast` で止めたときは、実行したテストだけを数える |
 | `RANDOM SEED: <seed>` | `--naos-shuffle` のとき、各回の最初 |
 | `ITERATION: <i> of <n>` | `--naos-repeat` が 2 以上のとき、各回の前 |
 | `ITERATION FAILED: <i> of <n>` | `--naos-repeat` が 2 以上のとき、失敗した回の後。`--naos-shuffle` なら後ろに ` (random seed <seed>)` |
@@ -24,6 +24,34 @@
 | `FAIL FAST: stopped at the first failure; <n> not run` | `--naos-fail-fast` で止め、実行しなかったテストがあるとき |
 
 1 回の中の並びは `ITERATION:`、`RANDOM SEED:`、各テスト（`RUN:` から結果の行まで）、`FAIL FAST:`、`SUMMARY:`、`ITERATION FAILED:` の順で、最後に `REPEAT:` が来ます。1 つのテストの setup・本体・teardown で出た診断は、すべてそのテストの `RUN:` と結果の行の間に出ます。
+
+## `--naos-quiet` のとき
+
+`--naos-quiet` を付けると、目を向ける必要のないテストを省きます。出力する行は、付けないときと同じ形、同じ並びです。
+
+| 行 | `--naos-quiet` のとき |
+|---|---|
+| `RUN:` | 失敗したテストだけ。最初の失敗の直前に出る |
+| `PASS:` | 出ない |
+| スキップしたテスト（その `RUN:`、`skip` の行、`SKIP:`） | 出ない。`SUMMARY:` で数える |
+| `FAIL:` と、失敗したテストのすべての診断 | 出る |
+| `SUMMARY:`、`RANDOM SEED:`、`FAIL FAST:`、`ITERATION FAILED:`、`REPEAT:` | 出る |
+| `ITERATION:` | 出ない |
+
+- スキップしたあと teardown で失敗したテストは `FAIL` です。その `skip` の行はテストが終わるまで保持し、失敗の前に出力します。そのため、失敗したテストは `--naos-quiet` がないときと同じに読めます。
+- テストが自分で出力したものはそのまま出ますが、前に `RUN:` の行がないので、どのテストが出力したのかは分かりません。
+- `RUN:` を各テストの開始時に出さなくなるので、失敗する前にプロセスを終わらせたテストは、その名前を示す行を残しません。`--naos-output` のファイルは実行の終わりにしか書かないので、そこにも残りません。CTest の下では各テストが別のプロセスで動き、終わったテストは CTest が示します。そうでなければ、同じコマンドを `--naos-quiet` なしで実行し直してください。
+
+```
+$ prog --naos-quiet
+RUN: text.greeting
+greet_test.c:12: error: greeting == "hello"
+  left:  "hello\n"
+  right: "hello"
+  first difference: offset 5, end of right
+FAIL: text.greeting (1 failure)
+SUMMARY: 497 passed, 1 failed, 2 skipped
+```
 
 ## 診断の行
 
