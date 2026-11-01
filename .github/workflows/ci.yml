@@ -37,7 +37,7 @@ jobs:
           - toolchain: msvc
             os: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Configure
         shell: bash
@@ -87,7 +87,7 @@ jobs:
     env:
       CMAKE_GENERATOR: Ninja
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: msys2/setup-msys2@v2
         with:
