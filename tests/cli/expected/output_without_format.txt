@@ -1,0 +1,6 @@
+args: --naos-output out.xml
+exit code: 2
+--- stdout
+--- stderr
+naos: --naos-output takes <format>:<path>: out.xml
+usage: PROG [--naos-filter <patterns>] [--naos-list] [--naos-shuffle] [--naos-random-seed <n>] [--naos-repeat <n>] [--naos-fail-fast] [--naos-output <format>:<path>] [--help] [args...]

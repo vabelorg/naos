@@ -12,12 +12,16 @@
 
 #include "format.h"
 #include "human.h"
+#include "xml.h"
 
-/* Most writers on at once: the human-readable one. */
-#define NAOS_WRITER_COUNT 1
+/* Most writers on at once: the human-readable one, and the one of --naos-output. */
+#define NAOS_WRITER_COUNT 2
 
 static const naos_writer_t *g_writers[NAOS_WRITER_COUNT];
 static size_t g_writer_count = 0;
+
+/* The path of --naos-output, for the messages; NULL without it. */
+static const char *g_output_path = NULL;
 
 /*
  * The writers on: the human-readable one alone until naos_report_begin(), so that a diagnostic out of
@@ -34,14 +38,25 @@ static size_t writer_count(void)
     return g_writer_count;
 }
 
-int naos_report_begin(const char *program)
+/* The human-readable writer, first in g_writers, writes to stdout and never fails; only the one of --naos-output can. */
+int naos_report_begin(const char *program, naos_format_t format, const char *path)
 {
     size_t i;
 
+    writer_count();
+    if (format == NAOS_FORMAT_XML)
+    {
+        g_writers[g_writer_count] = naos_xml_writer();
+        g_writer_count++;
+        g_output_path = path;
+    }
+
     for (i = 0; i < writer_count(); i++)
     {
-        if (g_writers[i]->begin(program, NULL) == 0)
+        if (g_writers[i]->begin(program, (i == 0) ? NULL : path) == 0)
         {
+            naos_report_error("cannot open the file of --naos-output: %s", path);
+
             return 0;
         }
     }
@@ -110,6 +125,7 @@ int naos_report_end(long failed_rounds, long repeat, long rounds_not_run)
     {
         if (g_writers[i]->end(failed_rounds, repeat, rounds_not_run) == 0)
         {
+            naos_report_error("cannot write the file of --naos-output, or out of memory for it: %s", g_output_path);
             written = 0;
         }
     }

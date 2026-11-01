@@ -83,7 +83,7 @@ typedef struct naos_round
  */
 typedef struct naos_writer
 {
-    /* program is argv[0], possibly NULL; path is where to write, or NULL. Returns 0 after reporting why it cannot write. */
+    /* program is argv[0], possibly NULL; path is where to write, or NULL. Returns 0 when it cannot write there. */
     int (*begin)(const char *program, const char *path);
     void (*round_begin)(const naos_round_t *round);
     void (*test_begin)(const char *suite, const char *test);
@@ -93,7 +93,7 @@ typedef struct naos_writer
     /* selected is the number of tests the filter selects; not_run is how many --naos-fail-fast left out, this round and later. */
     void (*round_end)(const naos_round_t *round, size_t selected, const naos_tally_t *tally, size_t not_run);
 
-    /* rounds_not_run is how many rounds --naos-fail-fast left out. Returns 0 after reporting why it could not write. */
+    /* rounds_not_run is how many rounds --naos-fail-fast left out. Returns 0 when it could not write all of it. */
     int (*end)(long failed_rounds, long repeat, long rounds_not_run);
 } naos_writer_t;
 

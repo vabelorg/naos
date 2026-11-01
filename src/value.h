@@ -17,6 +17,16 @@
  */
 #define NAOS_VALUE_DOUBLE_SIZE 32
 
+/* Size of a buffer that holds how one byte of a string value is written: \xNN and its NUL. */
+#define NAOS_VALUE_BYTE_SIZE 5
+
+/*
+ * Writes into text, NUL-terminated, how one byte of a string value is written, as
+ * naos_value_print_string() does; text has NAOS_VALUE_BYTE_SIZE chars. Returns the length written,
+ * from 1 to 4. The result is printable ASCII only.
+ */
+size_t naos_value_escape_byte(unsigned char byte, char *text);
+
 /*
  * Writes a C string of the test to out on one line: (null) for NULL, otherwise the bytes between
  * double quotes, with \n, \t, \r, \", \\ and \xNN (two upper-case hex digits) for every other byte

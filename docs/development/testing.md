@@ -17,6 +17,7 @@ The self tests of Naos: what they check, how they compare outputs, and how to ad
 | `fixtures/` | Setup and teardown | The same |
 | `context/` | Notes and traces | The same |
 | `runs/` | `--naos-shuffle`, `--naos-repeat`, `--naos-fail-fast` | The same |
+| `report/` | The JUnit XML file of `--naos-output` | Output and the file compared |
 | `discovery/` | The messages of `NaosDiscover.cmake` when listing the tests fails | The same |
 | `no_cmake/` | Building without CMake, as [installation](../getting-started/installation.md#without-cmake) describes | Built and run |
 | `examples/` | The projects of `examples/`, and the outputs the documentation quotes from them | Their tests pass; outputs compared |
@@ -53,6 +54,8 @@ So that the content is the same on every platform, only this is replaced before 
 A line missing from the expected output is a line that must not appear: no list of `REJECT` regexes is needed. To check that a place is never reached, print `reached-...` there: its absence from the expected output checks it.
 
 Only output that changes between runs or platforms (pointer values, a seed taken from the time, numbers whose width depends on `long`, output that grows when tests are added) is matched with **regexes** instead (`naos_expect_match`).
+
+A case of a file the executable writes, such as the XML of `--naos-output`, gives `OUTPUT_FILE <name>` to `naos_expect`: `{output}` in its arguments stands for that file in the build directory. The file is removed before the run and compared after it, in a third part `--- output` (`[no file]` when none is written), with the locations made the same in the same way (`file="<file>" line="LINE"`). Where `xmllint` is found, the file must also be well-formed XML; CI installs it on Linux.
 
 ## Adding a case
 

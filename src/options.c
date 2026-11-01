@@ -54,6 +54,7 @@ typedef struct naos_option_entry
 static void take_filter(const char *name, const char *value);
 static void take_random_seed(const char *name, const char *value);
 static void take_repeat(const char *name, const char *value);
+static void take_output(const char *name, const char *value);
 static void report_usage_error(const char *format, ...) NAOS_PRINTF_FORMAT(1, 2);
 
 static naos_options_t g_options =
@@ -65,6 +66,8 @@ static naos_options_t g_options =
     0,    /* random_seed */
     1,    /* repeat */
     0,    /* fail_fast */
+    NAOS_FORMAT_NONE, /* output_format */
+    NULL, /* output_path */
     0,    /* help_requested */
     0     /* usage_error */
 };
@@ -101,6 +104,11 @@ static const naos_option_entry_t g_option_table[] =
         "--naos-fail-fast", NULL, NULL, &g_options.fail_fast, NULL,
         "stop at the first failing test, leaving the other tests and\n"
         "iterations not run"
+    },
+    {
+        "--naos-output", "<format>:<path>", "<format>:<path>", NULL, take_output,
+        "also write the results to the file <path> in <format>,\n"
+        "when the run ends; the formats: xml (JUnit XML)"
     },
     {
         NAOS_HELP_OPTION, NULL, NULL, &g_options.help_requested, NULL,
@@ -254,6 +262,37 @@ static void take_repeat(const char *name, const char *value)
     {
         g_options.repeat = (long)number;
     }
+}
+
+/*
+ * Takes "<format>:<path>", split at the first ':' so that the path may hold one ("xml:C:\out.xml").
+ * Given once only: a later version may write several files.
+ */
+static void take_output(const char *name, const char *value)
+{
+    const char *colon;
+
+    if (g_options.output_path != NULL)
+    {
+        report_usage_error("%s is given more than once: %s", name, value);
+        return;
+    }
+
+    colon = strchr(value, ':');
+    if ((colon == NULL) || (colon == value) || (colon[1] == '\0'))
+    {
+        report_usage_error("%s takes <format>:<path>: %s", name, value);
+        return;
+    }
+
+    if (((size_t)(colon - value) == 3) && (strncmp(value, "xml", 3) == 0))
+    {
+        g_options.output_format = NAOS_FORMAT_XML;
+        g_options.output_path = colon + 1;
+        return;
+    }
+
+    report_usage_error("%s: unknown format: %.*s (the formats: xml)", name, (int)(colon - value), value);
 }
 
 /* Finds the option arg names, setting *form as option_form() does, or returns NULL. */

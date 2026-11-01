@@ -1,0 +1,7 @@
+args: --naos-output xml:{output}
+exit code: 2
+--- stdout
+--- stderr
+naos: cannot open the file of --naos-output: {output}
+--- output
+[no file]

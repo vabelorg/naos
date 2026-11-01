@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  *
  * Everything a run writes. The events of a run go to every writer on (writer.h): the human-readable
- * output on stdout always. The names of --naos-list on stdout and the messages of Naos itself
+ * output on stdout always, and the file of --naos-output when given. The names of --naos-list on stdout and the messages of Naos itself
  * ("naos: ...") on stderr are written here. The other modules decide what to tell and when; only the
  * writers know how it looks. The help and the usage of the command line are left to options.c.
  */
@@ -18,11 +18,19 @@
 
 #include "writer.h"
 
+/* The formats --naos-output writes besides the human-readable output. */
+typedef enum naos_format
+{
+    NAOS_FORMAT_NONE,
+    NAOS_FORMAT_XML /* "xml": JUnit XML */
+} naos_format_t;
+
 /*
- * Starts the run: every writer on gets ready to write. Returns 0 after reporting why one cannot,
- * and then no test may run.
+ * Starts the run: turns on the writer of format, if any, to write to path, and every writer on gets
+ * ready to write. program is argv[0], possibly NULL; path lives until the process ends. Returns 0
+ * after reporting why a writer cannot write, and then no test may run.
  */
-int naos_report_begin(const char *program);
+int naos_report_begin(const char *program, naos_format_t format, const char *path);
 
 /* The events of the run, told to every writer on; see naos_writer_t for what each means. */
 void naos_report_round_begin(const naos_round_t *round);

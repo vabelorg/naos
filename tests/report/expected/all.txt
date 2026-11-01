@@ -1,0 +1,174 @@
+args: --naos-output xml:{output} --naos-filter -crash.*
+exit code: 1
+--- stdout
+RUN: results.passes
+PASS: results.passes
+RUN: results.fails_twice
+report.c:LINE: error: 1 == 2
+  left:  1
+  right: 2
+report.c:LINE: error: "hello\n" == "hello"
+  left:  "hello\n"
+  right: "hello"
+  first difference: offset 5, end of right
+FAIL: results.fails_twice (2 failures)
+RUN: results.skips
+report.c:LINE: skip: not here
+SKIP: results.skips
+RUN: results.fails_then_skips
+report.c:LINE: error: 0
+report.c:LINE: skip: later
+FAIL: results.fails_then_skips (1 failure)
+RUN: results.with_context
+report.c:LINE: error: 0.1 ~= 0.25
+  left:  0.1
+  right: 0.25
+  tolerance: 0.001
+  note: locale C
+report.c:LINE: note: inner 2
+report.c:LINE: note: outer
+report.c:LINE: error: "ab" == "ac"
+  left size:  2
+  right size: 2
+  first difference: offset 1, left 0x62, right 0x63
+report.c:LINE: note: inner 2
+report.c:LINE: note: outer
+FAIL: results.with_context (2 failures)
+RUN: results.too_deep
+report.c:LINE: error: NAOS_TRACE_PUSH beyond 16 levels
+report.c:LINE: error: 0
+  traces: 1 innermost not kept
+report.c:LINE: note: level 15
+report.c:LINE: note: level 14
+report.c:LINE: note: level 13
+report.c:LINE: note: level 12
+report.c:LINE: note: level 11
+report.c:LINE: note: level 10
+report.c:LINE: note: level 9
+report.c:LINE: note: level 8
+report.c:LINE: note: level 7
+report.c:LINE: note: level 6
+report.c:LINE: note: level 5
+report.c:LINE: note: level 4
+report.c:LINE: note: level 3
+report.c:LINE: note: level 2
+report.c:LINE: note: level 1
+report.c:LINE: note: level 0
+FAIL: results.too_deep (2 failures)
+RUN: text.markup
+report.c:LINE: error: <a & "b" 'c'>
+FAIL: text.markup (1 failure)
+RUN: text.utf8
+report.c:LINE: error: 譌･譛ｬ
+FAIL: text.utf8 (1 failure)
+RUN: text.invalid_utf8
+report.c:LINE: error: bad  and 譌 bytes
+FAIL: text.invalid_utf8 (1 failure)
+RUN: text.control
+report.c:LINE: error: one
+two	three
+FAIL: text.control (1 failure)
+RUN: text.string_value
+report.c:LINE: error: "\xE6\x97\xA5 <&>" == "x"
+  left:  "\xE6\x97\xA5 <&>"
+  right: "x"
+  first difference: offset 0, left 0xE6, right 0x78
+FAIL: text.string_value (1 failure)
+RUN: text.skip_markup
+report.c:LINE: skip: needs <a> & "b"
+SKIP: text.skip_markup
+SUMMARY: 1 passed, 9 failed, 2 skipped
+--- stderr
+--- output
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="naos_selftest_report" tests="12" failures="9" errors="0" skipped="2">
+  <testsuite name="results" tests="6" failures="4" errors="0" skipped="1">
+    <testcase classname="results" name="passes"/>
+    <testcase classname="results" name="fails_twice" file="report.c" line="LINE">
+      <failure type="error" message="1 == 2">file: report.c
+line: LINE
+left: 1
+right: 2</failure>
+      <failure type="error" message="&quot;hello\n&quot; == &quot;hello&quot;">file: report.c
+line: LINE
+left: "hello\n"
+right: "hello"
+first difference: offset 5, end of right</failure>
+    </testcase>
+    <testcase classname="results" name="skips" file="report.c" line="LINE">
+      <skipped message="not here"/>
+    </testcase>
+    <testcase classname="results" name="fails_then_skips" file="report.c" line="LINE">
+      <failure type="error" message="0">file: report.c
+line: LINE</failure>
+    </testcase>
+    <testcase classname="results" name="with_context" file="report.c" line="LINE">
+      <failure type="error" message="0.1 ~= 0.25">file: report.c
+line: LINE
+left: 0.1
+right: 0.25
+tolerance: 0.001
+note: locale C
+trace: report.c:LINE: inner 2
+trace: report.c:LINE: outer</failure>
+      <failure type="error" message="&quot;ab&quot; == &quot;ac&quot;">file: report.c
+line: LINE
+left size: 2
+right size: 2
+first difference: offset 1, left 0x62, right 0x63
+trace: report.c:LINE: inner 2
+trace: report.c:LINE: outer</failure>
+    </testcase>
+    <testcase classname="results" name="too_deep" file="report.c" line="LINE">
+      <failure type="error" message="NAOS_TRACE_PUSH beyond 16 levels">file: report.c
+line: LINE</failure>
+      <failure type="error" message="0">file: report.c
+line: LINE
+traces: 1 innermost not kept
+trace: report.c:LINE: level 15
+trace: report.c:LINE: level 14
+trace: report.c:LINE: level 13
+trace: report.c:LINE: level 12
+trace: report.c:LINE: level 11
+trace: report.c:LINE: level 10
+trace: report.c:LINE: level 9
+trace: report.c:LINE: level 8
+trace: report.c:LINE: level 7
+trace: report.c:LINE: level 6
+trace: report.c:LINE: level 5
+trace: report.c:LINE: level 4
+trace: report.c:LINE: level 3
+trace: report.c:LINE: level 2
+trace: report.c:LINE: level 1
+trace: report.c:LINE: level 0</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="text" tests="6" failures="5" errors="0" skipped="1">
+    <testcase classname="text" name="markup" file="report.c" line="LINE">
+      <failure type="error" message="&lt;a &amp; &quot;b&quot; &apos;c&apos;&gt;">file: report.c
+line: LINE</failure>
+    </testcase>
+    <testcase classname="text" name="utf8" file="report.c" line="LINE">
+      <failure type="error" message="日本">file: report.c
+line: LINE</failure>
+    </testcase>
+    <testcase classname="text" name="invalid_utf8" file="report.c" line="LINE">
+      <failure type="error" message="bad \xFF and \xE6\x97 bytes">file: report.c
+line: LINE</failure>
+    </testcase>
+    <testcase classname="text" name="control" file="report.c" line="LINE">
+      <failure type="error" message="one&#10;two&#9;three&#13;\x01">file: report.c
+line: LINE</failure>
+    </testcase>
+    <testcase classname="text" name="string_value" file="report.c" line="LINE">
+      <failure type="error" message="&quot;\xE6\x97\xA5 &lt;&amp;&gt;&quot; == &quot;x&quot;">file: report.c
+line: LINE
+left: "\xE6\x97\xA5 &lt;&amp;&gt;"
+right: "x"
+first difference: offset 0, left 0xE6, right 0x78</failure>
+    </testcase>
+    <testcase classname="text" name="skip_markup" file="report.c" line="LINE">
+      <skipped message="needs &lt;a&gt; &amp; &quot;b&quot;"/>
+    </testcase>
+  </testsuite>
+</testsuites>

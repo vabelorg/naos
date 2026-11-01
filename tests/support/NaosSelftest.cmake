@@ -12,10 +12,13 @@
 #   Gives existing targets the strict warnings, when Naos is the top-level project: an enclosing
 #   project that turns NAOS_SELFTEST on keeps its own compilers and flags.
 #
-# naos_expect(<case> <target> [ARGS <arg>...])
+# naos_expect(<case> <target> [ARGS <arg>...] [OUTPUT_FILE <name>])
 #   Golden case: runs <target> with the arguments and compares them, its exit code, its stdout and
 #   its stderr with expected/<case>.txt, after making the output independent of the platform (see
 #   support/check-output.cmake). Run the case with NAOS_UPDATE_EXPECTED=1 to write the file.
+#   With OUTPUT_FILE, {output} in the arguments stands for the file <name> of the build directory,
+#   which the case removes before the run and compares after it as well; where xmllint is found, a
+#   file the case writes must also be well-formed XML.
 #
 # naos_expect_tests(<target> <suite>.<test>...)
 #   One golden case per test, named after it and run with "--naos-filter <suite>.<test>": the case
@@ -34,6 +37,9 @@
 include_guard(GLOBAL)
 
 set(NAOS_SELFTEST_CHECK_SCRIPT "${CMAKE_CURRENT_LIST_DIR}/check-output.cmake")
+
+# Checks that the files of OUTPUT_FILE are well-formed XML, where it is installed.
+find_program(NAOS_SELFTEST_XMLLINT xmllint)
 
 function(naos_selftest_strict)
     if(NOT PROJECT_IS_TOP_LEVEL)
@@ -70,11 +76,17 @@ function(naos_selftest_run_defines out exe)
 endfunction()
 
 function(naos_expect case target)
-    cmake_parse_arguments(PARSE_ARGV 2 arg "" "" "ARGS")
+    cmake_parse_arguments(PARSE_ARGV 2 arg "" "OUTPUT_FILE" "ARGS")
     if(arg_UNPARSED_ARGUMENTS)
         message(FATAL_ERROR "naos_expect(${case}): unknown arguments: ${arg_UNPARSED_ARGUMENTS}")
     endif()
     naos_selftest_run_defines(defines "$<TARGET_FILE:${target}>" ${arg_ARGS})
+    if(DEFINED arg_OUTPUT_FILE)
+        list(APPEND defines -D "OUTPUT_FILE=${CMAKE_CURRENT_BINARY_DIR}/${arg_OUTPUT_FILE}")
+        if(NAOS_SELFTEST_XMLLINT)
+            list(APPEND defines -D "XMLLINT=${NAOS_SELFTEST_XMLLINT}")
+        endif()
+    endif()
     naos_selftest_add_case(${case} ${defines} -D "EXPECTED=${CMAKE_CURRENT_SOURCE_DIR}/expected/${case}.txt")
 endfunction()
 

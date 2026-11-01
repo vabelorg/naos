@@ -2,7 +2,8 @@
  * Copyright (c) 2026 The Naos Authors
  * SPDX-License-Identifier: MIT
  *
- * naos_value_format_double: the shortest decimal that reads back to the value, in a fixed form.
+ * naos_value_escape_byte: how one byte of a string value is written; naos_value_format_double: the
+ * shortest decimal that reads back to the value, in a fixed form.
  */
 
 #include <naos/naos.h>
@@ -110,7 +111,36 @@ NAOS_TEST(small_buffer_cuts_short)
     NAOS_CHECK_STR_EQ("0.3", text);
 }
 
+/* The text of byte as naos_value_escape_byte writes it; valid until the next call. */
+static const char *byte_text(unsigned char byte)
+{
+    static char text[NAOS_VALUE_BYTE_SIZE];
+    size_t length;
+
+    length = naos_value_escape_byte(byte, text);
+    NAOS_CHECK_UINT_EQ(strlen(text), length);
+
+    return text;
+}
+
+NAOS_TEST(escape_byte)
+{
+    NAOS_CHECK_STR_EQ("a", byte_text('a'));
+    NAOS_CHECK_STR_EQ(" ", byte_text(' '));
+    NAOS_CHECK_STR_EQ("~", byte_text('~'));
+    NAOS_CHECK_STR_EQ("\\n", byte_text('\n'));
+    NAOS_CHECK_STR_EQ("\\t", byte_text('\t'));
+    NAOS_CHECK_STR_EQ("\\r", byte_text('\r'));
+    NAOS_CHECK_STR_EQ("\\\"", byte_text('"'));
+    NAOS_CHECK_STR_EQ("\\\\", byte_text('\\'));
+    NAOS_CHECK_STR_EQ("\\x01", byte_text(0x01));
+    NAOS_CHECK_STR_EQ("\\x7F", byte_text(0x7F));
+    NAOS_CHECK_STR_EQ("\\x80", byte_text(0x80));
+    NAOS_CHECK_STR_EQ("\\xFF", byte_text(0xFF));
+}
+
 NAOS_SUITE(value,
+    NAOS_ADD_TEST(escape_byte),
     NAOS_ADD_TEST(special_values),
     NAOS_ADD_TEST(shortest_digits),
     NAOS_ADD_TEST(integers_written_out),

@@ -189,7 +189,7 @@ static int run_rounds(const naos_options_t *options, const naos_suite_t *suites,
         return NAOS_EXIT_FAIL;
     }
 
-    if (naos_report_begin(options->program) == 0)
+    if (naos_report_begin(options->program, options->output_format, options->output_path) == 0)
     {
         free_orders(&orders);
 
