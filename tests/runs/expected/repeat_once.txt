@@ -2,6 +2,6 @@ args: --naos-repeat 1 --naos-filter a.t1
 exit code: 0
 --- stdout
 RUN: a.t1
-PASS: a.t1
-SUMMARY: 1 passed, 0 failed, 0 skipped
+PASS: a.t1 (N ms)
+SUMMARY: 1 passed, 0 failed, 0 skipped (N ms)
 --- stderr

@@ -7,6 +7,6 @@ note.c:LINE: error: expected == actual
   right size: 3
   first difference: offset 1, left 0x02, right 0xFF
   note: mem-note
-FAIL: note.with_mem (1 failure)
-SUMMARY: 0 passed, 1 failed, 0 skipped
+FAIL: note.with_mem (1 failure, N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 --- stderr

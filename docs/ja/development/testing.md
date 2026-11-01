@@ -19,6 +19,7 @@ Naos の自己テストについて、何を確かめるか、出力をどう照
 | `runs/` | `--naos-shuffle`、`--naos-repeat`、`--naos-fail-fast` | 同上 |
 | `report/` | `--naos-output` の JUnit XML のファイル | 出力とファイルを照合する |
 | `quiet/` | `--naos-quiet` が標準出力から省くもの、および JUnit XML のファイルが変わらないこと | 出力とファイルを照合する |
+| `timing/` | 結果の行と `SUMMARY:` の時間を測っていること。setup と teardown を含む | 正規表現。決まった時間だけプロセッサを使い続けるテストが、少なくともその半分の時間を示す |
 | `discovery/` | テストの列挙に失敗したときの `NaosDiscover.cmake` のメッセージ | 同上 |
 | `no_cmake/` | CMake を使わないビルド（[インストール](../getting-started/installation.md#cmake-を使わない場合)のとおり） | ビルドして実行する |
 | `examples/` | `examples/` のプロジェクトと、文書がそこから引用する出力 | テストが通ること、出力の照合 |
@@ -42,14 +43,16 @@ RUN: integer.eq
 integer.c:LINE: error: -1 == 2
   left:  -1
   right: 2
-FAIL: integer.eq (1 failure)
-SUMMARY: 0 passed, 1 failed, 0 skipped
+FAIL: integer.eq (1 failure, N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 --- stderr
 ```
 
 どの環境でも同じ内容になるよう、照合の前に次だけを置き換えます。
 
 - 診断の場所: `<ディレクトリ>/<ファイル>:<行>: `（MSVC では `(<行>)`）を `<ファイル>:LINE: ` に。テストを編集しても期待する出力が変わらないようにするため
+- 結果の行や `SUMMARY:` の最後の時間 `(<n> ms)` や `, <n> ms)`: `N ms` に。実行のたびに変わるため。時間を測っていることは `timing/` で確かめる
+- `--help` の最後の行が示す時計: `<clock>` に。システムによって変わるため。`wall-clock time, from a monotonic clock` と `processor time, from clock(), not wall-clock time` のどちらかだけを置き換える
 - 実行ファイルのパス: `PROG` に。使い方の行は、パスの長さで折り返し位置が変わるので 1 行につなげる
 - CR を除く
 
@@ -57,7 +60,7 @@ SUMMARY: 0 passed, 1 failed, 0 skipped
 
 出力が実行や環境で変わるもの（ポインタの値、時刻から選ぶ種、`long` の幅で変わる数、テストを足すと伸びる出力）だけは、**正規表現**で照合します（`naos_expect_match`）。
 
-`--naos-output` の XML のように実行ファイルが書くファイルを照合するケースは、`naos_expect` に `OUTPUT_FILE <name>` を渡します。引数の中の `{output}` が、ビルドディレクトリのそのファイルを表します。ファイルは実行の前に消し、実行の後に 3 つ目の部分 `--- output` として照合します（書かれなかったときは `[no file]`）。場所も同じように置き換えます（`file="<file>" line="LINE"`）。`xmllint` が見つかる環境では、ファイルが整形式の XML であることも確かめます。CI は Linux で `xmllint` をインストールします。標準出力に ASCII 以外のバイトを書くテストは `FILE_ONLY` も渡し、ファイルだけを照合します。CMake は標準出力をプラットフォームのコードページで読むので、そうしたバイトが環境によって変わるためです。
+`--naos-output` の XML のように実行ファイルが書くファイルを照合するケースは、`naos_expect` に `OUTPUT_FILE <name>` を渡します。引数の中の `{output}` が、ビルドディレクトリのそのファイルを表します。ファイルは実行の前に消し、実行の後に 3 つ目の部分 `--- output` として照合します（書かれなかったときは `[no file]`）。場所も同じように置き換え（`file="<file>" line="LINE"`）、時間は `time="N.NNN"` にします。ほかの形の時間は置き換えずに残るので、照合に失敗します。`xmllint` が見つかる環境では、ファイルが整形式の XML であることも確かめます。CI は Linux で `xmllint` をインストールします。標準出力に ASCII 以外のバイトを書くテストは `FILE_ONLY` も渡し、ファイルだけを照合します。CMake は標準出力をプラットフォームのコードページで読むので、そうしたバイトが環境によって変わるためです。
 
 ## ケースを足す
 

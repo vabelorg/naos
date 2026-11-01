@@ -3,9 +3,9 @@ exit code: 77
 --- stdout
 RUN: skips.skipped_one
 results.c:LINE: skip: not applicable
-SKIP: skips.skipped_one
+SKIP: skips.skipped_one (N ms)
 RUN: skips.skipped_two
 results.c:LINE: skip: not applicable either
-SKIP: skips.skipped_two
-SUMMARY: 0 passed, 0 failed, 2 skipped
+SKIP: skips.skipped_two (N ms)
+SUMMARY: 0 passed, 0 failed, 2 skipped (N ms)
 --- stderr

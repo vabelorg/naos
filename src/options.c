@@ -18,6 +18,7 @@
 
 #include <naos/export.h>
 
+#include "clock.h"
 #include "format.h"
 #include "order.h"
 #include "report.h"
@@ -180,6 +181,7 @@ static void print_help(const char *program)
     }
     naos_printf("an option that takes a value also takes it after '=': --naos-filter=<patterns>.\n");
     naos_printf("the other args are left in argv for the program.\n");
+    naos_printf("the times of the results are %s.\n", naos_clock_description());
     fflush(stdout);
 }
 

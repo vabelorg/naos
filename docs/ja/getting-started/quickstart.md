@@ -140,12 +140,12 @@ CTest はテストごとに別のプロセスを起動し、`<target>.<suite>.<t
 ```
 $ ./build/clamp_tests
 RUN: clamp.inside_range
-PASS: clamp.inside_range
+PASS: clamp.inside_range (0 ms)
 RUN: clamp.below_range
-PASS: clamp.below_range
+PASS: clamp.below_range (0 ms)
 RUN: clamp.above_range
-PASS: clamp.above_range
-SUMMARY: 3 passed, 0 failed, 0 skipped
+PASS: clamp.above_range (0 ms)
+SUMMARY: 3 passed, 0 failed, 0 skipped (0 ms)
 ```
 
 Visual Studio などのマルチコンフィグのジェネレータでは、ビルドに `--config Debug` を、`ctest` に `-C Debug` を付けます。実行ファイルは `build\Debug\clamp_tests.exe` になります。
@@ -162,12 +162,12 @@ RUN: clamp.inside_range
 clamp_test.c:10: error: 6 == clamp(5, 0, 10)
   left:  6
   right: 5
-FAIL: clamp.inside_range (1 failure)
+FAIL: clamp.inside_range (1 failure, 0 ms)
 RUN: clamp.below_range
-PASS: clamp.below_range
+PASS: clamp.below_range (0 ms)
 RUN: clamp.above_range
-PASS: clamp.above_range
-SUMMARY: 2 passed, 1 failed, 0 skipped
+PASS: clamp.above_range (0 ms)
+SUMMARY: 2 passed, 1 failed, 0 skipped (0 ms)
 ```
 
 `inside_range` だけが失敗し、残りの 2 つは通りました。1 つのテストが失敗しても、ほかのテストは実行されます。失敗の表示は次のように読みます。

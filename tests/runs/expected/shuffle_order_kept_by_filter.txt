@@ -3,14 +3,14 @@ exit code: 0
 --- stdout
 RANDOM SEED: 1
 RUN: a.t2
-PASS: a.t2
+PASS: a.t2 (N ms)
 RUN: a.t3
-PASS: a.t3
+PASS: a.t3 (N ms)
 RUN: a.t1
-PASS: a.t1
+PASS: a.t1 (N ms)
 RUN: b.t1
-PASS: b.t1
+PASS: b.t1 (N ms)
 RUN: b.t3
-PASS: b.t3
-SUMMARY: 5 passed, 0 failed, 0 skipped
+PASS: b.t3 (N ms)
+SUMMARY: 5 passed, 0 failed, 0 skipped (N ms)
 --- stderr

@@ -13,15 +13,17 @@
 | 行 | 出すとき |
 |---|---|
 | `RUN: <suite>.<test>` | テストを始めるとき（setup の前）。すぐに書き出すので、プロセスが落ちても残る |
-| `PASS: <suite>.<test>` | 失敗もスキップもなく終わったとき |
-| `FAIL: <suite>.<test> (<N> failure)` | 失敗を記録したとき。N が 2 以上なら `failures` |
-| `SKIP: <suite>.<test>` | スキップし、失敗を記録しなかったとき |
-| `SUMMARY: <p> passed, <f> failed, <s> skipped` | 各回の最後。実行したテストが 1 つや 0 のときも出る。`--naos-fail-fast` で止めたときは、実行したテストだけを数える |
+| `PASS: <suite>.<test> (<t> ms)` | 失敗もスキップもなく終わったとき |
+| `FAIL: <suite>.<test> (<N> failure, <t> ms)` | 失敗を記録したとき。N が 2 以上なら `failures` |
+| `SKIP: <suite>.<test> (<t> ms)` | スキップし、失敗を記録しなかったとき |
+| `SUMMARY: <p> passed, <f> failed, <s> skipped (<t> ms)` | 各回の最後。実行したテストが 1 つや 0 のときも出る。`--naos-fail-fast` で止めたときは、実行したテストだけを数える |
 | `RANDOM SEED: <seed>` | `--naos-shuffle` のとき、各回の最初 |
 | `ITERATION: <i> of <n>` | `--naos-repeat` が 2 以上のとき、各回の前 |
 | `ITERATION FAILED: <i> of <n>` | `--naos-repeat` が 2 以上のとき、失敗した回の後。`--naos-shuffle` なら後ろに ` (random seed <seed>)` |
 | `REPEAT: <f> of <n> iterations failed` | `--naos-repeat` が 2 以上のとき、すべての回の後。途中で止めたときは後ろに `, <k> not run` |
 | `FAIL FAST: stopped at the first failure; <n> not run` | `--naos-fail-fast` で止め、実行しなかったテストがあるとき |
+
+<t> はミリ秒の[時間](#時間)です。
 
 1 回の中の並びは `ITERATION:`、`RANDOM SEED:`、各テスト（`RUN:` から結果の行まで）、`FAIL FAST:`、`SUMMARY:`、`ITERATION FAILED:` の順で、最後に `REPEAT:` が来ます。1 つのテストの setup・本体・teardown で出た診断は、すべてそのテストの `RUN:` と結果の行の間に出ます。
 
@@ -49,9 +51,21 @@ greet_test.c:12: error: greeting == "hello"
   left:  "hello\n"
   right: "hello"
   first difference: offset 5, end of right
-FAIL: text.greeting (1 failure)
-SUMMARY: 497 passed, 1 failed, 2 skipped
+FAIL: text.greeting (1 failure, 1 ms)
+SUMMARY: 497 passed, 1 failed, 2 skipped (2318 ms)
 ```
+
+## 時間
+
+結果の行と `SUMMARY:` の最後には、テストにかかった時間が付きます。指定しなくても、遅いテストが目に入るようにするためです。
+
+- テストの時間は、setup・本体・teardown にかかった時間です。テストの開始と終了に合わせ、setup の直前から teardown の直後までを測ります。行を出力する時間は含みません。
+- `SUMMARY:` の時間は、その回のテストの時間の合計です。`--naos-fail-fast` で止めたときは、実行したテストだけの合計です。`--naos-repeat` では回ごとに出ます。
+- どちらも切り捨てたミリ秒の整数です。1 ミリ秒に満たないテストは `0 ms` になります。`SUMMARY:` は合計を最後に 1 回だけ切り捨てるので、表示された時間の和より少し大きいことがあります。
+- 時計は、システムの単調時計による実時間です。システムの時刻を変えても飛びません。Windows では `QueryPerformanceCounter`、macOS とそのほかの POSIX システムでは `clock_gettime(CLOCK_MONOTONIC)` を使います。それ以外では標準 C の `clock()` に頼り、これはプロセッサ時間です。眠ったり待ったりするテストは、実際より短く出ます。どちらを使っているかは `--help` の最後の行に出ます（[コマンドライン](command-line.md)）。
+- 時間は実行のたびに変わるので、標準出力も変わります。2 回の実行の結果を比べるときは、`time` を除いた [JUnit XML](xml.md) のファイルか、時間を除いた出力を比べてください。
+
+[JUnit XML](xml.md) のファイルにも、同じ時間を秒で書きます。
 
 ## 診断の行
 
@@ -133,13 +147,13 @@ GCC 形式の `error` の行は、VS Code の `$gcc` など GCC の診断を読�
 
 ```
 RUN: math.addition
-PASS: math.addition
+PASS: math.addition (0 ms)
 RUN: text.greeting
 greet_test.c:12: error: greeting == "hello"
   left:  "hello\n"
   right: "hello"
   first difference: offset 5, end of right
 greet_test.c:30: note: locale C
-FAIL: text.greeting (1 failure)
-SUMMARY: 1 passed, 1 failed, 0 skipped
+FAIL: text.greeting (1 failure, 1 ms)
+SUMMARY: 1 passed, 1 failed, 0 skipped (1 ms)
 ```

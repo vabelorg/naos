@@ -2,8 +2,8 @@ args: --slow
 exit code: 0
 --- stdout
 RUN: quick.adds
-PASS: quick.adds
+PASS: quick.adds (N ms)
 RUN: slow.sums_a_million
-PASS: slow.sums_a_million
-SUMMARY: 2 passed, 0 failed, 0 skipped
+PASS: slow.sums_a_million (N ms)
+SUMMARY: 2 passed, 0 failed, 0 skipped (N ms)
 --- stderr

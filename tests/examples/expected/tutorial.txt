@@ -2,10 +2,10 @@ args:
 exit code: 0
 --- stdout
 RUN: strbuf.starts_empty
-PASS: strbuf.starts_empty
+PASS: strbuf.starts_empty (N ms)
 RUN: strbuf.append_joins
-PASS: strbuf.append_joins
+PASS: strbuf.append_joins (N ms)
 RUN: strbuf.append_grows
-PASS: strbuf.append_grows
-SUMMARY: 3 passed, 0 failed, 0 skipped
+PASS: strbuf.append_grows (N ms)
+SUMMARY: 3 passed, 0 failed, 0 skipped (N ms)
 --- stderr

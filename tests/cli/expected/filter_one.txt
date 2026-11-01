@@ -2,6 +2,6 @@ args: --naos-filter parser.empty
 exit code: 0
 --- stdout
 RUN: parser.empty
-PASS: parser.empty
-SUMMARY: 1 passed, 0 failed, 0 skipped
+PASS: parser.empty (N ms)
+SUMMARY: 1 passed, 0 failed, 0 skipped (N ms)
 --- stderr

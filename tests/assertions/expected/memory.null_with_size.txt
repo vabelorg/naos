@@ -14,6 +14,6 @@ memory.c:LINE: error: none == none
   left size:  2
   right size: 2
   invalid: left and right are NULL with non-zero size
-FAIL: memory.null_with_size (3 failures)
-SUMMARY: 0 passed, 1 failed, 0 skipped
+FAIL: memory.null_with_size (3 failures, N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 --- stderr

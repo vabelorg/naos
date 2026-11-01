@@ -3,6 +3,6 @@ exit code: 1
 --- stdout
 RUN: note.used_up_by_pass
 note.c:LINE: error: 0
-FAIL: note.used_up_by_pass (1 failure)
-SUMMARY: 0 passed, 1 failed, 0 skipped
+FAIL: note.used_up_by_pass (1 failure, N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 --- stderr

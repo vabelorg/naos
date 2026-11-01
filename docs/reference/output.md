@@ -13,15 +13,17 @@ While the tests run, Naos writes only three kinds of lines to standard output. T
 | Line | When |
 |---|---|
 | `RUN: <suite>.<test>` | As a test starts (before setup). Flushed at once, so it stays even if the process dies |
-| `PASS: <suite>.<test>` | The test ended with no failure and no skip |
-| `FAIL: <suite>.<test> (<N> failure)` | The test recorded failures; `failures` when N is 2 or more |
-| `SKIP: <suite>.<test>` | The test was skipped and recorded no failure |
-| `SUMMARY: <p> passed, <f> failed, <s> skipped` | At the end of each iteration, even when it ran a single test or none. After a stop by `--naos-fail-fast`, only the tests run are counted |
+| `PASS: <suite>.<test> (<t> ms)` | The test ended with no failure and no skip |
+| `FAIL: <suite>.<test> (<N> failure, <t> ms)` | The test recorded failures; `failures` when N is 2 or more |
+| `SKIP: <suite>.<test> (<t> ms)` | The test was skipped and recorded no failure |
+| `SUMMARY: <p> passed, <f> failed, <s> skipped (<t> ms)` | At the end of each iteration, even when it ran a single test or none. After a stop by `--naos-fail-fast`, only the tests run are counted |
 | `RANDOM SEED: <seed>` | At the start of each iteration, with `--naos-shuffle` |
 | `ITERATION: <i> of <n>` | Before each iteration, when `--naos-repeat` is 2 or more |
 | `ITERATION FAILED: <i> of <n>` | After an iteration that failed, when `--naos-repeat` is 2 or more; followed by ` (random seed <seed>)` with `--naos-shuffle` |
 | `REPEAT: <f> of <n> iterations failed` | After all the iterations, when `--naos-repeat` is 2 or more; followed by `, <k> not run` after a stop |
 | `FAIL FAST: stopped at the first failure; <n> not run` | When `--naos-fail-fast` stopped the run with tests not run |
+
+<t> is a [time](#times) in milliseconds.
 
 Within an iteration, the order is `ITERATION:`, `RANDOM SEED:`, each test (from `RUN:` to its result line), `FAIL FAST:`, `SUMMARY:` and `ITERATION FAILED:`; `REPEAT:` comes last. Every diagnostic of the setup, body and teardown of a test comes between its `RUN:` and its result line.
 
@@ -49,9 +51,21 @@ greet_test.c:12: error: greeting == "hello"
   left:  "hello\n"
   right: "hello"
   first difference: offset 5, end of right
-FAIL: text.greeting (1 failure)
-SUMMARY: 497 passed, 1 failed, 2 skipped
+FAIL: text.greeting (1 failure, 1 ms)
+SUMMARY: 497 passed, 1 failed, 2 skipped (2318 ms)
 ```
+
+## Times
+
+The result lines and `SUMMARY:` end with the time the tests took, so that a slow test shows without asking for it.
+
+- The time of a test covers its setup, body and teardown: from just before setup to just after teardown, as the test starts and ends. Writing its lines is not counted.
+- The time of `SUMMARY:` is the sum of the times of the tests of its iteration, of those run only after a stop by `--naos-fail-fast`. With `--naos-repeat`, each iteration has its own.
+- Both are whole milliseconds, rounded down: a test shorter than a millisecond shows `0 ms`. `SUMMARY:` rounds the sum down once, so it may be a little more than the sum of the times shown.
+- The clock is wall-clock time from the monotonic clock of the system, which does not jump when the time of the system is changed: `QueryPerformanceCounter` on Windows, `clock_gettime(CLOCK_MONOTONIC)` on macOS and other POSIX systems. Elsewhere, Naos falls back on `clock()` of standard C, which is processor time: a test that sleeps or waits shows less than it took. The last line of `--help` says which one is used ([command line](command-line.md)).
+- The times change from run to run, so standard output does too. To compare the results of two runs, compare the [JUnit XML](xml.md) files without their `time`, or the output without the times.
+
+The [JUnit XML](xml.md) file has the same times, in seconds.
 
 ## Diagnostic lines
 
@@ -133,13 +147,13 @@ Everything else on this page, such as the flow lines, the detail lines, the orde
 
 ```
 RUN: math.addition
-PASS: math.addition
+PASS: math.addition (0 ms)
 RUN: text.greeting
 greet_test.c:12: error: greeting == "hello"
   left:  "hello\n"
   right: "hello"
   first difference: offset 5, end of right
 greet_test.c:30: note: locale C
-FAIL: text.greeting (1 failure)
-SUMMARY: 1 passed, 1 failed, 0 skipped
+FAIL: text.greeting (1 failure, 1 ms)
+SUMMARY: 1 passed, 1 failed, 0 skipped (1 ms)
 ```

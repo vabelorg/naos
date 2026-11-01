@@ -3,27 +3,27 @@ exit code: 1
 --- stdout
 RANDOM SEED: 2
 RUN: b.t2
-PASS: b.t2
+PASS: b.t2 (N ms)
 RUN: b.t3
-PASS: b.t3
+PASS: b.t3 (N ms)
 RUN: b.t1
-PASS: b.t1
+PASS: b.t1 (N ms)
 RUN: c.t3
-PASS: c.t3
+PASS: c.t3 (N ms)
 RUN: c.t1
-PASS: c.t1
+PASS: c.t1 (N ms)
 RUN: c.t2
-PASS: c.t2
+PASS: c.t2 (N ms)
 RUN: dependent.second
 shuffle.c:LINE: error: first_ran
-FAIL: dependent.second (1 failure)
+FAIL: dependent.second (1 failure, N ms)
 RUN: dependent.first
-PASS: dependent.first
+PASS: dependent.first (N ms)
 RUN: a.t2
-PASS: a.t2
+PASS: a.t2 (N ms)
 RUN: a.t1
-PASS: a.t1
+PASS: a.t1 (N ms)
 RUN: a.t3
-PASS: a.t3
-SUMMARY: 10 passed, 1 failed, 0 skipped
+PASS: a.t3 (N ms)
+SUMMARY: 10 passed, 1 failed, 0 skipped (N ms)
 --- stderr

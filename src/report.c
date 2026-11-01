@@ -95,13 +95,13 @@ void naos_report_diagnostic(const naos_diagnostic_record_t *record)
     }
 }
 
-void naos_report_test_result(const char *suite, const char *test, naos_outcome_t outcome, int failure_count)
+void naos_report_test_result(const char *suite, const char *test, naos_outcome_t outcome, int failure_count, naos_nanoseconds_t elapsed)
 {
     size_t i;
 
     for (i = 0; i < writer_count(); i++)
     {
-        g_writers[i]->test_end(suite, test, outcome, failure_count);
+        g_writers[i]->test_end(suite, test, outcome, failure_count, elapsed);
     }
 }
 

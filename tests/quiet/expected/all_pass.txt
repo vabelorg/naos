@@ -1,5 +1,5 @@
 args: --naos-quiet --naos-filter results.passes
 exit code: 0
 --- stdout
-SUMMARY: 1 passed, 0 failed, 0 skipped
+SUMMARY: 1 passed, 0 failed, 0 skipped (N ms)
 --- stderr

@@ -2,10 +2,10 @@ args:
 exit code: 0
 --- stdout
 RUN: clamp.inside_range
-PASS: clamp.inside_range
+PASS: clamp.inside_range (N ms)
 RUN: clamp.below_range
-PASS: clamp.below_range
+PASS: clamp.below_range (N ms)
 RUN: clamp.above_range
-PASS: clamp.above_range
-SUMMARY: 3 passed, 0 failed, 0 skipped
+PASS: clamp.above_range (N ms)
+SUMMARY: 3 passed, 0 failed, 0 skipped (N ms)
 --- stderr

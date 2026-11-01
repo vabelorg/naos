@@ -4,6 +4,6 @@ exit code: 1
 RUN: setup_fails.body
 fixtures.c:LINE: error: 1 == 2
 teardown-ran
-FAIL: setup_fails.body (1 failure)
-SUMMARY: 0 passed, 1 failed, 0 skipped
+FAIL: setup_fails.body (1 failure, N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 --- stderr

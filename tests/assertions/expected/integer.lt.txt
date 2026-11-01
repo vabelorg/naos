@@ -5,6 +5,6 @@ RUN: integer.lt
 integer.c:LINE: error: 2 < -1
   left:  2
   right: -1
-FAIL: integer.lt (1 failure)
-SUMMARY: 0 passed, 1 failed, 0 skipped
+FAIL: integer.lt (1 failure, N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 --- stderr

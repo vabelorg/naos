@@ -5,6 +5,6 @@ RUN: trace.pop_without_push
 trace.c:LINE: error: NAOS_TRACE_POP without NAOS_TRACE_PUSH
 trace.c:LINE: error: 0
   note: kept-note
-FAIL: trace.pop_without_push (2 failures)
-SUMMARY: 0 passed, 1 failed, 0 skipped
+FAIL: trace.pop_without_push (2 failures, N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 --- stderr

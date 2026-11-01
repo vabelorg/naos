@@ -38,18 +38,18 @@ NAOS_MAIN(
 ```
 $ ./clamp_tests
 RUN: clamp.below_range
-PASS: clamp.below_range
+PASS: clamp.below_range (0 ms)
 RUN: clamp.above_range
 clamp_test.c:12: error: 10 == clamp(42, 0, 10)
   left:  10
   right: 42
-FAIL: clamp.above_range (1 failure)
-SUMMARY: 1 passed, 1 failed, 0 skipped
+FAIL: clamp.above_range (1 failure, 0 ms)
+SUMMARY: 1 passed, 1 failed, 0 skipped (0 ms)
 ```
 
 ## 特徴
 
-- **1 つの実行ファイルで全テストを実行**: テストごとの行と集計を出力し、結果を終了コードでも返します。
+- **1 つの実行ファイルで全テストを実行**: テストごとの行をかかった時間と一緒に出力し、集計も出して、結果を終了コードでも返します。
 - **1 テストだけ実行**: `--naos-filter clamp.above_range` で、デバッガに掛けるのも簡単です。ワイルドカードと除外でまとめて選べます。
 - **1 テストずつ別プロセスで実行**: `naos_add_executable()` がテストを 1 件ずつ CTest に登録し、クラッシュの分離、並列実行、時間制限は CTest が担います。
 - **隠れた依存をあぶり出す**: 種付きで再現できる `--naos-shuffle`、`--naos-repeat`、`--naos-fail-fast`。

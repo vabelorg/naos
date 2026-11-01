@@ -24,5 +24,6 @@ options (anywhere on the command line):
   --help                    print this help without running any test
 an option that takes a value also takes it after '=': --naos-filter=<patterns>.
 the other args are left in argv for the program.
+the times of the results are <clock>.
 program saw --help
 --- stderr

@@ -6,16 +6,16 @@ RUN: mixed.fails
 failing.c:LINE: error: 1 == 2
   left:  1
   right: 2
-FAIL: mixed.fails (1 failure)
-SUMMARY: 0 passed, 1 failed, 0 skipped
+FAIL: mixed.fails (1 failure, N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 ITERATION FAILED: 1 of 2
 ITERATION: 2 of 2
 RUN: mixed.fails
 failing.c:LINE: error: 1 == 2
   left:  1
   right: 2
-FAIL: mixed.fails (1 failure)
-SUMMARY: 0 passed, 1 failed, 0 skipped
+FAIL: mixed.fails (1 failure, N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 ITERATION FAILED: 2 of 2
 REPEAT: 2 of 2 iterations failed
 --- stderr

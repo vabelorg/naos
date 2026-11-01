@@ -34,8 +34,8 @@ RUN: parser.nested
 parser_test.c:41: error: depth == 3
   left:  2
   right: 3
-FAIL: parser.nested (1 failure)
-SUMMARY: 211 passed, 1 failed, 0 skipped
+FAIL: parser.nested (1 failure, 0 ms)
+SUMMARY: 211 passed, 1 failed, 0 skipped (1834 ms)
 ```
 
 The tests that are skipped are only counted in the summary. A test that ends the process, such as by a crash, leaves no line naming it: run the same command again without `--naos-quiet` to see which one it was. The lines that are left out are listed in [output](../reference/output.md#with---naos-quiet).
@@ -62,6 +62,23 @@ This runs the tests 50 times in random orders and stops at the first failure:
 ```sh
 ./my_tests --naos-shuffle --naos-repeat 50 --naos-fail-fast
 ```
+
+## Find slow tests
+
+Each result line ends with the time the test took, setup and teardown included, and `SUMMARY:` with the total:
+
+```
+$ ./my_tests
+RUN: storage.open_empty
+PASS: storage.open_empty (0 ms)
+RUN: storage.rebuild_index
+PASS: storage.rebuild_index (3120 ms)
+SUMMARY: 2 passed, 0 failed, 0 skipped (3120 ms)
+```
+
+A test that a change made slower shows on its line. To list the slowest tests, sort the result lines by their time, or the test cases of the [JUnit XML](../reference/xml.md) file of `--naos-output` by `time`. Slow tests named after a pattern, such as `slow_*`, can be left out of the edit-and-run loop with `--naos-filter '-*.slow_*'`. The times also help to choose the time limit of CTest (`--timeout`, [CTest and CI](ctest-and-ci.md)).
+
+The times are wall-clock time. On a system without a monotonic clock, they are processor time, which `--help` says ([times](../reference/output.md#times)).
 
 ## Run each test in its own process
 

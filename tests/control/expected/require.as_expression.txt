@@ -3,6 +3,6 @@ exit code: 1
 --- stdout
 RUN: require.as_expression
 require.c:LINE: error: 1 == 2
-FAIL: require.as_expression (1 failure)
-SUMMARY: 0 passed, 1 failed, 0 skipped
+FAIL: require.as_expression (1 failure, N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 --- stderr

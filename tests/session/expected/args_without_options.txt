@@ -2,6 +2,6 @@ args: first --naos-filter own_main.sees_args_without_options second
 exit code: 0
 --- stdout
 RUN: own_main.sees_args_without_options
-PASS: own_main.sees_args_without_options
-SUMMARY: 1 passed, 0 failed, 0 skipped
+PASS: own_main.sees_args_without_options (N ms)
+SUMMARY: 1 passed, 0 failed, 0 skipped (N ms)
 --- stderr

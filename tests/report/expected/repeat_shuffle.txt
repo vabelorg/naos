@@ -5,67 +5,67 @@ ITERATION: 1 of 2
 RANDOM SEED: 3
 RUN: text.markup
 report.c:LINE: error: <a & "b" 'c'>
-FAIL: text.markup (1 failure)
+FAIL: text.markup (1 failure, N ms)
 RUN: results.skips
 report.c:LINE: skip: not here
-SKIP: results.skips
+SKIP: results.skips (N ms)
 RUN: results.passes
-PASS: results.passes
-SUMMARY: 1 passed, 1 failed, 1 skipped
+PASS: results.passes (N ms)
+SUMMARY: 1 passed, 1 failed, 1 skipped (N ms)
 ITERATION FAILED: 1 of 2 (random seed 3)
 ITERATION: 2 of 2
 RANDOM SEED: 4
 RUN: results.passes
-PASS: results.passes
+PASS: results.passes (N ms)
 RUN: results.skips
 report.c:LINE: skip: not here
-SKIP: results.skips
+SKIP: results.skips (N ms)
 RUN: text.markup
 report.c:LINE: error: <a & "b" 'c'>
-FAIL: text.markup (1 failure)
-SUMMARY: 1 passed, 1 failed, 1 skipped
+FAIL: text.markup (1 failure, N ms)
+SUMMARY: 1 passed, 1 failed, 1 skipped (N ms)
 ITERATION FAILED: 2 of 2 (random seed 4)
 REPEAT: 2 of 2 iterations failed
 --- stderr
 --- output
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="naos_selftest_report" tests="6" failures="2" errors="0" skipped="2">
-  <testsuite name="text" tests="1" failures="1" errors="0" skipped="0">
+<testsuites name="naos_selftest_report" tests="6" failures="2" errors="0" skipped="2" time="N.NNN">
+  <testsuite name="text" tests="1" failures="1" errors="0" skipped="0" time="N.NNN">
     <properties>
       <property name="iteration" value="1"/>
       <property name="random_seed" value="3"/>
     </properties>
-    <testcase classname="text" name="markup" file="report.c" line="LINE">
+    <testcase classname="text" name="markup" time="N.NNN" file="report.c" line="LINE">
       <failure type="error" message="&lt;a &amp; &quot;b&quot; &apos;c&apos;&gt;">report.c:LINE: error: &lt;a &amp; "b" 'c'&gt;
 </failure>
     </testcase>
   </testsuite>
-  <testsuite name="results" tests="2" failures="0" errors="0" skipped="1">
+  <testsuite name="results" tests="2" failures="0" errors="0" skipped="1" time="N.NNN">
     <properties>
       <property name="iteration" value="1"/>
       <property name="random_seed" value="3"/>
     </properties>
-    <testcase classname="results" name="skips" file="report.c" line="LINE">
+    <testcase classname="results" name="skips" time="N.NNN" file="report.c" line="LINE">
       <skipped message="not here"/>
     </testcase>
-    <testcase classname="results" name="passes"/>
+    <testcase classname="results" name="passes" time="N.NNN"/>
   </testsuite>
-  <testsuite name="results" tests="2" failures="0" errors="0" skipped="1">
+  <testsuite name="results" tests="2" failures="0" errors="0" skipped="1" time="N.NNN">
     <properties>
       <property name="iteration" value="2"/>
       <property name="random_seed" value="4"/>
     </properties>
-    <testcase classname="results" name="passes"/>
-    <testcase classname="results" name="skips" file="report.c" line="LINE">
+    <testcase classname="results" name="passes" time="N.NNN"/>
+    <testcase classname="results" name="skips" time="N.NNN" file="report.c" line="LINE">
       <skipped message="not here"/>
     </testcase>
   </testsuite>
-  <testsuite name="text" tests="1" failures="1" errors="0" skipped="0">
+  <testsuite name="text" tests="1" failures="1" errors="0" skipped="0" time="N.NNN">
     <properties>
       <property name="iteration" value="2"/>
       <property name="random_seed" value="4"/>
     </properties>
-    <testcase classname="text" name="markup" file="report.c" line="LINE">
+    <testcase classname="text" name="markup" time="N.NNN" file="report.c" line="LINE">
       <failure type="error" message="&lt;a &amp; &quot;b&quot; &apos;c&apos;&gt;">report.c:LINE: error: &lt;a &amp; "b" 'c'&gt;
 </failure>
     </testcase>

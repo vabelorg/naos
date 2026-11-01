@@ -19,6 +19,7 @@
 #   runs/       --naos-shuffle, --naos-repeat and --naos-fail-fast
 #   report/     the JUnit XML file of --naos-output
 #   quiet/      the output of --naos-quiet
+#   timing/     the times of the result lines and SUMMARY: that they are measured
 #   discovery/  the messages of NaosDiscover.cmake when listing the tests fails
 #   no_cmake/   building without CMake, as docs/getting-started/installation.md describes
 #   examples/   the projects of examples/, and the outputs the documentation quotes from them
@@ -34,6 +35,6 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/support/NaosSelftest.cmake)
 naos_selftest_strict(naos)
 
 foreach(subject IN ITEMS
-        api unit cli session assertions control fixtures context runs report quiet discovery no_cmake examples docs sources misuse)
+        api unit cli session assertions control fixtures context runs report quiet timing discovery no_cmake examples docs sources misuse)
     add_subdirectory(${subject})
 endforeach()

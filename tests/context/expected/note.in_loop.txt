@@ -10,6 +10,6 @@ note.c:LINE: error: i < 3
   left:  4
   right: 3
   note: i=4 of loop
-FAIL: note.in_loop (2 failures)
-SUMMARY: 0 passed, 1 failed, 0 skipped
+FAIL: note.in_loop (2 failures, N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 --- stderr

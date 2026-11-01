@@ -38,18 +38,18 @@ When `clamp()` forgets its upper bound:
 ```
 $ ./clamp_tests
 RUN: clamp.below_range
-PASS: clamp.below_range
+PASS: clamp.below_range (0 ms)
 RUN: clamp.above_range
 clamp_test.c:12: error: 10 == clamp(42, 0, 10)
   left:  10
   right: 42
-FAIL: clamp.above_range (1 failure)
-SUMMARY: 1 passed, 1 failed, 0 skipped
+FAIL: clamp.above_range (1 failure, 0 ms)
+SUMMARY: 1 passed, 1 failed, 0 skipped (0 ms)
 ```
 
 ## Features
 
-- **One executable runs every test**: a line per test, a summary, and the result as the exit code.
+- **One executable runs every test**: a line per test with the time it took, a summary, and the result as the exit code.
 - **One test at a time**: `--naos-filter clamp.above_range`, under a debugger for instance. Wildcards and exclusions select groups.
 - **One process per test**: `naos_add_executable()` registers each test with CTest, which isolates crashes, runs in parallel and sets time limits.
 - **Hidden dependencies shaken out**: `--naos-shuffle` (replayable seed), `--naos-repeat`, `--naos-fail-fast`.

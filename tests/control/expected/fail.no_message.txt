@@ -3,6 +3,6 @@ exit code: 1
 --- stdout
 RUN: fail.no_message
 fail.c:LINE: error: (no message)
-FAIL: fail.no_message (1 failure)
-SUMMARY: 0 passed, 1 failed, 0 skipped
+FAIL: fail.no_message (1 failure, N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 --- stderr

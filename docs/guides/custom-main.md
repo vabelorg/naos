@@ -43,10 +43,10 @@ int main(int argc, char **argv)
 ```
 $ ./custom_main_tests --slow
 RUN: quick.adds
-PASS: quick.adds
+PASS: quick.adds (0 ms)
 RUN: slow.sums_a_million
-PASS: slow.sums_a_million
-SUMMARY: 2 passed, 0 failed, 0 skipped
+PASS: slow.sums_a_million (3 ms)
+SUMMARY: 2 passed, 0 failed, 0 skipped (3 ms)
 ```
 
 The options of Naos still work, anywhere among the arguments:

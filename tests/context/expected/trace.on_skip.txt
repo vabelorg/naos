@@ -4,6 +4,6 @@ exit code: 77
 RUN: trace.on_skip
 trace.c:LINE: skip: not applicable
 trace.c:LINE: note: skip-trace
-SKIP: trace.on_skip
-SUMMARY: 0 passed, 0 failed, 1 skipped
+SKIP: trace.on_skip (N ms)
+SUMMARY: 0 passed, 0 failed, 1 skipped (N ms)
 --- stderr

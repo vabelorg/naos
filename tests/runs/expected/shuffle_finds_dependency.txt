@@ -4,8 +4,8 @@ exit code: 1
 RANDOM SEED: 2
 RUN: dependent.second
 shuffle.c:LINE: error: first_ran
-FAIL: dependent.second (1 failure)
+FAIL: dependent.second (1 failure, N ms)
 RUN: dependent.first
-PASS: dependent.first
-SUMMARY: 1 passed, 1 failed, 0 skipped
+PASS: dependent.first (N ms)
+SUMMARY: 1 passed, 1 failed, 0 skipped (N ms)
 --- stderr

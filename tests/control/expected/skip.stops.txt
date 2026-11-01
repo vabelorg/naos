@@ -3,6 +3,6 @@ exit code: 77
 --- stdout
 RUN: skip.stops
 skip.c:LINE: skip: not applicable
-SKIP: skip.stops
-SUMMARY: 0 passed, 0 failed, 1 skipped
+SKIP: skip.stops (N ms)
+SUMMARY: 0 passed, 0 failed, 1 skipped (N ms)
 --- stderr

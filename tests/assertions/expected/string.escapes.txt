@@ -6,6 +6,6 @@ string.c:LINE: error: "a\nb\tc\rd" == "a\"b\\c\x01\x7F"
   left:  "a\nb\tc\rd"
   right: "a\"b\\c\x01\x7F"
   first difference: offset 1, left 0x0A, right 0x22
-FAIL: string.escapes (1 failure)
-SUMMARY: 0 passed, 1 failed, 0 skipped
+FAIL: string.escapes (1 failure, N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 --- stderr

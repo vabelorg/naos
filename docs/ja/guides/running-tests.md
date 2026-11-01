@@ -34,8 +34,8 @@ RUN: parser.nested
 parser_test.c:41: error: depth == 3
   left:  2
   right: 3
-FAIL: parser.nested (1 failure)
-SUMMARY: 211 passed, 1 failed, 0 skipped
+FAIL: parser.nested (1 failure, 0 ms)
+SUMMARY: 211 passed, 1 failed, 0 skipped (1834 ms)
 ```
 
 スキップしたテストは集計で数えるだけです。クラッシュなどでプロセスを終わらせたテストは、その名前を示す行を残しません。どのテストだったかは、同じコマンドを `--naos-quiet` なしで実行し直すと分かります。省く行の一覧は[出力](../reference/output.md#--naos-quiet-のとき)にあります。
@@ -62,6 +62,23 @@ $ ./my_tests --naos-shuffle --naos-random-seed 4242   # 同じ順序で実行し
 ```sh
 ./my_tests --naos-shuffle --naos-repeat 50 --naos-fail-fast
 ```
+
+## 遅いテストを見つける
+
+結果の行の最後には、setup と teardown を含めてテストにかかった時間が付き、`SUMMARY:` には合計が付きます。
+
+```
+$ ./my_tests
+RUN: storage.open_empty
+PASS: storage.open_empty (0 ms)
+RUN: storage.rebuild_index
+PASS: storage.rebuild_index (3120 ms)
+SUMMARY: 2 passed, 0 failed, 0 skipped (3120 ms)
+```
+
+変更で遅くなったテストは、その行で分かります。遅い順に並べるには、結果の行を時間で並べ替えるか、`--naos-output` の [JUnit XML](../reference/xml.md) のファイルのテストケースを `time` で並べ替えます。`slow_*` のように名前で分かる遅いテストは、`--naos-filter '-*.slow_*'` で、編集しては実行するループから外せます。CTest の時間制限（`--timeout`、[CTest と CI](ctest-and-ci.md)）を決めるのにも役立ちます。
+
+時間は実時間です。単調時計のないシステムではプロセッサ時間になり、そのことは `--help` に出ます（[時間](../reference/output.md#時間)）。
 
 ## 1 テストずつ別のプロセスで実行する
 
