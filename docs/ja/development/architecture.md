@@ -6,7 +6,7 @@ Naos 自体を保守・拡張する人向けに、ソースの置き方とモジ
 
 何を Naos に入れるかは、個々の機能より先に、次の原則で決めます。
 
-- **導入しやすさが最優先**: 標準 C ライブラリ以外に依存しない、コンパイラ拡張を使わない。このどちらかを損なう機能は入れません。
+- **導入しやすさが最優先**: 標準 C ライブラリ以外に依存しない、コンパイラ拡張を使わない。このどちらかを損なう機能は入れません。ここでいう依存とは、インストールやリンクが必要なライブラリのことです。サポートするどのプラットフォームでもそのどちらも要らない OS の関数は、依存に当たりません。そうした関数は、同じことができるものが標準 C にないときだけ、1 つのファイルの中でだけ使い、それ以外の環境では標準 C で代わりをします。今のところ、`clock.c` の単調時計だけです。`clock()` は POSIX ではプロセッサ時間、Windows では実時間を測るためです。
 - **人向けの出力とツール向けの出力を分ける**: 標準出力は人が読むためのもので、読みやすくするためにどのバージョンでも変わることがあります。ツールは `--naos-output` の JUnit XML のファイルを読みます。そのうち JUnit XML を読む一般的なツールが処理するものを契約とし、失敗の内容などほかの部分は、標準出力と同じく人向けです（[JUnit XML](../reference/xml.md#互換性)）。標準出力のうち安定させるのは、ツールがそれなしでは動かないものだけです。エディタが読む診断の行の始まり、CTest への登録が読む `--naos-list` の名前、終了コードです（[出力](../reference/output.md#互換を保つもの)）。
 - **公開 API は文書にあるものだけ**: 公開して互換を保つのは、[リファレンス](../reference/README.md)に載せたものだけです。
 - **責務を絞る**: プロセスの分離、並列実行、時間制限は呼び出し側（CTest、スクリプト、CI）に任せます。レポートの形式は、Naos だけが知る結果（各失敗の場所と内容）のために 1 つだけ書き、ほかの形式ははっきり必要になったときにだけ足します。
@@ -41,7 +41,8 @@ Naos 自体を保守・拡張する人向けに、ソースの置き方とモジ
 | `runner.c` | 繰り返し・シャッフル・fail fast を含む全体の実行と集計 |
 | `filter.c` | `--naos-filter` のパターン照合 |
 | `order.c` | `--naos-shuffle` の順序と種（自前の xorshift） |
-| `test.c` | 1 つのテストの実行（setup・本体・teardown と `setjmp` / `longjmp`） |
+| `test.c` | 1 つのテストの実行（setup・本体・teardown と `setjmp` / `longjmp`）と、その時間 |
+| `clock.c` | テストの時間を測る時計。OS の単調時計か `clock()`。プラットフォームに依存する唯一のファイル |
 | `diagnostic.c` | 1 つの診断（始め → 詳細を溜める → 終わり）と、テストの結果の集計 |
 | `context.c` | 診断に添えるメモ（`NAOS_NOTE`）と trace のスタック。出力はしない |
 | `report.c` | 実行のイベント（テストの開始、診断、テストの終了など）を、有効なすべての書き手に伝える。`--naos-list` の名前と、Naos 自身のメッセージ（標準エラー出力）も書く。イベントと書き手の関数は `writer.h` で宣言する |
@@ -59,7 +60,7 @@ flowchart LR
   session --> runner
   runner --> filter & order
   runner --> test --> diagnostic
-  test --> context
+  test --> context & clock
   diagnostic --> context
   diagnostic --> report --> xml --> human --> value
   xml & human --> text
@@ -74,6 +75,7 @@ flowchart LR
 - **停止**: `test.c` は setup・本体・teardown を `setjmp` の下で実行します。停止（`naos_stop`）は、マクロをどの関数の中で使っていても、この `setjmp` の位置まで一気に戻ります。
 - **診断**: 失敗はすべて `naos_diagnostic_begin()` → `naos_diagnostic_add*()` → `naos_diagnostic_end()` を通ります。ここで `context.c` のメモと trace を添え、終わりに診断の全体を `report.c` を通して書き手に伝えます。
 - **書き手**: 実行が書くものはすべて `report.c` を通ります。`report.c` は各イベントを、有効なすべての書き手に同じ順で伝えます。何がいつ起きたかはテストを実行するモジュールが決め、それをどう見せ、どれを書くかは書き手だけが決めます。そのため、出力ごとにほかの出力と関係なく変えられます。
+- **時間**: `test.c` は setup の直前と teardown の直後に 1 回ずつ時計（`clock.c`）を読み、テストの結果と一緒に時間を伝えます。`runner.c` は 1 回の中のテストの時間を集計に足し、回の終わりに伝えます。書き手はそれを書くだけなので、標準出力と JUnit XML のファイルは常に同じ時間を示します（[出力](../reference/output.md#時間)）。`src/` の中で OS についての `#if` はすべて `clock.c` にあります。Windows では `QueryPerformanceCounter`、POSIX では `clock_gettime(CLOCK_MONOTONIC)`（`-std=c99` のために、どの include よりも前に `_POSIX_C_SOURCE` を定義します。ただし macOS は、定義しなくてもヘッダがすべてを宣言するので除きます）、それ以外では `clock()` を使います。どれで測っているかは `--help` が示します。
 - **書式付きの出力**: `src/` の書式付きの出力はすべて `format.h` を通ります。`format.h` は C ライブラリのうち C99 に従う関数を選びます（MinGW では `__mingw_` の関数）。`naos/export.h` の `NAOS_PRINTF_FORMAT` は Naos の printf 形式の関数を同じ書式で宣言するので、コンパイラのチェックと Naos の出力が一致します。
 - **状態**: 共有する可変状態は各モジュールの `static` 変数（`g_` 接頭辞）に閉じ、`extern` 変数にはしません。例外は `naos_init` 以後読むだけのオプションで、`naos_options_get()` で読みます。
 - **列挙**: `naos_add_executable()` は、ビルド後に `NaosDiscover.cmake` を実行する `POST_BUILD` のコマンドを足します。このスクリプトは `<exe> --naos-list` を実行し、出力の 1 行を 1 件のテストとして登録する CTest のファイルを書きます。パラメータはファイル経由で渡すので、リストをエスケープする必要はありません。列挙に失敗したときは、テストが 0 件のまま黙って進めず、ビルドを失敗させて原因と対処をメッセージに出します（[トラブルシューティング](../guides/troubleshooting.md#cmake-と-ctest)）。

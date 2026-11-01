@@ -93,7 +93,7 @@ if (getenv("LARGE_FILE") == NULL)
 
 ```
 io_test.c:8: skip: LARGE_FILE is not set
-SKIP: io.reads_large_file
+SKIP: io.reads_large_file (0 ms)
 ```
 
 - setup の中で `NAOS_SKIP` を呼ぶと、スイートのテストをまとめてスキップできます（[setup と teardown](fixtures.md)）。

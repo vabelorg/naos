@@ -137,7 +137,7 @@ strbuf_test.c:32: error: "hello, world" == strbuf_cstr(&sb)
 strbuf_test.c:33: error: 12 == sb.length
   left:  12
   right: 0
-FAIL: strbuf.append_joins (2 failures)
+FAIL: strbuf.append_joins (2 failures, 0 ms)
 ```
 
 `CHECK` は最初の失敗の後も続けるので、2 つのチェックがどちらも失敗として報告されています。文字列では、`first difference` が最初に違うバイトの位置を示します。出力の各行は[出力](../reference/output.md)で説明しています。
@@ -180,10 +180,10 @@ strbuf.append_grows
 ```
 $ ./build/strbuf_tests --naos-filter 'strbuf.append_*'
 RUN: strbuf.append_joins
-PASS: strbuf.append_joins
+PASS: strbuf.append_joins (0 ms)
 RUN: strbuf.append_grows
-PASS: strbuf.append_grows
-SUMMARY: 2 passed, 0 failed, 0 skipped
+PASS: strbuf.append_grows (0 ms)
+SUMMARY: 2 passed, 0 failed, 0 skipped (0 ms)
 ```
 
 ## 隠れた依存

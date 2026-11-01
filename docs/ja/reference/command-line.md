@@ -22,7 +22,7 @@ prog --help
 - `--naos-fail-fast`: 最初に失敗したテストを teardown まで終えたところで止め、残りのテスト（`--naos-repeat` なら残りの回も）を実行しません。スキップでは止まりません。
 - `--naos-quiet`: 成功したテストとスキップしたテスト、および `ITERATION:` を標準出力から省きます。失敗したテストはこれがないときと同じ形で出力し、実行の最後には集計も出します（[`--naos-quiet` のとき](output.md#--naos-quiet-のとき)）。終了コードと `--naos-output` のファイルは変わりません。
 - `--naos-output <format>:<path>`: 実行の結果を、実行の終わりにファイル `<path>` にも `<format>` で書きます。形式は `xml`（JUnit XML）だけです（[JUnit XML](xml.md)）。値は最初の `:` で分けるので、パスに `:` を含められます（`xml:C:\out\results.xml`）。形式やパスがないとき、未知の形式、2 回の指定は使い方エラーです。
-- `--help`: 使い方を出力し、テストを実行せずに 0 で終了します。
+- `--help`: 使い方を出力し、テストを実行せずに 0 で終了します。最後の行は、結果の[時間](output.md#時間)が何を測っているかを示します。`wall-clock time, from a monotonic clock`（単調時計による実時間）か、そのような時計のないシステムでは `processor time, from clock(), not wall-clock time`（`clock()` によるプロセッサ時間）です。
 
 値を取るオプションは `--naos-filter=<value>` の形でも書けます。値が空のとき（`--naos-filter=`）と、値を取らないオプションに `=` を付けたとき（`--naos-list=1`）は使い方エラーです。
 
