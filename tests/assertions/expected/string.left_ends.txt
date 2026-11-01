@@ -7,4 +7,5 @@ string.c:LINE: error: "ab" == "abc"
   right: "abc"
   first difference: offset 2, end of left
 FAIL: string.left_ends (1 failure)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr

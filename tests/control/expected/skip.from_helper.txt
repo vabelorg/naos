@@ -4,4 +4,5 @@ exit code: 77
 RUN: skip.from_helper
 skip.c:LINE: skip: helper skip
 SKIP: skip.from_helper
+SUMMARY: 0 passed, 0 failed, 1 skipped
 --- stderr

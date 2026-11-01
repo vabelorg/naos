@@ -9,4 +9,5 @@ trace.c:LINE: error: i < 2
 trace.c:LINE: note: i=2
 trace.c:LINE: note: outer
 FAIL: trace.nested (1 failure)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr

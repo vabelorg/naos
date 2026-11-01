@@ -7,4 +7,5 @@ string.c:LINE: error: "\xE3\x81\x82" == "\xFF"
   right: "\xFF"
   first difference: offset 0, left 0xE3, right 0xFF
 FAIL: string.non_ascii (1 failure)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr

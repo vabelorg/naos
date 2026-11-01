@@ -5,4 +5,5 @@ RUN: setup_skips.body
 fixtures.c:LINE: skip: not applicable
 teardown-ran
 SKIP: setup_skips.body
+SUMMARY: 0 passed, 0 failed, 1 skipped
 --- stderr

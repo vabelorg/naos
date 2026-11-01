@@ -6,4 +6,5 @@ fixtures.c:LINE: error: 1 == 2
 body-ran
 teardown-ran
 FAIL: setup_check_continues.body (1 failure)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr

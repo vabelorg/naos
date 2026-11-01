@@ -4,4 +4,5 @@ exit code: 1
 RUN: fail.ends_value_helper
 fail.c:LINE: error: not found
 FAIL: fail.ends_value_helper (1 failure)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr

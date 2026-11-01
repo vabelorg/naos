@@ -37,7 +37,7 @@ void naos_report_round_begin(const naos_round_t *round);
 void naos_report_test_start(const char *suite, const char *test);
 void naos_report_diagnostic(const naos_diagnostic_record_t *record);
 void naos_report_test_result(const char *suite, const char *test, naos_outcome_t outcome, int failure_count);
-void naos_report_round_end(const naos_round_t *round, size_t selected, const naos_tally_t *tally, size_t not_run);
+void naos_report_round_end(const naos_round_t *round, const naos_tally_t *tally, size_t not_run);
 
 /* Ends the run. Returns 0 when a writer could not write all of it, after reporting why. */
 int naos_report_end(long failed_rounds, long repeat, long rounds_not_run);

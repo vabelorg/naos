@@ -90,8 +90,8 @@ typedef struct naos_writer
     void (*diagnostic)(const naos_diagnostic_record_t *record);
     void (*test_end)(const char *suite, const char *test, naos_outcome_t outcome, int failure_count);
 
-    /* selected is the number of tests the filter selects; not_run is how many --naos-fail-fast left out, this round and later. */
-    void (*round_end)(const naos_round_t *round, size_t selected, const naos_tally_t *tally, size_t not_run);
+    /* not_run is how many tests --naos-fail-fast left out, this round and later. */
+    void (*round_end)(const naos_round_t *round, const naos_tally_t *tally, size_t not_run);
 
     /* rounds_not_run is how many rounds --naos-fail-fast left out. Returns 0 when it could not write all of it. */
     int (*end)(long failed_rounds, long repeat, long rounds_not_run);

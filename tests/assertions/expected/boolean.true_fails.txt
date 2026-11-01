@@ -4,4 +4,5 @@ exit code: 1
 RUN: boolean.true_fails
 boolean.c:LINE: error: done
 FAIL: boolean.true_fails (1 failure)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr

@@ -15,4 +15,5 @@ floating.c:LINE: error: 5e-324 ~= 1.0
   right: 1
   tolerance: 0.5
 FAIL: floating.exponent (3 failures)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr

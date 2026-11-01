@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **BREAKING**: The lines Naos writes on standard output are no longer kept compatible, so that they can change to read better. Only the start of a diagnostic line (`file:line: error: `, which editors read), the names of `--naos-list` and the exit codes stay compatible. A tool that parses standard output to collect results, in CI for example, should read the file of `--naos-output xml:<path>` instead, whose tests, results, counts, and the message and location of each failure are kept compatible ([#4](https://github.com/vabelorg/naos/issues/4)).
+- `SUMMARY:` ends every iteration, also when a single test is selected, so that a run always ends with a line saying what happened ([#8](https://github.com/vabelorg/naos/issues/8)).
 
 ## [0.1.0] - 2026-10-31
 

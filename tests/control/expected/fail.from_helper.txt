@@ -4,4 +4,5 @@ exit code: 1
 RUN: fail.from_helper
 fail.c:LINE: error: helper failure
 FAIL: fail.from_helper (1 failure)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr

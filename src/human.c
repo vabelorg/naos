@@ -235,18 +235,15 @@ static void test_end(const char *suite, const char *test, naos_outcome_t outcome
     fflush(stdout);
 }
 
-/* The FAIL FAST, SUMMARY and ITERATION FAILED lines; a summary of a single test would say nothing more. */
-static void round_end(const naos_round_t *round, size_t selected, const naos_tally_t *tally, size_t not_run)
+/* The FAIL FAST, SUMMARY and ITERATION FAILED lines; every round ends with its summary, so that a run always says what happened. */
+static void round_end(const naos_round_t *round, const naos_tally_t *tally, size_t not_run)
 {
     if (not_run > 0)
     {
         naos_printf("FAIL FAST: stopped at the first failure; %zu not run\n", not_run);
     }
 
-    if (selected > 1)
-    {
-        naos_printf("SUMMARY: %zu passed, %zu failed, %zu skipped\n", tally->passed, tally->failed, tally->skipped);
-    }
+    naos_printf("SUMMARY: %zu passed, %zu failed, %zu skipped\n", tally->passed, tally->failed, tally->skipped);
 
     if ((round->repeat > 1) && (tally->failed > 0))
     {

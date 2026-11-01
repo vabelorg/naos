@@ -16,7 +16,7 @@ While the tests run, Naos writes only three kinds of lines to standard output. T
 | `PASS: <suite>.<test>` | The test ended with no failure and no skip |
 | `FAIL: <suite>.<test> (<N> failure)` | The test recorded failures; `failures` when N is 2 or more |
 | `SKIP: <suite>.<test>` | The test was skipped and recorded no failure |
-| `SUMMARY: <p> passed, <f> failed, <s> skipped` | At the end of each iteration, when 2 or more tests are selected. After a stop by `--naos-fail-fast`, only the tests run are counted |
+| `SUMMARY: <p> passed, <f> failed, <s> skipped` | At the end of each iteration, even when it ran a single test or none. After a stop by `--naos-fail-fast`, only the tests run are counted |
 | `RANDOM SEED: <seed>` | At the start of each iteration, with `--naos-shuffle` |
 | `ITERATION: <i> of <n>` | Before each iteration, when `--naos-repeat` is 2 or more |
 | `ITERATION FAILED: <i> of <n>` | After an iteration that failed, when `--naos-repeat` is 2 or more; followed by ` (random seed <seed>)` with `--naos-shuffle` |

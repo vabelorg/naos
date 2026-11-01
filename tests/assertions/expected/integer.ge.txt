@@ -6,4 +6,5 @@ integer.c:LINE: error: INTMAX_MIN >= 7
   left:  -9223372036854775808
   right: 7
 FAIL: integer.ge (1 failure)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr

@@ -4,11 +4,14 @@ exit code: 0
 ITERATION: 1 of 3
 RUN: a.t1
 PASS: a.t1
+SUMMARY: 1 passed, 0 failed, 0 skipped
 ITERATION: 2 of 3
 RUN: a.t1
 PASS: a.t1
+SUMMARY: 1 passed, 0 failed, 0 skipped
 ITERATION: 3 of 3
 RUN: a.t1
 PASS: a.t1
+SUMMARY: 1 passed, 0 failed, 0 skipped
 REPEAT: 0 of 3 iterations failed
 --- stderr

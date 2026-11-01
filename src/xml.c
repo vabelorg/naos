@@ -542,10 +542,9 @@ static void test_end(const char *suite_name, const char *test, naos_outcome_t ou
     suite->end = g_cases.length;
 }
 
-static void round_end(const naos_round_t *round, size_t selected, const naos_tally_t *tally, size_t not_run)
+static void round_end(const naos_round_t *round, const naos_tally_t *tally, size_t not_run)
 {
     (void)round;
-    (void)selected;
     (void)tally;
     (void)not_run;
 

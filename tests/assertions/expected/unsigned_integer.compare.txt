@@ -18,4 +18,5 @@ unsigned_integer.c:LINE: error: 11u >= 12u
   left:  11
   right: 12
 FAIL: unsigned_integer.compare (5 failures)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr

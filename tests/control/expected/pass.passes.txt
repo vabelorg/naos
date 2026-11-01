@@ -3,4 +3,5 @@ exit code: 0
 --- stdout
 RUN: pass.passes
 PASS: pass.passes
+SUMMARY: 1 passed, 0 failed, 0 skipped
 --- stderr

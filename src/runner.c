@@ -162,7 +162,7 @@ static int end_round(const naos_options_t *options, const naos_round_t *round, s
         not_run = add_saturated(selected - (tally->passed + tally->failed + tally->skipped), multiply_saturated(selected, (size_t)(options->repeat - round->index)));
     }
 
-    naos_report_round_end(round, selected, tally, not_run);
+    naos_report_round_end(round, tally, not_run);
 
     return stopped;
 }

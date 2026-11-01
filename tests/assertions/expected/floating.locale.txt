@@ -7,4 +7,5 @@ floating.c:LINE: error: 1.5 ~= 2.5
   right: 2.5
   tolerance: 0.25
 FAIL: floating.locale (1 failure)
+SUMMARY: 0 passed, 1 failed, 0 skipped
 --- stderr
