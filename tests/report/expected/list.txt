@@ -6,7 +6,6 @@ results.fails_twice
 results.skips
 results.fails_then_skips
 results.with_context
-results.multiline_context
 results.too_deep
 text.markup
 text.utf8

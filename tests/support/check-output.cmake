@@ -26,7 +26,8 @@ cmake_minimum_required(VERSION 3.21)
 # Makes text the same wherever it was produced: no CR; the path of the executable, which the usage
 # line prints, as PROG, and the usage on one line, since its wrapping depends on that path; and a
 # location as <file name>:LINE: in either compiler form, without its directory, so that editing a
-# test program moves no expected output.
+# test program moves no expected output. The directory stops at a quote or a '>' too, since in the
+# XML file a location starts the text of <failure> right after its start tag.
 function(normalize var)
     set(text "${${var}}")
     string(REPLACE "\r" "" text "${text}")
@@ -34,22 +35,19 @@ function(normalize var)
     string(REPLACE "${EXE}" "PROG" text "${text}")
     string(REPLACE "${native_exe}" "PROG" text "${text}")
     string(REPLACE "\n       [" " [" text "${text}")
-    string(REGEX REPLACE "([^ \n]*[/\\\\])?([A-Za-z0-9_]+\\.(c|cpp))(:[0-9]+|\\([0-9]+\\)): " "\\2:LINE: " text "${text}")
+    string(REGEX REPLACE "([^ \n\">]*[/\\\\])?([A-Za-z0-9_]+\\.(c|cpp))(:[0-9]+|\\([0-9]+\\)): " "\\2:LINE: " text "${text}")
     if(DEFINED OUTPUT_FILE)
         string(REPLACE "${OUTPUT_FILE}" "{output}" text "${text}")
     endif()
     set(${var} "${text}" PARENT_SCOPE)
 endfunction()
 
-# As normalize, for the XML file of --naos-output: the location of a test case and of a failure,
-# file="<file>" line="<line>", the lines "file: <file>" and "line: <line>", and the location of a
-# trace, "at: <file>:<line>", lose the directory and the line number too.
+# As normalize, for the XML file of --naos-output: the location of a test case, file="<file>"
+# line="<line>", loses the directory and the line number too.
 function(normalize_output var)
     normalize(${var})
     set(text "${${var}}")
     string(REGEX REPLACE "file=\"([^\"]*[/\\\\])?([A-Za-z0-9_]+\\.(c|cpp))\" line=\"[0-9]+\"" "file=\"\\2\" line=\"LINE\"" text "${text}")
-    string(REGEX REPLACE "file: ([^\n]*[/\\\\])?([A-Za-z0-9_]+\\.(c|cpp))\nline: [0-9]+" "file: \\2\nline: LINE" text "${text}")
-    string(REGEX REPLACE "\nat: ([^\n]*[/\\\\])?([A-Za-z0-9_]+\\.(c|cpp)):[0-9]+" "\nat: \\2:LINE" text "${text}")
     set(${var} "${text}" PARENT_SCOPE)
 endfunction()
 

@@ -50,18 +50,6 @@ NAOS_TEST(with_context)
     NAOS_TRACE_POP();
 }
 
-/*
- * A note and a trace over several lines, with a backslash: each stays one value of its line, which
- * a tool can read back, and cannot pass for another line.
- */
-NAOS_TEST(multiline_context)
-{
-    NAOS_TRACE_PUSH("first\nat: x.c:1");
-    NAOS_NOTE("a\ntrace: b\\n\r");
-    NAOS_CHECK_TRUE(0);
-    NAOS_TRACE_POP();
-}
-
 /* 17 levels: the innermost one is only counted. */
 NAOS_TEST(too_deep)
 {
@@ -86,7 +74,6 @@ NAOS_SUITE(results,
     NAOS_ADD_TEST(skips),
     NAOS_ADD_TEST(fails_then_skips),
     NAOS_ADD_TEST(with_context),
-    NAOS_ADD_TEST(multiline_context),
     NAOS_ADD_TEST(too_deep)
 )
 

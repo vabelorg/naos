@@ -2,7 +2,7 @@
 
 `--naos-output xml:<path>` を指定すると、Naos でビルドした実行ファイルは、実行の結果をファイル `<path>` にも JUnit XML で書きます。JUnit XML は CI サービスやテストレポートのツールが読む形式です。標準出力の人間向けの出力は変わりません。
 
-このファイルはツール向けの出力で、形式は互換を保ちます（[バージョン](version.md)）。結果を読むツールは、標準出力ではなくこのファイルを読んでください（[出力](output.md)）。
+このファイルはツール向けの出力です。JUnit XML を読む一般的なツールが処理するもの（テスト、その結果と件数、各失敗のメッセージと場所）は互換を保ちます（[バージョン](version.md)）。それ以外は人が読むためのものです（[互換性](#互換性)）。結果を読むツールは、標準出力ではなくこのファイルを読んでください（[出力](output.md)）。
 
 ```
 prog --naos-output xml:results.xml
@@ -47,68 +47,21 @@ prog --naos-filter 'parser.*' --naos-output=xml:build/parser.xml
 
 テストケースは、テストが失敗したときは `<failure>` 要素を、スキップしたときは `<skipped>` を 1 つ持ち、成功したときは何も持ちません。失敗した後にスキップしたテストは、失敗だけを持ちます。`--naos-fail-fast` で実行しなかったテストには、テストケースがありません。Naos は時間を測らず、テストが出力したものも取り込まないので、`time`、`timestamp`、`<system-out>` は書きません。
 
-## 失敗
-
-`<failure>` の中身は `<label>: <value>` の行で、次の順に並びます。
-
-1. `file: <file>` と `line: <line>`: 失敗した場所
-2. アサーションの[値](#値)。`left: <value>`、`right: <value>` など。`NAOS_FAIL` にはない
-3. `NAOS_NOTE` のメモがあれば `note: <text>`
-4. 16 段を超えて trace を積んでいれば `traces: <n> innermost not kept`
-5. 積んである trace ごとに（内側から）、`trace: <text>` と、続けて積んだ場所の `at: <file>:<line>`。ファイル名が `:` を含むことがあるので、行番号は行の最後の `:` の後ろにあります
-
-ラベルはそのまま書き、値を揃える空白は足しません。後のバージョンで行が増えることがあるので、ツールは知らないラベルを読み飛ばしてください。
-
-どの値もその行に収まり、元のとおりに読み戻せます。文字列の値は[値の表記](#値の表記)で書きます（二重引用符で囲むか `(null)`）。ほかの値（ファイル名、メモ、trace の内容、アサーションのほかの値）は[テキスト](#テキスト)の規則で書き、さらに `\` を `\\`、改行を `\n`、復帰を `\r` とエスケープします。メモ `a` の次の行が `b` なら `note: a\nb`、Windows のファイル名 `C:\src\a.c` はそこでは `file: C:\\src\\a.c` になります。`<testcase>` の `file` 属性はそのままです。
-
-## 値
-
-| アサーション | ラベル（順に） |
-|---|---|
-| `*_INT_*`、`*_UINT_*` | `left`、`right`（10 進） |
-| `*_DOUBLE_NEAR` | `left`、`right`、`tolerance` |
-| `*_STR_EQ`（どちらも `NULL` でない） | `left`、`right`、`first difference` |
-| `*_STR_EQ`（片方が `NULL`）、`*_STR_NE` | `left`、`right` |
-| `*_PTR_EQ` | `left`、`right`（`%p`、または `(null)`） |
-| `*_NULL` | `value`（`%p`） |
-| `*_MEM_EQ` | `left size`、`right size`、続けて `first difference` か `invalid` |
-| `*_TRUE`、`*_FALSE`、`*_NOT_NULL` | なし |
-
-`first difference` は `offset N, left 0xXX, right 0xYY` です。一方がもう一方の先頭部分と一致するときは `offset N, end of left` / `end of right` で、N は短いほうの長さです。
+`<failure>` の中身は、標準出力が書くとおりの診断です。`error` の行、値を示す詳細の行、メモ、trace です（[出力](output.md)）。CI サービスはこれをそのまま表示するので、失敗は CI でも端末と同じように読めます。標準出力と同じく、人が読むためのものです。
 
 ## テキスト
 
-ファイルは UTF-8 です。テキストはすべて XML 用にエスケープします（`&amp;`、`&lt;`、`&gt;`。属性では `&quot;` と `&apos;` も使い、改行とタブを `&#10;` と `&#9;` にします。復帰は常に `&#13;` です）。
-
-- **文字列の値**は[値の表記](#値の表記)のとおりに書くので、印字できる ASCII だけになります。0x80 以上のバイトは `\xNN` にエスケープします。
-- **ほかのテキスト**（式、`NAOS_FAIL` と `NAOS_SKIP` のメッセージ、メモ、trace、ファイル名）は、正しい UTF-8 ならそのまま書きます。どの言語で書いたメッセージも書いたとおりに読めます。正しい UTF-8 の一部でないバイトと、XML 1.0 で使えない制御文字（改行、タブ、復帰以外の 0x20 未満）は `\xNN` と書きます。属性では、そうしたテキストを、テキスト自身が `\xNN` を含むものと区別できないことがあります。`<failure>` の行では `\` もエスケープするので区別できます。
-
-## 値の表記
-
-文字列と double は、ここでも標準出力でも、どのプラットフォーム・ロケールでも同じ表記で書きます。整数、ポインタ、メモリ比較の値、メモ、trace、`NAOS_FAIL` / `NAOS_SKIP` のメッセージ、診断の行の式は、この規則によらず、そのまま書きます。
-
-**文字列**は二重引用符で囲んで 1 行で書き、切り詰めません。`NULL` は引用符なしの `(null)` です。0x80 以上のバイトは、UTF-8 として正しいかどうかによらずエスケープします。
-
-| バイト | 書く形 |
-|---|---|
-| 0x0A、0x09、0x0D | `\n`、`\t`、`\r` |
-| 0x22、0x5C | `\"`、`\\` |
-| 上記以外の 0x20 未満、0x7F、0x80〜0xFF | `\x` と大文字の 16 進 2 桁 |
-| 上記以外の 0x20〜0x7E | そのまま |
-
-**double** は、読み戻すと同じ値になる最も短い 10 進表記で書きます。10 進の指数が -4 以上 17 未満なら指数を使わず、それ以外は `<digits>e<sign><exponent>` の形で、指数は少なくとも 2 桁です。末尾の不要な `0` と、小数部のない小数点は付けません。負のゼロは `-0`、無限大は `inf` と `-inf`、NaN はすべて `nan` です。小数点は常に `.` です。
-
-| 値 | 書く形 |
-|---|---|
-| `0.1` | `0.1` |
-| `1.0 / 3.0` | `0.3333333333333333` |
-| `100.0` | `100` |
-| `1e-5` | `1e-05` |
-| `1.5e20` | `1.5e+20` |
+ファイルは UTF-8 です。テキストはすべて XML 用にエスケープします（`&amp;`、`&lt;`、`&gt;`。属性では `&quot;` と `&apos;` も使い、改行とタブを `&#10;` と `&#9;` にします。復帰は常に `&#13;` です）。正しい UTF-8 はそのまま書くので、どの言語で書いたメッセージも書いたとおりに読めます。正しい UTF-8 の一部でないバイトと、XML 1.0 で使えない制御文字（改行、タブ、復帰以外の 0x20 未満）は `\xNN` と書きます。そのため、テキスト自身が `\xNN` を含むものとは区別できないことがあります。文字列の値は標準出力と同じく書き（[値の表記](output.md#値の表記)）、印字できる ASCII だけになります。
 
 ## 互換性
 
-このページに書いた要素、属性、失敗の行は互換を保ちます。後のバージョンで、属性、プロパティ、要素、失敗の行、`xml` 以外の形式が増えることがあります。ツールは知らないものを読み飛ばしてください。
+互換を保つのは、JUnit XML を読む一般的なツールが処理するものです。
+
+- 要素 `<testsuites>`、`<testsuite>`、`<testcase>`、`<failure>`、`<skipped>` と、その入れ子、どのテストケースと、どの `<failure>`・`<skipped>` を書くか（[要素](#要素)）。
+- 上に書いたそれらの属性。`name`、`classname`、件数の `tests`・`failures`・`errors`・`skipped`、`file`、`line`、`type`、`message` と、それぞれが持つもの、そのテキストのエスケープ（[テキスト](#テキスト)）。
+- ファイルを書くときと終了コード（[ファイルを書くとき](#ファイルを書くとき)）。
+
+一般的なツールは表示するか読み飛ばすだけなので、次は互換を保ちません。標準出力に従う `<failure>` の中身、スイートの `<properties>`、ファイルのレイアウト（字下げ、要素の間の改行、属性の順）です。後のバージョンで、属性、要素、`xml` 以外の形式が増えることがあります。ツールは知らないものを読み飛ばしてください。
 
 ## 出力例
 
@@ -120,39 +73,35 @@ Naos の自己テストのうち 4 つのテスト（`tests/report/report.c`）�
   <testsuite name="results" tests="4" failures="2" errors="0" skipped="1">
     <testcase classname="results" name="passes"/>
     <testcase classname="results" name="fails_twice" file="report.c" line="26">
-      <failure type="error" message="1 == 2">file: report.c
-line: 26
-left: 1
-right: 2</failure>
-      <failure type="error" message="&quot;hello\n&quot; == &quot;hello&quot;">file: report.c
-line: 27
-left: "hello\n"
-right: "hello"
-first difference: offset 5, end of right</failure>
+      <failure type="error" message="1 == 2">report.c:26: error: 1 == 2
+  left:  1
+  right: 2
+</failure>
+      <failure type="error" message="&quot;hello\n&quot; == &quot;hello&quot;">report.c:27: error: "hello\n" == "hello"
+  left:  "hello\n"
+  right: "hello"
+  first difference: offset 5, end of right
+</failure>
     </testcase>
     <testcase classname="results" name="skips" file="report.c" line="32">
       <skipped message="not here"/>
     </testcase>
     <testcase classname="results" name="with_context" file="report.c" line="47">
-      <failure type="error" message="0.1 ~= 0.25">file: report.c
-line: 47
-left: 0.1
-right: 0.25
-tolerance: 0.001
-note: locale C
-trace: inner 2
-at: report.c:45
-trace: outer
-at: report.c:44</failure>
-      <failure type="error" message="&quot;ab&quot; == &quot;ac&quot;">file: report.c
-line: 48
-left size: 2
-right size: 2
-first difference: offset 1, left 0x62, right 0x63
-trace: inner 2
-at: report.c:45
-trace: outer
-at: report.c:44</failure>
+      <failure type="error" message="0.1 ~= 0.25">report.c:47: error: 0.1 ~= 0.25
+  left:  0.1
+  right: 0.25
+  tolerance: 0.001
+  note: locale C
+report.c:45: note: inner 2
+report.c:44: note: outer
+</failure>
+      <failure type="error" message="&quot;ab&quot; == &quot;ac&quot;">report.c:48: error: "ab" == "ac"
+  left size:  2
+  right size: 2
+  first difference: offset 1, left 0x62, right 0x63
+report.c:45: note: inner 2
+report.c:44: note: outer
+</failure>
     </testcase>
   </testsuite>
 </testsuites>

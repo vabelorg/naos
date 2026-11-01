@@ -12,5 +12,5 @@
 | [バージョン](version.md) | `NAOS_VERSION_*`、`naos_version_number()`、`naos_version_string()` |
 | [コマンドライン](command-line.md) | `--naos-*` オプションと終了コード |
 | [出力](output.md) | 標準出力の人間向けの出力と、そのうち互換を保つもの |
-| [JUnit XML](xml.md) | `--naos-output xml:<path>` のファイル、ツール向けの出力と値の表記 |
+| [JUnit XML](xml.md) | `--naos-output xml:<path>` のファイル、ツール向けの出力と、そのうち互換を保つもの |
 | [CMake](cmake.md) | `naos::naos`、`naos_add_executable()`、`naos_discover_tests()`、オプション、パッケージ |

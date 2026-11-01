@@ -12,7 +12,7 @@ The form of every line of standard output is written in `human.c`, and only ther
 
 ## Change the JUnit XML file
 
-The file is written by `xml.c`. Its format is kept compatible: add attributes, properties, elements or lines of a failure, but do not change or remove those that [JUnit XML](../reference/xml.md) states, unless the version allows it ([changelog](changelog.md)). Update the reference and the expected outputs of `tests/report/`.
+The file is written by `xml.c`. What [JUnit XML](../reference/xml.md#compatibility) keeps compatible (the elements, their attributes and when the file is written) may grow, but must not change or go, unless the version allows it ([changelog](changelog.md)). The text of a `<failure>` is the diagnostic of `human.c`, and changes with it. Update the reference and the expected outputs of `tests/report/`.
 
 ## Add an output format
 
@@ -29,7 +29,7 @@ A format is a writer: a table of the functions of `naos_writer_t` (`writer.h`), 
 3. Stringify the arguments in the public macro itself. Passing them to a helper macro first and stringifying there with `#` would expand the macros in the arguments.
 4. Write the failure with `naos_diagnostic_begin()` → `naos_diagnostic_add*()` → `naos_diagnostic_end()`.
 5. Add a file to `tests/assertions/` for its failure output, and a test to `tests/api/check.c`.
-6. Update [assertions](../reference/assertions.md) and the table of values in [JUnit XML](../reference/xml.md#values).
+6. Update [assertions](../reference/assertions.md) and the table of detail lines in [output](../reference/output.md#detail-lines).
 
 ## Add a command-line option
 

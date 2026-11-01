@@ -211,27 +211,6 @@ static size_t write_exponent(char *text, size_t length, const char *digits, size
     return length;
 }
 
-/* Every byte up to the terminating NUL is written; nothing is cut and nothing is buffered. */
-void naos_value_print_string(FILE *out, const char *value)
-{
-    char escape[NAOS_VALUE_BYTE_SIZE];
-    const unsigned char *byte;
-
-    if (value == NULL)
-    {
-        fputs("(null)", out);
-        return;
-    }
-
-    fputc('"', out);
-    for (byte = (const unsigned char *)value; *byte != '\0'; byte++)
-    {
-        naos_value_escape_byte(*byte, escape);
-        fputs(escape, out);
-    }
-    fputc('"', out);
-}
-
 /*
  * The digits and the decimal exponent come from %e, and the result is put together here, so neither
  * the form of %g nor the decimal point of the locale reaches it.

@@ -12,7 +12,7 @@
 
 ## JUnit XML のファイルを変える
 
-ファイルは `xml.c` が書きます。形式は互換を保つので、属性、プロパティ、要素、失敗の行は足してかまいませんが、[JUnit XML](../reference/xml.md) に書いたものは、バージョンが許さない限り変えたり消したりしません（[変更履歴](changelog.md)）。リファレンスと `tests/report/` の期待する出力を直します。
+ファイルは `xml.c` が書きます。[JUnit XML](../reference/xml.md#互換性) が互換を保つもの（要素、その属性、ファイルを書くとき）は、足してかまいませんが、バージョンが許さない限り変えたり消したりしません（[変更履歴](changelog.md)）。`<failure>` の中身は `human.c` の診断で、それと一緒に変わります。リファレンスと `tests/report/` の期待する出力を直します。
 
 ## 出力の形式を足す
 
@@ -29,7 +29,7 @@
 3. 引数の文字列化は公開マクロの側で行う。補助マクロに渡してから `#` を使うと、引数のマクロが展開されてしまう。
 4. 失敗は `naos_diagnostic_begin()` → `naos_diagnostic_add*()` → `naos_diagnostic_end()` で書く。
 5. 失敗の出力のために `tests/assertions/` にファイルを、`tests/api/check.c` にテストを足す。
-6. [アサーション](../reference/assertions.md)と、[JUnit XML](../reference/xml.md#値)の値の表を直す。
+6. [アサーション](../reference/assertions.md)と、[出力](../reference/output.md#詳細の行)の詳細の行の表を直す。
 
 ## コマンドラインのオプションを足す
 

@@ -58,7 +58,7 @@ A CI job configures, builds and runs CTest. `--output-junit` writes a JUnit XML 
   run: ctest --test-dir build -C Debug --output-on-failure --output-junit junit.xml
 ```
 
-CTest's report holds only the result and the whole output of each test. For the location and the values of each failure as data, run the executable directly with `--naos-output xml:<path>`: it writes a JUnit XML file of its own run ([JUnit XML](../reference/xml.md)). Give each executable its own path, since every CTest test of an executable would write the same file:
+CTest's report holds only the result and the whole output of each test. For a test case per Naos test, with the message and the location of each failure, run the executable directly with `--naos-output xml:<path>`: it writes a JUnit XML file of its own run ([JUnit XML](../reference/xml.md)). Give each executable its own path, since every CTest test of an executable would write the same file:
 
 ```yaml
 - name: Test

@@ -8,23 +8,45 @@
 
 #include "human.h"
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+
+#include <naos/export.h>
 
 #include "format.h"
 #include "value.h"
 
+/* Size of what put_format() formats: a number with a few chars around it. */
+#define NAOS_HUMAN_NUMBER_SIZE 48
+
+static void put_format(naos_human_sink_t sink, void *context, const char *format, ...) NAOS_PRINTF_FORMAT(3, 4);
+
+/* Gives sink numbers formatted as printf does; the result is shorter than NAOS_HUMAN_NUMBER_SIZE. */
+static void put_format(naos_human_sink_t sink, void *context, const char *format, ...)
+{
+    char buffer[NAOS_HUMAN_NUMBER_SIZE];
+    va_list args;
+
+    va_start(args, format);
+    naos_vsnprintf(buffer, sizeof(buffer), format, args);
+    va_end(args);
+
+    sink(context, buffer);
+}
+
 /*
- * Writes where a diagnostic happened, followed by a space, in the form of the diagnostics of the
+ * Gives where a diagnostic happened, followed by a space, in the form of the diagnostics of the
  * compiler Naos is built with: "<file>(<line>): " for MSVC, "<file>:<line>: " otherwise. This is
  * the only place that depends on the compiler.
  */
-static void print_location(const char *file, int line)
+static void put_location(naos_human_sink_t sink, void *context, const char *file, int line)
 {
+    sink(context, file);
 #if defined(_MSC_VER)
-    naos_printf("%s(%d): ", file, line);
+    put_format(sink, context, "(%d): ", line);
 #else
-    naos_printf("%s:%d: ", file, line);
+    put_format(sink, context, ":%d: ", line);
 #endif
 }
 
@@ -44,24 +66,48 @@ static const char *report_kind_word(naos_report_kind_t kind)
     return "error";
 }
 
-/* Writes "<location> <kind>: <text>"; file and text are written as they are. */
-static void print_diagnostic_line(naos_report_kind_t kind, const char *file, int line, const char *text)
+/* Gives "<location> <kind>: <text>\n"; file and text are given as they are. */
+static void put_diagnostic_line(naos_human_sink_t sink, void *context, naos_report_kind_t kind, const char *file, int line, const char *text)
 {
-    print_location(file, line);
-    naos_printf("%s: %s\n", report_kind_word(kind), text);
+    put_location(sink, context, file, line);
+    sink(context, report_kind_word(kind));
+    sink(context, ": ");
+    sink(context, text);
+    sink(context, "\n");
 }
 
-/* Writes the value of one detail as its kind says. */
-static void print_detail_value(const naos_detail_t *detail)
+/* Gives the value of one detail as its kind says: a string between double quotes, escaped one byte at a time, or (null). */
+static void put_detail_value(naos_human_sink_t sink, void *context, const naos_detail_t *detail)
 {
-    if (detail->kind == NAOS_DETAIL_STRING)
+    char escape[NAOS_VALUE_BYTE_SIZE];
+    const unsigned char *byte;
+
+    if (detail->kind != NAOS_DETAIL_STRING)
     {
-        naos_value_print_string(stdout, detail->value);
+        sink(context, detail->value);
+        return;
     }
-    else
+
+    if (detail->value == NULL)
     {
-        fputs(detail->value, stdout);
+        sink(context, "(null)");
+        return;
     }
+
+    sink(context, "\"");
+    for (byte = (const unsigned char *)detail->value; *byte != '\0'; byte++)
+    {
+        naos_value_escape_byte(*byte, escape);
+        sink(context, escape);
+    }
+    sink(context, "\"");
+}
+
+/* The sink of the lines of stdout. */
+static void put_stdout(void *context, const char *text)
+{
+    (void)context;
+    fputs(text, stdout);
 }
 
 /*
@@ -125,41 +171,49 @@ static void test_begin(const char *suite, const char *test)
 }
 
 /*
- * Writes the diagnostic line, its details as "  <label>: <value>", the note and the count of the
- * traces not kept, then the traces as note lines. "left" and "left <rest>" get one more space when
- * "right" or "right <rest>" is in the block, so the two values line up.
+ * The diagnostic line, its details as "  <label>: <value>", the note and the count of the traces not
+ * kept, then the traces as note lines. "left" and "left <rest>" get one more space when "right" or
+ * "right <rest>" is in the block, so the two values line up.
  */
-static void diagnostic(const naos_diagnostic_record_t *record)
+void naos_human_put_diagnostic(const naos_diagnostic_record_t *record, naos_human_sink_t sink, void *context)
 {
     const naos_trace_t *trace;
     size_t i;
     int j;
 
-    print_diagnostic_line(record->kind, record->file, record->line, record->text);
+    put_diagnostic_line(sink, context, record->kind, record->file, record->line, record->text);
 
     for (i = 0; i < record->detail_count; i++)
     {
-        naos_printf("  %s:%s", record->details[i].label, has_right_partner(record->details[i].label, record->details, record->detail_count) ? "  " : " ");
-        print_detail_value(&record->details[i]);
-        fputc('\n', stdout);
+        sink(context, "  ");
+        sink(context, record->details[i].label);
+        sink(context, has_right_partner(record->details[i].label, record->details, record->detail_count) ? ":  " : ": ");
+        put_detail_value(sink, context, &record->details[i]);
+        sink(context, "\n");
     }
 
     if (record->note != NULL)
     {
-        naos_printf("  note: %s\n", record->note);
+        sink(context, "  note: ");
+        sink(context, record->note);
+        sink(context, "\n");
     }
 
     if (record->traces_not_kept > 0)
     {
-        naos_printf("  traces: %d innermost not kept\n", record->traces_not_kept);
+        put_format(sink, context, "  traces: %d innermost not kept\n", record->traces_not_kept);
     }
 
     for (j = 0; j < record->trace_count; j++)
     {
         trace = record->traces[j];
-        print_diagnostic_line(NAOS_REPORT_NOTE, trace->file, trace->line, trace->text);
+        put_diagnostic_line(sink, context, NAOS_REPORT_NOTE, trace->file, trace->line, trace->text);
     }
+}
 
+static void diagnostic(const naos_diagnostic_record_t *record)
+{
+    naos_human_put_diagnostic(record, put_stdout, NULL);
     fflush(stdout);
 }
 

@@ -2,7 +2,7 @@
 
 With `--naos-output xml:<path>`, an executable built with Naos also writes the results of its run to the file `<path>` as JUnit XML, which CI services and test report tools read. The human-readable output on standard output does not change.
 
-This file is the output meant for tools: its format is kept compatible ([version](version.md)). A tool that reads the results should read this file, not standard output ([output](output.md)).
+This file is the output meant for tools. What the common tools that read JUnit XML process (the tests, their results and counts, the message and the location of each failure) is kept compatible ([version](version.md)); the rest is written for people ([compatibility](#compatibility)). A tool that reads the results should read this file, not standard output ([output](output.md)).
 
 ```
 prog --naos-output xml:results.xml
@@ -47,68 +47,21 @@ The path is relative to the working directory. Under CTest, every test of an exe
 
 A test case holds the `<failure>` elements when the test failed, one `<skipped>` when it was skipped, and nothing when it passed. A test that fails and then skips has its failures only. The tests that `--naos-fail-fast` left out have no test case. Naos writes no `time`, `timestamp` or `<system-out>`, since it measures no time and does not capture what the tests print.
 
-## Failures
-
-The text of a `<failure>` is lines of `<label>: <value>`, in this order:
-
-1. `file: <file>` and `line: <line>`: where the failure happened
-2. The [values](#values) of the assertion, such as `left: <value>` and `right: <value>`; none for `NAOS_FAIL`
-3. `note: <text>`, if a note of `NAOS_NOTE` is there
-4. `traces: <n> innermost not kept`, if more than 16 levels of traces are pushed
-5. For each trace pushed, the innermost first, `trace: <text>` followed by `at: <file>:<line>`, where it was pushed. The line number follows the last `:` of the line, since a file name may hold one
-
-The labels are written as they are, with no space added to line up the values. More lines may be added in a later version: a tool should skip the labels it does not know.
-
-Every value stays on its line and reads back as it was. A string value is written in the [value formats](#value-formats), between double quotes or as `(null)`. Every other value (file names, notes, the texts of traces, the other values of assertions) is written as the [text](#text) rules say, with three escapes more: `\\` for `\`, `\n` for a line feed and `\r` for a carriage return. A note `a` followed by a line `b` is `note: a\nb`, and a Windows file name `C:\src\a.c` is `file: C:\\src\\a.c` there; the `file` attribute of `<testcase>` has it as it is.
-
-## Values
-
-| Assertion | Labels, in order |
-|---|---|
-| `*_INT_*`, `*_UINT_*` | `left`, `right` (decimal) |
-| `*_DOUBLE_NEAR` | `left`, `right`, `tolerance` |
-| `*_STR_EQ` (neither `NULL`) | `left`, `right`, `first difference` |
-| `*_STR_EQ` (one `NULL`), `*_STR_NE` | `left`, `right` |
-| `*_PTR_EQ` | `left`, `right` (`%p`, or `(null)`) |
-| `*_NULL` | `value` (`%p`) |
-| `*_MEM_EQ` | `left size`, `right size`, then `first difference` or `invalid` |
-| `*_TRUE`, `*_FALSE`, `*_NOT_NULL` | none |
-
-`first difference` is `offset N, left 0xXX, right 0xYY`. When one side is the beginning of the other, it is `offset N, end of left` or `end of right`, N being the shorter length.
+The text of a `<failure>` is the diagnostic as standard output writes it: the `error` line, its detail lines with the values, the note and the traces ([output](output.md)). CI services show it as it is, so that a failure reads the same in CI as in a terminal. It is written for people, as standard output is.
 
 ## Text
 
-The file is UTF-8. Every text is escaped for XML (`&amp;`, `&lt;`, `&gt;`, and `&quot;` and `&apos;` in attributes; line breaks and tabs in attributes as `&#10;` and `&#9;`; carriage returns as `&#13;`).
-
-- **The values of strings** are written as the [value formats](#value-formats) say, which leaves only printable ASCII; the bytes from 0x80 are escaped as `\xNN`.
-- **Other texts** (expressions, the messages of `NAOS_FAIL` and `NAOS_SKIP`, notes, traces and file names) keep valid UTF-8 as it is, so that a message written in any language reads as written. A byte that is not part of valid UTF-8, and a control character that XML 1.0 does not allow (below 0x20, except line breaks, tabs and carriage returns), is written as `\xNN`. In an attribute, such a text cannot always be told apart from one that holds `\xNN` itself; in the lines of a `<failure>`, where `\` is escaped too, it can.
-
-## Value formats
-
-Strings and doubles are written the same way on every platform and in every locale, here and on standard output. Integers, pointers, the values of memory comparisons, notes, traces, the messages of `NAOS_FAIL` and `NAOS_SKIP`, and the expressions of diagnostic lines are written as they are, outside these rules.
-
-A **string** is written in double quotes on one line and never cut short. `NULL` is `(null)`, without quotes. Bytes from 0x80 are escaped, whether they are valid UTF-8 or not.
-
-| Byte | Written as |
-|---|---|
-| 0x0A, 0x09, 0x0D | `\n`, `\t`, `\r` |
-| 0x22, 0x5C | `\"`, `\\` |
-| Other bytes below 0x20, 0x7F, 0x80 to 0xFF | `\x` and two uppercase hexadecimal digits |
-| Other bytes from 0x20 to 0x7E | As they are |
-
-A **double** is written in the shortest decimal form that reads back as the same value. With a decimal exponent from -4 to below 17, no exponent is used; otherwise the form is `<digits>e<sign><exponent>`, with at least two exponent digits. No trailing `0` is written, nor a decimal point with no fraction after it. Negative zero is `-0`, the infinities `inf` and `-inf`, every NaN `nan`. The decimal point is always `.`.
-
-| Value | Written as |
-|---|---|
-| `0.1` | `0.1` |
-| `1.0 / 3.0` | `0.3333333333333333` |
-| `100.0` | `100` |
-| `1e-5` | `1e-05` |
-| `1.5e20` | `1.5e+20` |
+The file is UTF-8. Every text is escaped for XML (`&amp;`, `&lt;`, `&gt;`, and `&quot;` and `&apos;` in attributes; line breaks and tabs in attributes as `&#10;` and `&#9;`; carriage returns as `&#13;`). Valid UTF-8 is kept as it is, so that a message written in any language reads as written. A byte that is not part of valid UTF-8, and a control character that XML 1.0 does not allow (below 0x20, except line breaks, tabs and carriage returns), is written as `\xNN`; such a text cannot always be told apart from one that holds `\xNN` itself. The values of strings are written as on standard output ([value formats](output.md#value-formats)), which leaves only printable ASCII.
 
 ## Compatibility
 
-The elements, the attributes and the lines of a failure stated on this page are kept compatible. A later version may add attributes, properties, elements and lines of a failure, and formats besides `xml`; a tool should skip what it does not know.
+Kept compatible is what the common tools that read JUnit XML process:
+
+- The elements `<testsuites>`, `<testsuite>`, `<testcase>`, `<failure>` and `<skipped>`, how they nest, and which test cases and which `<failure>` and `<skipped>` elements are written ([elements](#elements)).
+- Their attributes stated above: `name`, `classname`, the counts `tests`, `failures`, `errors` and `skipped`, `file`, `line`, `type` and `message`, with what they hold and how their text is escaped ([text](#text)).
+- When the file is written, and the exit codes ([when the file is written](#when-the-file-is-written)).
+
+Not kept compatible, since the common tools only show it or leave it out: the text of `<failure>`, which follows standard output, the `<properties>` of a suite, and the layout of the file (indentation, line breaks between elements, the order of attributes). A later version may add attributes, elements and formats besides `xml`; a tool should skip what it does not know.
 
 ## Example
 
@@ -120,39 +73,35 @@ Four tests of the self tests of Naos (`tests/report/report.c`), run with `--naos
   <testsuite name="results" tests="4" failures="2" errors="0" skipped="1">
     <testcase classname="results" name="passes"/>
     <testcase classname="results" name="fails_twice" file="report.c" line="26">
-      <failure type="error" message="1 == 2">file: report.c
-line: 26
-left: 1
-right: 2</failure>
-      <failure type="error" message="&quot;hello\n&quot; == &quot;hello&quot;">file: report.c
-line: 27
-left: "hello\n"
-right: "hello"
-first difference: offset 5, end of right</failure>
+      <failure type="error" message="1 == 2">report.c:26: error: 1 == 2
+  left:  1
+  right: 2
+</failure>
+      <failure type="error" message="&quot;hello\n&quot; == &quot;hello&quot;">report.c:27: error: "hello\n" == "hello"
+  left:  "hello\n"
+  right: "hello"
+  first difference: offset 5, end of right
+</failure>
     </testcase>
     <testcase classname="results" name="skips" file="report.c" line="32">
       <skipped message="not here"/>
     </testcase>
     <testcase classname="results" name="with_context" file="report.c" line="47">
-      <failure type="error" message="0.1 ~= 0.25">file: report.c
-line: 47
-left: 0.1
-right: 0.25
-tolerance: 0.001
-note: locale C
-trace: inner 2
-at: report.c:45
-trace: outer
-at: report.c:44</failure>
-      <failure type="error" message="&quot;ab&quot; == &quot;ac&quot;">file: report.c
-line: 48
-left size: 2
-right size: 2
-first difference: offset 1, left 0x62, right 0x63
-trace: inner 2
-at: report.c:45
-trace: outer
-at: report.c:44</failure>
+      <failure type="error" message="0.1 ~= 0.25">report.c:47: error: 0.1 ~= 0.25
+  left:  0.1
+  right: 0.25
+  tolerance: 0.001
+  note: locale C
+report.c:45: note: inner 2
+report.c:44: note: outer
+</failure>
+      <failure type="error" message="&quot;ab&quot; == &quot;ac&quot;">report.c:48: error: "ab" == "ac"
+  left size:  2
+  right size: 2
+  first difference: offset 1, left 0x62, right 0x63
+report.c:45: note: inner 2
+report.c:44: note: outer
+</failure>
     </testcase>
   </testsuite>
 </testsuites>

@@ -7,9 +7,9 @@ How the sources of Naos are laid out and how the modules depend on each other, f
 These decide what goes into Naos, before any feature:
 
 - **Easy to adopt, first**: no dependency besides the standard C library, and no compiler extension. A feature that would cost either of them stays out.
-- **One output for people, one for tools**: standard output is written for people, and may change in any version to read better. Tools read the JUnit XML file of `--naos-output`, whose format is a contract ([JUnit XML](../reference/xml.md)). Of standard output, only what tools cannot do without stays stable: the start of a diagnostic line, which editors read, the names of `--naos-list`, which CTest discovery reads, and the exit codes ([output](../reference/output.md#what-is-kept-compatible)).
+- **One output for people, one for tools**: standard output is written for people, and may change in any version to read better. Tools read the JUnit XML file of `--naos-output`: what the common tools of JUnit XML process in it is a contract, and the rest, such as the text of a failure, is for people as standard output is ([JUnit XML](../reference/xml.md#compatibility)). Of standard output, only what tools cannot do without stays stable: the start of a diagnostic line, which editors read, the names of `--naos-list`, which CTest discovery reads, and the exit codes ([output](../reference/output.md#what-is-kept-compatible)).
 - **A documented public API**: only what the [reference](../reference/README.md) documents is public and kept compatible.
-- **A narrow scope**: process isolation, parallel runs and time limits are left to the caller (CTest, scripts, CI). Naos writes one report format, for the results only it knows (where each failure is and its values); others are added only when a clear need for them shows.
+- **A narrow scope**: process isolation, parallel runs and time limits are left to the caller (CTest, scripts, CI). Naos writes one report format, for the results only it knows (where each failure is and what it says); others are added only when a clear need for them shows.
 
 ## Directories
 
@@ -60,7 +60,8 @@ flowchart LR
   runner --> test --> diagnostic
   test --> context
   diagnostic --> context
-  diagnostic --> report --> human & xml --> value
+  diagnostic --> report --> xml --> human --> value
+  report --> human
   control --> test & diagnostic & context
   check --> diagnostic & value
 ```

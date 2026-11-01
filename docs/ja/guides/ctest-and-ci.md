@@ -58,7 +58,7 @@ CI のジョブでは、configure、ビルド、CTest の実行を行います�
   run: ctest --test-dir build -C Debug --output-on-failure --output-junit junit.xml
 ```
 
-CTest のレポートにあるのは、各テストの結果と出力の全体だけです。各失敗の場所と値をデータとして得るには、実行ファイルを `--naos-output xml:<path>` で直接実行します。その実行の JUnit XML のファイルを書きます（[JUnit XML](../reference/xml.md)）。実行ファイルの CTest のテストはどれも同じファイルに書くことになるので、実行ファイルごとに別のパスを指定します。
+CTest のレポートにあるのは、各テストの結果と出力の全体だけです。Naos のテストごとのテストケースと、各失敗のメッセージと場所を得るには、実行ファイルを `--naos-output xml:<path>` で直接実行します。その実行の JUnit XML のファイルを書きます（[JUnit XML](../reference/xml.md)）。実行ファイルの CTest のテストはどれも同じファイルに書くことになるので、実行ファイルごとに別のパスを指定します。
 
 ```yaml
 - name: Test

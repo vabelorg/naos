@@ -25,7 +25,7 @@ endif()
 #   diagnostic -> context, report
 #   report     -> human, xml, writer
 #   human      -> writer, value
-#   xml        -> writer, value
+#   xml        -> human, writer, value
 #   writer     -> context
 # version, order, context and value use no other module. writer.h has no .c: it is the events
 # report.c tells and the functions a writer has.

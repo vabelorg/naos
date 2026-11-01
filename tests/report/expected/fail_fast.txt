@@ -12,7 +12,7 @@ report.c:LINE: error: "hello\n" == "hello"
   right: "hello"
   first difference: offset 5, end of right
 FAIL: results.fails_twice (2 failures)
-FAIL FAST: stopped at the first failure; 5 not run
+FAIL FAST: stopped at the first failure; 4 not run
 SUMMARY: 1 passed, 1 failed, 0 skipped
 --- stderr
 --- output
@@ -21,15 +21,15 @@ SUMMARY: 1 passed, 1 failed, 0 skipped
   <testsuite name="results" tests="2" failures="1" errors="0" skipped="0">
     <testcase classname="results" name="passes"/>
     <testcase classname="results" name="fails_twice" file="report.c" line="LINE">
-      <failure type="error" message="1 == 2">file: report.c
-line: LINE
-left: 1
-right: 2</failure>
-      <failure type="error" message="&quot;hello\n&quot; == &quot;hello&quot;">file: report.c
-line: LINE
-left: "hello\n"
-right: "hello"
-first difference: offset 5, end of right</failure>
+      <failure type="error" message="1 == 2">report.c:LINE: error: 1 == 2
+  left:  1
+  right: 2
+</failure>
+      <failure type="error" message="&quot;hello\n&quot; == &quot;hello&quot;">report.c:LINE: error: "hello\n" == "hello"
+  left:  "hello\n"
+  right: "hello"
+  first difference: offset 5, end of right
+</failure>
     </testcase>
   </testsuite>
 </testsuites>
