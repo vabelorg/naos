@@ -29,26 +29,26 @@
  * the other bytes that are not printable ASCII, and the byte itself otherwise. The digits do not
  * depend on the locale, so the same bytes are always written the same way.
  */
-static void print_string_byte(unsigned char byte)
+static void print_string_byte(FILE *out, unsigned char byte)
 {
     static const char hex_digits[] = "0123456789ABCDEF";
 
     switch (byte)
     {
     case '\n':
-        fputs("\\n", stdout);
+        fputs("\\n", out);
         return;
     case '\t':
-        fputs("\\t", stdout);
+        fputs("\\t", out);
         return;
     case '\r':
-        fputs("\\r", stdout);
+        fputs("\\r", out);
         return;
     case '"':
-        fputs("\\\"", stdout);
+        fputs("\\\"", out);
         return;
     case '\\':
-        fputs("\\\\", stdout);
+        fputs("\\\\", out);
         return;
     default:
         break;
@@ -56,13 +56,13 @@ static void print_string_byte(unsigned char byte)
 
     if ((byte < 0x20) || (byte >= 0x7F))
     {
-        fputs("\\x", stdout);
-        fputc(hex_digits[byte >> 4], stdout);
-        fputc(hex_digits[byte & 0x0F], stdout);
+        fputs("\\x", out);
+        fputc(hex_digits[byte >> 4], out);
+        fputc(hex_digits[byte & 0x0F], out);
     }
     else
     {
-        fputc(byte, stdout);
+        fputc(byte, out);
     }
 }
 
@@ -196,22 +196,22 @@ static size_t write_exponent(char *text, size_t length, const char *digits, size
 }
 
 /* Every byte up to the terminating NUL is written; nothing is cut and nothing is buffered. */
-void naos_value_print_string(const char *value)
+void naos_value_print_string(FILE *out, const char *value)
 {
     const unsigned char *byte;
 
     if (value == NULL)
     {
-        fputs("(null)", stdout);
+        fputs("(null)", out);
         return;
     }
 
-    fputc('"', stdout);
+    fputc('"', out);
     for (byte = (const unsigned char *)value; *byte != '\0'; byte++)
     {
-        print_string_byte(*byte);
+        print_string_byte(out, *byte);
     }
-    fputc('"', stdout);
+    fputc('"', out);
 }
 
 /*

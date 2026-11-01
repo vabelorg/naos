@@ -11,14 +11,14 @@
 #include "context.h"
 #include "format.h"
 
-/* Most detail lines of one diagnostic: values, the note and the count of traces not kept. */
+/* Most values of one diagnostic. */
 #define NAOS_DETAIL_COUNT 8
 
 /* Which of the note and the traces a diagnostic is closed with. */
 typedef enum naos_context_use
 {
     NAOS_CONTEXT_ALL,   /* a failure, NAOS_FAIL or NAOS_SKIP */
-    NAOS_CONTEXT_OUTER, /* NAOS_TRACE_PUSH without NAOS_TRACE_POP: its first line is the innermost trace */
+    NAOS_CONTEXT_OUTER, /* NAOS_TRACE_PUSH without NAOS_TRACE_POP: its text names the innermost trace */
     NAOS_CONTEXT_NONE   /* NAOS_TRACE_POP without NAOS_TRACE_PUSH, or a push too deep: the note is kept */
 } naos_context_use_t;
 
@@ -31,7 +31,8 @@ typedef struct naos_result
 
 static naos_result_t g_result = { 0, 0 };
 
-/* Detail lines of the open diagnostic; their labels and values are borrowed until it ends. */
+/* The open diagnostic; its file, text, labels and values are borrowed until it ends. */
+static naos_diagnostic_record_t g_record;
 static naos_detail_t g_details[NAOS_DETAIL_COUNT];
 static size_t g_detail_count = 0;
 
@@ -49,63 +50,50 @@ static void add_detail(const char *label, naos_detail_kind_t kind, const char *v
 }
 
 /*
- * Writes the traces still pushed as note lines at the place of their push, innermost first. With
- * NAOS_CONTEXT_OUTER, the innermost one is left out: the first line already names it.
- */
-static void write_traces(naos_context_use_t use)
-{
-    const naos_trace_t *trace;
-    int i;
-
-    i = naos_context_trace_count() - 1;
-    if (use == NAOS_CONTEXT_OUTER)
-    {
-        i--;
-    }
-
-    while (i >= 0)
-    {
-        trace = naos_context_trace(i);
-        naos_report_diagnostic(NAOS_REPORT_NOTE, trace->file, trace->line, trace->text);
-        i--;
-    }
-}
-
-/*
- * Closes the open diagnostic and flushes stdout. Unless use is NAOS_CONTEXT_NONE, the note and the
- * count of the traces not kept follow its values, the note is used up, and the traces follow the
- * details as note lines.
+ * Closes the open diagnostic and tells it to the writers. Unless use is NAOS_CONTEXT_NONE, the note,
+ * the count of the traces not kept and the traces still pushed go with it, innermost first, and the
+ * note is used up. With NAOS_CONTEXT_OUTER, the innermost trace is left out: the text names it.
  */
 static void end_with(naos_context_use_t use)
 {
-    char not_kept[32]; /* "<int> innermost not kept" */
-    int left_out;
+    const naos_trace_t *traces[NAOS_CONTEXT_TRACE_DEPTH];
+    int trace_count;
+    int i;
+
+    g_record.details = g_details;
+    g_record.detail_count = g_detail_count;
+    g_record.note = NULL;
+    g_record.traces_not_kept = 0;
+    trace_count = 0;
 
     if (use != NAOS_CONTEXT_NONE)
     {
-        if (naos_context_note() != NULL)
+        g_record.note = naos_context_note();
+        g_record.traces_not_kept = naos_context_trace_depth() - naos_context_trace_count();
+
+        i = naos_context_trace_count() - 1;
+        if (use == NAOS_CONTEXT_OUTER)
         {
-            add_detail("note", NAOS_DETAIL_TEXT, naos_context_note());
+            i--;
         }
 
-        left_out = naos_context_trace_depth() - naos_context_trace_count();
-        if (left_out > 0)
+        while (i >= 0)
         {
-            naos_snprintf(not_kept, sizeof(not_kept), "%d innermost not kept", left_out);
-            add_detail("traces", NAOS_DETAIL_TEXT, not_kept);
+            traces[trace_count] = naos_context_trace(i);
+            trace_count++;
+            i--;
         }
     }
 
-    naos_report_details(g_details, g_detail_count);
+    g_record.traces = traces;
+    g_record.trace_count = trace_count;
+    naos_report_diagnostic(&g_record);
     g_detail_count = 0;
 
     if (use != NAOS_CONTEXT_NONE)
     {
         naos_context_clear_note();
-        write_traces(use);
     }
-
-    naos_report_flush();
 }
 
 void naos_diagnostic_start_test(void)
@@ -140,8 +128,11 @@ void naos_diagnostic_begin(naos_report_kind_t kind, const char *file, int line, 
         g_result.failure_count++;
     }
 
+    g_record.kind = kind;
+    g_record.file = file;
+    g_record.line = line;
+    g_record.text = text;
     g_detail_count = 0;
-    naos_report_diagnostic(kind, file, line, text);
 }
 
 void naos_diagnostic_add(const char *label, const char *value)

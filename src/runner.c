@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  *
  * The whole run of the selected tests (runner.h): the rounds of --naos-repeat, the order of
- * --naos-shuffle, --naos-fail-fast, the lines around the rounds and the exit code.
+ * --naos-shuffle, --naos-fail-fast, the events around the rounds and the exit code.
  */
 
 #include "runner.h"
@@ -17,13 +17,6 @@
 #include "order.h"
 #include "report.h"
 #include "test.h"
-
-typedef struct naos_tally
-{
-    size_t passed;
-    size_t failed;
-    size_t skipped;
-} naos_tally_t;
 
 /* Order of the suites, and of the tests of one suite at a time; malloc as for the builder. */
 typedef struct naos_orders
@@ -151,68 +144,27 @@ static unsigned long choose_seed(const naos_options_t *options)
     return (options->shuffle != 0) ? naos_order_pick_seed(options->random_seed) : options->random_seed;
 }
 
-/* Prints what comes before a round: the ITERATION and RANDOM SEED lines. */
-static void begin_round(const naos_options_t *options, long round, unsigned long seed)
-{
-    if (options->repeat > 1)
-    {
-        naos_report_iteration(round, options->repeat);
-    }
-
-    if (options->shuffle != 0)
-    {
-        /* --naos-shuffle --naos-random-seed <seed> runs the same order again. */
-        naos_report_random_seed(seed);
-        naos_order_start(seed);
-    }
-}
-
 /*
- * Prints what follows a round: the FAIL FAST, SUMMARY and ITERATION FAILED lines. Returns 1 when
- * --naos-fail-fast stops the run after this round, and 0 otherwise.
+ * Ends a round and tells it. Returns 1 when --naos-fail-fast stops the run after this round, and 0
+ * otherwise.
  */
-static int end_round(const naos_options_t *options, long round, unsigned long seed, size_t selected, const naos_tally_t *tally)
+static int end_round(const naos_options_t *options, const naos_round_t *round, size_t selected, const naos_tally_t *tally)
 {
     size_t not_run;
     int stopped;
 
     stopped = 0;
+    not_run = 0;
     if ((options->fail_fast != 0) && (tally->failed > 0))
     {
         /* The rest of this round, then every later round; --naos-repeat may make it more than size_t holds. */
         stopped = 1;
-        not_run = add_saturated(selected - (tally->passed + tally->failed + tally->skipped), multiply_saturated(selected, (size_t)(options->repeat - round)));
-        if (not_run > 0)
-        {
-            naos_report_fail_fast(not_run);
-        }
+        not_run = add_saturated(selected - (tally->passed + tally->failed + tally->skipped), multiply_saturated(selected, (size_t)(options->repeat - round->index)));
     }
 
-    if (selected > 1)
-    {
-        naos_report_summary(tally->passed, tally->failed, tally->skipped);
-    }
-
-    if ((options->repeat > 1) && (tally->failed > 0))
-    {
-        naos_report_iteration_failed(round, options->repeat, options->shuffle, seed);
-    }
-
-    naos_report_flush();
+    naos_report_round_end(round, selected, tally, not_run);
 
     return stopped;
-}
-
-/* Prints the REPEAT line after the rounds; next_round is one past the last round run. */
-static void report_repeat(const naos_options_t *options, long failed_rounds, long next_round)
-{
-    if (options->repeat <= 1)
-    {
-        return;
-    }
-
-    naos_report_repeat(failed_rounds, options->repeat, options->repeat - next_round + 1);
-    naos_report_flush();
 }
 
 /*
@@ -224,10 +176,11 @@ static int run_rounds(const naos_options_t *options, const naos_suite_t *suites,
 {
     naos_orders_t orders;
     naos_tally_t total = { 0, 0, 0 };
+    naos_round_t round;
     unsigned long seed;
     long failed_rounds;
-    long round;
     int stopped;
+    int result;
 
     if (alloc_orders(&orders, suites, count) == 0)
     {
@@ -236,26 +189,48 @@ static int run_rounds(const naos_options_t *options, const naos_suite_t *suites,
         return NAOS_EXIT_FAIL;
     }
 
+    if (naos_report_begin(options->program) == 0)
+    {
+        free_orders(&orders);
+
+        return NAOS_EXIT_USAGE;
+    }
+
     seed = choose_seed(options);
     failed_rounds = 0;
     stopped = 0;
-    for (round = 1; (round <= options->repeat) && (stopped == 0); round++)
+    round.repeat = options->repeat;
+    round.shuffled = options->shuffle;
+    for (round.index = 1; (round.index <= options->repeat) && (stopped == 0); round.index++)
     {
         naos_tally_t tally = { 0, 0, 0 };
 
-        begin_round(options, round, seed);
+        round.seed = seed;
+        naos_report_round_begin(&round);
+        if (options->shuffle != 0)
+        {
+            /* --naos-shuffle --naos-random-seed <seed> runs the same order again. */
+            naos_order_start(seed);
+        }
+
         run_round(options, suites, count, &orders, &tally);
-        stopped = end_round(options, round, seed, selected, &tally);
+        stopped = end_round(options, &round, selected, &tally);
 
         failed_rounds += (tally.failed > 0) ? 1 : 0;
         tally_add(&total, &tally);
         seed = naos_order_next_seed(seed);
     }
 
-    report_repeat(options, failed_rounds, round);
     free_orders(&orders);
+    result = tally_result(&total);
 
-    return tally_result(&total);
+    /* round.index is one past the last round run. */
+    if (naos_report_end(failed_rounds, options->repeat, options->repeat - round.index + 1) == 0)
+    {
+        result = NAOS_EXIT_FAIL;
+    }
+
+    return result;
 }
 
 /* Number of tests the filter selects. */

@@ -2,176 +2,124 @@
  * Copyright (c) 2026 The Naos Authors
  * SPDX-License-Identifier: MIT
  *
- * The form of every line Naos writes, on stdout and on stderr (report.h).
+ * Telling the events of a run to every writer on, the names of --naos-list, and the messages of Naos
+ * itself on stderr (report.h).
  */
 
 #include "report.h"
 
 #include <stdio.h>
-#include <string.h>
 
 #include "format.h"
-#include "value.h"
+#include "human.h"
+
+/* Most writers on at once: the human-readable one. */
+#define NAOS_WRITER_COUNT 1
+
+static const naos_writer_t *g_writers[NAOS_WRITER_COUNT];
+static size_t g_writer_count = 0;
 
 /*
- * Writes where a diagnostic happened, followed by a space, in the form of the diagnostics of the
- * compiler Naos is built with: "<file>(<line>): " for MSVC, "<file>:<line>: " otherwise. This is
- * the only place that depends on the compiler.
+ * The writers on: the human-readable one alone until naos_report_begin(), so that a diagnostic out of
+ * a run, such as a misuse of NAOS_TRACE_POP before naos_run(), is still written.
  */
-static void print_location(const char *file, int line)
+static size_t writer_count(void)
 {
-#if defined(_MSC_VER)
-    naos_printf("%s(%d): ", file, line);
-#else
-    naos_printf("%s:%d: ", file, line);
-#endif
-}
-
-/* Word of a diagnostic line, after the location. */
-static const char *report_kind_word(naos_report_kind_t kind)
-{
-    switch (kind)
+    if (g_writer_count == 0)
     {
-    case NAOS_REPORT_ERROR:
-        return "error";
-    case NAOS_REPORT_SKIP:
-        return "skip";
-    case NAOS_REPORT_NOTE:
-        return "note";
+        g_writers[0] = naos_human_writer();
+        g_writer_count = 1;
     }
 
-    return "error";
+    return g_writer_count;
 }
 
-/* Writes the value of one detail as its kind says. */
-static void print_detail_value(const naos_detail_t *detail)
+int naos_report_begin(const char *program)
 {
-    if (detail->kind == NAOS_DETAIL_STRING)
-    {
-        naos_value_print_string(detail->value);
-    }
-    else
-    {
-        fputs(detail->value, stdout);
-    }
-}
-
-/*
- * Whether label is "left" or "left <rest>" and details[0, count) also holds its partner "right" or
- * "right <rest>". Such a label gets one more space so that its value lines up with the partner's.
- */
-static int has_right_partner(const char *label, const naos_detail_t *details, size_t count)
-{
-    const char *rest;
     size_t i;
 
-    if (strncmp(label, "left", 4) != 0)
+    for (i = 0; i < writer_count(); i++)
     {
-        return 0;
-    }
-
-    rest = label + 4;
-    if ((*rest != '\0') && (*rest != ' '))
-    {
-        return 0;
-    }
-
-    for (i = 0; i < count; i++)
-    {
-        if ((strncmp(details[i].label, "right", 5) == 0) && (strcmp(details[i].label + 5, rest) == 0))
+        if (g_writers[i]->begin(program, NULL) == 0)
         {
-            return 1;
+            return 0;
         }
     }
 
-    return 0;
+    return 1;
+}
+
+void naos_report_round_begin(const naos_round_t *round)
+{
+    size_t i;
+
+    for (i = 0; i < writer_count(); i++)
+    {
+        g_writers[i]->round_begin(round);
+    }
 }
 
 void naos_report_test_start(const char *suite, const char *test)
 {
-    naos_printf("RUN: %s.%s\n", suite, test);
-    fflush(stdout);
+    size_t i;
+
+    for (i = 0; i < writer_count(); i++)
+    {
+        g_writers[i]->test_begin(suite, test);
+    }
+}
+
+void naos_report_diagnostic(const naos_diagnostic_record_t *record)
+{
+    size_t i;
+
+    for (i = 0; i < writer_count(); i++)
+    {
+        g_writers[i]->diagnostic(record);
+    }
 }
 
 void naos_report_test_result(const char *suite, const char *test, naos_outcome_t outcome, int failure_count)
 {
-    switch (outcome)
+    size_t i;
+
+    for (i = 0; i < writer_count(); i++)
     {
-    case NAOS_OUTCOME_FAIL:
-        naos_printf("FAIL: %s.%s (%d %s)\n", suite, test, failure_count, (failure_count == 1) ? "failure" : "failures");
-        break;
-    case NAOS_OUTCOME_SKIP:
-        naos_printf("SKIP: %s.%s\n", suite, test);
-        break;
-    case NAOS_OUTCOME_PASS:
-        naos_printf("PASS: %s.%s\n", suite, test);
-        break;
+        g_writers[i]->test_end(suite, test, outcome, failure_count);
     }
-
-    fflush(stdout);
 }
 
-void naos_report_diagnostic(naos_report_kind_t kind, const char *file, int line, const char *text)
-{
-    print_location(file, line);
-    naos_printf("%s: %s\n", report_kind_word(kind), text);
-}
-
-void naos_report_details(const naos_detail_t *details, size_t count)
+void naos_report_round_end(const naos_round_t *round, size_t selected, const naos_tally_t *tally, size_t not_run)
 {
     size_t i;
 
-    for (i = 0; i < count; i++)
+    for (i = 0; i < writer_count(); i++)
     {
-        naos_printf("  %s:%s", details[i].label, has_right_partner(details[i].label, details, count) ? "  " : " ");
-        print_detail_value(&details[i]);
-        fputc('\n', stdout);
+        g_writers[i]->round_end(round, selected, tally, not_run);
     }
+}
+
+/* Every writer ends, even after one of them fails, so that each writes what it can. */
+int naos_report_end(long failed_rounds, long repeat, long rounds_not_run)
+{
+    size_t i;
+    int written;
+
+    written = 1;
+    for (i = 0; i < writer_count(); i++)
+    {
+        if (g_writers[i]->end(failed_rounds, repeat, rounds_not_run) == 0)
+        {
+            written = 0;
+        }
+    }
+
+    return written;
 }
 
 void naos_report_test_name(const char *suite, const char *test)
 {
     naos_printf("%s.%s\n", suite, test);
-}
-
-void naos_report_iteration(long round, long repeat)
-{
-    naos_printf("ITERATION: %ld of %ld\n", round, repeat);
-}
-
-void naos_report_random_seed(unsigned long seed)
-{
-    naos_printf("RANDOM SEED: %lu\n", seed);
-}
-
-void naos_report_fail_fast(size_t not_run)
-{
-    naos_printf("FAIL FAST: stopped at the first failure; %zu not run\n", not_run);
-}
-
-void naos_report_summary(size_t passed, size_t failed, size_t skipped)
-{
-    naos_printf("SUMMARY: %zu passed, %zu failed, %zu skipped\n", passed, failed, skipped);
-}
-
-void naos_report_iteration_failed(long round, long repeat, int shuffled, unsigned long seed)
-{
-    naos_printf("ITERATION FAILED: %ld of %ld", round, repeat);
-    if (shuffled != 0)
-    {
-        naos_printf(" (random seed %lu)", seed);
-    }
-    naos_printf("\n");
-}
-
-void naos_report_repeat(long failed_rounds, long repeat, long not_run)
-{
-    naos_printf("REPEAT: %ld of %ld iterations failed", failed_rounds, repeat);
-    if (not_run > 0)
-    {
-        naos_printf(", %ld not run", not_run);
-    }
-    naos_printf("\n");
 }
 
 void naos_report_flush(void)

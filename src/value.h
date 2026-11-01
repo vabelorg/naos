@@ -9,6 +9,7 @@
 #define NAOS_VALUE_H
 
 #include <stddef.h>
+#include <stdio.h>
 
 /*
  * Size of a buffer that holds every double formatted by naos_value_format_double: the longest
@@ -17,11 +18,11 @@
 #define NAOS_VALUE_DOUBLE_SIZE 32
 
 /*
- * Writes a C string of the test to stdout on one line: (null) for NULL, otherwise the bytes between
+ * Writes a C string of the test to out on one line: (null) for NULL, otherwise the bytes between
  * double quotes, with \n, \t, \r, \", \\ and \xNN (two upper-case hex digits) for every other byte
  * below 0x20, 0x7F and every byte from 0x80. Nothing is flushed.
  */
-void naos_value_print_string(const char *value);
+void naos_value_print_string(FILE *out, const char *value);
 
 /*
  * Formats value into buffer as the shortest decimal that reads back to it: plain for decimal

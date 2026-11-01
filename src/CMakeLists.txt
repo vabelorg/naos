@@ -23,8 +23,11 @@ endif()
 #   filter     -> suite
 #   test       -> suite, context, diagnostic, report
 #   diagnostic -> context, report
-#   report     -> value
-# version, order, context and value use no other module.
+#   report     -> human, writer
+#   human      -> writer, value
+#   writer     -> context
+# version, order, context and value use no other module. writer.h has no .c: it is the events
+# report.c tells and the functions a writer has.
 add_library(naos ${naos_library_type}
     # Public API
     session.c
@@ -42,6 +45,7 @@ add_library(naos ${naos_library_type}
     diagnostic.c
     context.c
     report.c
+    human.c
     value.c
 )
 add_library(naos::naos ALIAS naos)

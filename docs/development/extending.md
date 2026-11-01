@@ -4,7 +4,7 @@ Where each kind of change goes, and what must change with it. Every change to th
 
 ## Add or change an output line
 
-The form of every line is written in `report.c`, and only there. The output format is part of the public API, so:
+The form of every line is written in `human.c`, and only there; which lines a run writes is decided there too. The output format is part of the public API, so:
 
 1. Update [output](../reference/output.md).
 2. Rewrite the expected outputs of the self tests with `NAOS_UPDATE_EXPECTED=1` and check the diff ([testing](testing.md#adding-a-case)).
