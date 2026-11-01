@@ -63,6 +63,10 @@ static size_t add_saturated(size_t a, size_t b)
 
 A blank line between groups, each group in alphabetical order. Public headers are included as `<naos/...>`, internal ones as `"..."`.
 
+## Formatted output
+
+`src/` calls the formatted output functions through `format.h`: `naos_printf`, `naos_fprintf`, `naos_vfprintf`, `naos_snprintf` and `naos_vsnprintf`, never `printf` and the others directly. They format as C99 does on every platform, which the default functions of MinGW do not (`%zu`, `%jd`, the exponent of `%e`). Functions without a format (`puts`, `fputs`, `fputc`) are called directly. `naos.sources.format` checks it.
+
 ## Comments
 
 - In English.
