@@ -11,5 +11,6 @@ The functions the macros call (`naos_check_int()`, `naos_fail()` and others), th
 | [Failing, skipping and notes](control.md) | How a test stops, `NAOS_FAIL`, `NAOS_SKIP`, `NAOS_NOTE`, `NAOS_TRACE_*` |
 | [Version](version.md) | `NAOS_VERSION_*`, `naos_version_number()`, `naos_version_string()` |
 | [Command line](command-line.md) | The `--naos-*` options and the exit codes |
-| [Output](output.md) | Every line printed, and how values are written |
+| [Output](output.md) | The human-readable output on standard output, and what of it is kept compatible |
+| [JUnit XML](xml.md) | The file of `--naos-output xml:<path>`, the output for tools, and how values are written |
 | [CMake](cmake.md) | `naos::naos`, `naos_add_executable()`, `naos_discover_tests()`, options, package |

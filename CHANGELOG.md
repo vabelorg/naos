@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Building and testing with GCC of MinGW-w64 on Windows (MSYS2 UCRT64 and MINGW64). Naos formats its output as C99 does there too, and `NAOS_NOTE` and `NAOS_TRACE_PUSH` accept the formats of C99, such as `%zu` ([#3](https://github.com/vabelorg/naos/issues/3)).
+- `--naos-output xml:<path>` writes the results of the run to a JUnit XML file as well, with the location, the values, the note and the traces of each failure, for CI services and other tools ([#4](https://github.com/vabelorg/naos/issues/4)).
 
 ## [0.1.0] - 2026-10-31
 

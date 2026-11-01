@@ -4,7 +4,7 @@ Every executable built with Naos (`prog` below) takes these options:
 
 ```
 prog [--naos-filter <patterns>] [--naos-shuffle] [--naos-random-seed <n>]
-     [--naos-repeat <n>] [--naos-fail-fast] [args...]
+     [--naos-repeat <n>] [--naos-fail-fast] [--naos-output <format>:<path>] [args...]
 prog --naos-list
 prog --help
 ```
@@ -19,6 +19,7 @@ Without options, it runs every test once, in one process: the suites in the orde
 - `--naos-random-seed <n>`: the seed of `--naos-shuffle`, from 1 to 99999. 0, or no seed, picks one from the time. A value out of range or not a number is a usage error. Alone, it changes no order.
 - `--naos-repeat <n>`: runs the selected tests n times (1 or more), to find flaky tests. The exit code is the result of all the iterations together. With `--naos-shuffle`, each iteration adds 1 to the seed (after 99999 comes 1) for a new order.
 - `--naos-fail-fast`: stops after the first failing test, once its teardown has run, and runs no remaining test (with `--naos-repeat`, no remaining iteration either). A skip does not stop it.
+- `--naos-output <format>:<path>`: also writes the results of the run to the file `<path>`, in `<format>`, when the run ends. The one format is `xml`, JUnit XML ([JUnit XML](xml.md)). The value is split at the first `:`, so the path may hold one (`xml:C:\out\results.xml`). A missing format or path, an unknown format, and the option given twice are usage errors.
 - `--help`: prints the usage and exits with 0 without running any test.
 
 An option taking a value can also be written `--naos-filter=<value>`. An empty value (`--naos-filter=`) and `=` after an option that takes no value (`--naos-list=1`) are usage errors.
@@ -42,8 +43,8 @@ $ prog --naos-shuffle --naos-random-seed 4242 --naos-repeat 20
 | Code | Meaning |
 |---|---|
 | 0 | No test failed, and not every test run was skipped (a run with no test at all included). Or `--naos-list` or `--help` was given (and the suites hold no mistake) |
-| 1 | At least one test failed, or memory could not be allocated |
-| 2 | Usage error: a mistake in the arguments or the suites, or a call out of order |
+| 1 | At least one test failed, memory could not be allocated, or the file of `--naos-output` could not be written |
+| 2 | Usage error: a mistake in the arguments or the suites, a call out of order, or a file of `--naos-output` that cannot be opened |
 | 77 | Every test run was skipped |
 
 `naos_run()` returns one of these; return it from `main()` as it is. 77 is the code CTest and Automake treat as a skip, and the CMake functions of Naos register the tests with `SKIP_RETURN_CODE 77`.
