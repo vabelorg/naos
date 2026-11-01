@@ -1,0 +1,26 @@
+args: --naos-quiet --naos-filter -crash.*
+exit code: 1
+--- stdout
+RUN: results.fails
+quiet.c:LINE: error: "hello\n" == "hello"
+  left:  "hello\n"
+  right: "hello"
+  first difference: offset 5, end of right
+FAIL: results.fails (1 failure)
+RUN: results.fails_then_skips
+quiet.c:LINE: error: 1 == 2
+  left:  1
+  right: 2
+quiet.c:LINE: skip: later
+FAIL: results.fails_then_skips (1 failure)
+RUN: results.fails_with_trace
+quiet.c:LINE: error: 0
+quiet.c:LINE: note: case 3
+FAIL: results.fails_with_trace (1 failure)
+printed by the test
+RUN: skip_then_teardown_fails.body
+quiet.c:LINE: skip: not applicable
+quiet.c:LINE: error: 1 == 2
+FAIL: skip_then_teardown_fails.body (1 failure)
+SUMMARY: 2 passed, 4 failed, 3 skipped
+--- stderr

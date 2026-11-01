@@ -1,0 +1,4 @@
+args: --naos-quiet --naos-filter crash.*
+exit code: 3
+--- stdout
+--- stderr

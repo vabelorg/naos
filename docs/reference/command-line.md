@@ -4,7 +4,8 @@ Every executable built with Naos (`prog` below) takes these options:
 
 ```
 prog [--naos-filter <patterns>] [--naos-shuffle] [--naos-random-seed <n>]
-     [--naos-repeat <n>] [--naos-fail-fast] [--naos-output <format>:<path>] [args...]
+     [--naos-repeat <n>] [--naos-fail-fast] [--naos-quiet]
+     [--naos-output <format>:<path>] [args...]
 prog --naos-list
 prog --help
 ```
@@ -19,6 +20,7 @@ Without options, it runs every test once, in one process: the suites in the orde
 - `--naos-random-seed <n>`: the seed of `--naos-shuffle`, from 1 to 99999. 0, or no seed, picks one from the time. A value out of range or not a number is a usage error. Alone, it changes no order.
 - `--naos-repeat <n>`: runs the selected tests n times (1 or more), to find flaky tests. The exit code is the result of all the iterations together. With `--naos-shuffle`, each iteration adds 1 to the seed (after 99999 comes 1) for a new order.
 - `--naos-fail-fast`: stops after the first failing test, once its teardown has run, and runs no remaining test (with `--naos-repeat`, no remaining iteration either). A skip does not stop it.
+- `--naos-quiet`: leaves out of standard output the tests that pass or skip, and `ITERATION:`. A failing test is written as without it, and the run still ends with its summary ([with `--naos-quiet`](output.md#with---naos-quiet)). The exit code and the file of `--naos-output` do not change.
 - `--naos-output <format>:<path>`: also writes the results of the run to the file `<path>`, in `<format>`, when the run ends. The one format is `xml`, JUnit XML ([JUnit XML](xml.md)). The value is split at the first `:`, so the path may hold one (`xml:C:\out\results.xml`). A missing format or path, an unknown format, and the option given twice are usage errors.
 - `--help`: prints the usage and exits with 0 without running any test.
 

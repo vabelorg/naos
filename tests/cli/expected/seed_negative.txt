@@ -3,4 +3,4 @@ exit code: 2
 --- stdout
 --- stderr
 naos: --naos-random-seed takes 0 to 99999: -1
-usage: PROG [--naos-filter <patterns>] [--naos-list] [--naos-shuffle] [--naos-random-seed <n>] [--naos-repeat <n>] [--naos-fail-fast] [--naos-output <format>:<path>] [--help] [args...]
+usage: PROG [--naos-filter <patterns>] [--naos-list] [--naos-shuffle] [--naos-random-seed <n>] [--naos-repeat <n>] [--naos-fail-fast] [--naos-quiet] [--naos-output <format>:<path>] [--help] [args...]

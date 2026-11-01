@@ -24,7 +24,7 @@ endif()
 #   test       -> suite, context, diagnostic, report
 #   diagnostic -> context, report
 #   report     -> human, xml, writer
-#   human      -> writer, value
+#   human      -> writer, text, value
 #   xml        -> human, writer, text, value
 #   writer     -> context
 # version, order, context, value and text use no other module. writer.h has no .c: it is the events

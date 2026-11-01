@@ -66,6 +66,7 @@ static naos_options_t g_options =
     0,    /* random_seed */
     1,    /* repeat */
     0,    /* fail_fast */
+    0,    /* quiet */
     NAOS_FORMAT_NONE, /* output_format */
     NULL, /* output_path */
     0,    /* help_requested */
@@ -104,6 +105,11 @@ static const naos_option_entry_t g_option_table[] =
         "--naos-fail-fast", NULL, NULL, &g_options.fail_fast, NULL,
         "stop at the first failing test, leaving the other tests and\n"
         "iterations not run"
+    },
+    {
+        "--naos-quiet", NULL, NULL, &g_options.quiet, NULL,
+        "print only the tests that fail, and the lines that end the\n"
+        "iterations and the run"
     },
     {
         "--naos-output", "<format>:<path>", "<format>:<path>", NULL, take_output,

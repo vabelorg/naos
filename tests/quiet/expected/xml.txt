@@ -1,0 +1,69 @@
+args: --naos-quiet --naos-output xml:{output} --naos-filter -crash.*
+exit code: 1
+--- stdout
+RUN: results.fails
+quiet.c:LINE: error: "hello\n" == "hello"
+  left:  "hello\n"
+  right: "hello"
+  first difference: offset 5, end of right
+FAIL: results.fails (1 failure)
+RUN: results.fails_then_skips
+quiet.c:LINE: error: 1 == 2
+  left:  1
+  right: 2
+quiet.c:LINE: skip: later
+FAIL: results.fails_then_skips (1 failure)
+RUN: results.fails_with_trace
+quiet.c:LINE: error: 0
+quiet.c:LINE: note: case 3
+FAIL: results.fails_with_trace (1 failure)
+printed by the test
+RUN: skip_then_teardown_fails.body
+quiet.c:LINE: skip: not applicable
+quiet.c:LINE: error: 1 == 2
+FAIL: skip_then_teardown_fails.body (1 failure)
+SUMMARY: 2 passed, 4 failed, 3 skipped
+--- stderr
+--- output
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="naos_selftest_quiet" tests="9" failures="4" errors="0" skipped="3">
+  <testsuite name="results" tests="6" failures="3" errors="0" skipped="1">
+    <testcase classname="results" name="passes"/>
+    <testcase classname="results" name="fails" file="quiet.c" line="LINE">
+      <failure type="error" message="&quot;hello\n&quot; == &quot;hello&quot;">quiet.c:LINE: error: "hello\n" == "hello"
+  left:  "hello\n"
+  right: "hello"
+  first difference: offset 5, end of right
+</failure>
+    </testcase>
+    <testcase classname="results" name="skips" file="quiet.c" line="LINE">
+      <skipped message="not here"/>
+    </testcase>
+    <testcase classname="results" name="fails_then_skips" file="quiet.c" line="LINE">
+      <failure type="error" message="1 == 2">quiet.c:LINE: error: 1 == 2
+  left:  1
+  right: 2
+</failure>
+    </testcase>
+    <testcase classname="results" name="fails_with_trace" file="quiet.c" line="LINE">
+      <failure type="error" message="0">quiet.c:LINE: error: 0
+quiet.c:LINE: note: case 3
+</failure>
+    </testcase>
+    <testcase classname="results" name="prints"/>
+  </testsuite>
+  <testsuite name="skip_then_teardown_fails" tests="1" failures="1" errors="0" skipped="0">
+    <testcase classname="skip_then_teardown_fails" name="body" file="quiet.c" line="LINE">
+      <failure type="error" message="1 == 2">quiet.c:LINE: error: 1 == 2
+</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="skipping" tests="2" failures="0" errors="0" skipped="2">
+    <testcase classname="skipping" name="skipped_first" file="quiet.c" line="LINE">
+      <skipped message="first"/>
+    </testcase>
+    <testcase classname="skipping" name="skipped_second" file="quiet.c" line="LINE">
+      <skipped message="(no message)"/>
+    </testcase>
+  </testsuite>
+</testsuites>

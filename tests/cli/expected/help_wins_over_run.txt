@@ -1,7 +1,7 @@
 args: --naos-filter parser.empty --naos-list --help
 exit code: 0
 --- stdout
-usage: PROG [--naos-filter <patterns>] [--naos-list] [--naos-shuffle] [--naos-random-seed <n>] [--naos-repeat <n>] [--naos-fail-fast] [--naos-output <format>:<path>] [--help] [args...]
+usage: PROG [--naos-filter <patterns>] [--naos-list] [--naos-shuffle] [--naos-random-seed <n>] [--naos-repeat <n>] [--naos-fail-fast] [--naos-quiet] [--naos-output <format>:<path>] [--help] [args...]
 
 options (anywhere on the command line):
   --naos-filter <patterns>  run only the tests whose name <suite>.<test> matches
@@ -16,6 +16,8 @@ options (anywhere on the command line):
                             each time
   --naos-fail-fast          stop at the first failing test, leaving the other tests and
                             iterations not run
+  --naos-quiet              print only the tests that fail, and the lines that end the
+                            iterations and the run
   --naos-output <format>:<path>
                             also write the results to the file <path> in <format>,
                             when the run ends; the formats: xml (JUnit XML)

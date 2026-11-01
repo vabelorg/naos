@@ -62,7 +62,7 @@ flowchart LR
   test --> context
   diagnostic --> context
   diagnostic --> report --> xml --> human --> value
-  xml --> text
+  xml & human --> text
   report --> human
   control --> test & diagnostic & context
   check --> diagnostic & value

@@ -18,6 +18,7 @@ The self tests of Naos: what they check, how they compare outputs, and how to ad
 | `context/` | Notes and traces | The same |
 | `runs/` | `--naos-shuffle`, `--naos-repeat`, `--naos-fail-fast` | The same |
 | `report/` | The JUnit XML file of `--naos-output` | Output and the file compared |
+| `quiet/` | What `--naos-quiet` leaves out of standard output, and that the JUnit XML file stays the same | Output and the file compared |
 | `discovery/` | The messages of `NaosDiscover.cmake` when listing the tests fails | The same |
 | `no_cmake/` | Building without CMake, as [installation](../getting-started/installation.md#without-cmake) describes | Built and run |
 | `examples/` | The projects of `examples/`, and the outputs the documentation quotes from them | Their tests pass; outputs compared |

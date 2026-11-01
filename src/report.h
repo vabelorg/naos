@@ -27,10 +27,11 @@ typedef enum naos_format
 
 /*
  * Starts the run: turns on the writer of format, if any, to write to path, and every writer on gets
- * ready to write. program is argv[0], possibly NULL; path lives until the process ends. Returns 0
- * after reporting why a writer cannot write, and then no test may run.
+ * ready to write; with quiet, stdout leaves out the tests that pass or skip. program is argv[0],
+ * possibly NULL; path lives until the process ends. Returns 0 after reporting why a writer cannot
+ * write, and then no test may run.
  */
-int naos_report_begin(const char *program, naos_format_t format, const char *path);
+int naos_report_begin(const char *program, naos_format_t format, const char *path, int quiet);
 
 /* The events of the run, told to every writer on; see naos_writer_t for what each means. */
 void naos_report_round_begin(const naos_round_t *round);

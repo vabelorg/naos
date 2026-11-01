@@ -1,0 +1,5 @@
+args: --naos-quiet --naos-filter skipping.*
+exit code: 77
+--- stdout
+SUMMARY: 0 passed, 0 failed, 2 skipped
+--- stderr
