@@ -61,7 +61,7 @@ SUMMARY: 1 passed, 1 failed, 0 skipped
 - C99 のコンパイラ（GCC、Clang、MSVC）。C++ でテストを書く場合は C++11。
 - CMake 3.21 以降（なくても使えます）。
 
-すべての変更を Linux（GCC、Clang）、macOS（Clang）、Windows（MSVC）でビルドしてテストしています。
+すべての変更を Linux（GCC、Clang）、macOS（Clang）、Windows（MSVC、MSYS2 の MinGW-w64 の GCC）でビルドしてテストしています。
 
 ## インストール
 

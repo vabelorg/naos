@@ -61,7 +61,7 @@ SUMMARY: 1 passed, 1 failed, 0 skipped
 - A C99 compiler (GCC, Clang or MSVC); C++11 for tests written in C++.
 - CMake 3.21 or later, optional.
 
-Every change is built and tested on Linux (GCC, Clang), macOS (Clang) and Windows (MSVC).
+Every change is built and tested on Linux (GCC, Clang), macOS (Clang) and Windows (MSVC, and GCC of MinGW-w64 in MSYS2).
 
 ## Installation
 

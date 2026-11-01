@@ -26,6 +26,8 @@ ctest --preset default
 
 The same with `shared` checks the shared build. Run both before sending a change that touches the library or the CMake files.
 
+With MinGW-w64 on Windows, run them in the shell of MSYS2 (UCRT64 or MINGW64), with its `gcc`, `cmake` and `ninja` packages and `CMAKE_GENERATOR=Ninja`, as CI does.
+
 ## By hand
 
 ```sh
@@ -70,4 +72,4 @@ The library must also build with nothing but a compiler; the self test `naos.no_
 
 ## Continuous integration
 
-`.github/workflows/ci.yml` builds and tests every push and pull request with the presets, on Linux (GCC and Clang), macOS (Clang) and Windows (MSVC), each as a static and a shared library. A change is merged only when every job passes.
+`.github/workflows/ci.yml` builds and tests every push and pull request with the presets, on Linux (GCC and Clang), macOS (Clang) and Windows (MSVC, and GCC of MinGW-w64 in the UCRT64 and MINGW64 environments of MSYS2), each as a static and a shared library. A change is merged only when every job passes.
