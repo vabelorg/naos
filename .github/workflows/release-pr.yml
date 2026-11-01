@@ -83,9 +83,15 @@ jobs:
             echo
             echo "<details><summary>Diff</summary>"
             echo
-            echo '```diff'
-            git diff
-            echo '```'
+            # The fence is longer than any run of backticks in the diff, which shows the code
+            # blocks of the docs, so that none of them closes it
+            diff=$(git diff)
+            fence=$(printf '%s\n' "$diff" | grep -o '`\+' \
+              | awk '{ if (length > n) n = length } END { print n < 3 ? "```" : sprintf("%" n + 1 "s", "") }' \
+              | tr ' ' '`')
+            echo "${fence}diff"
+            printf '%s\n' "$diff"
+            echo "$fence"
             echo
             echo "</details>"
           } >> "$GITHUB_STEP_SUMMARY"
