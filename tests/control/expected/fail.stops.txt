@@ -3,6 +3,6 @@ exit code: 1
 --- stdout
 RUN: fail.stops
 fail.c:LINE: error: explicit failure
-FAIL: fail.stops (1 failure)
-SUMMARY: 0 passed, 1 failed, 0 skipped
+FAIL: fail.stops (1 failure, N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 --- stderr

@@ -3,6 +3,6 @@ exit code: 77
 --- stdout
 RUN: skip.from_helper
 skip.c:LINE: skip: helper skip
-SKIP: skip.from_helper
-SUMMARY: 0 passed, 0 failed, 1 skipped
+SKIP: skip.from_helper (N ms)
+SUMMARY: 0 passed, 0 failed, 1 skipped (N ms)
 --- stderr

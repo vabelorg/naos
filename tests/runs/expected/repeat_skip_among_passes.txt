@@ -4,22 +4,22 @@ exit code: 0
 ITERATION: 1 of 2
 RUN: skips.skip_one
 failing.c:LINE: skip: not applicable
-SKIP: skips.skip_one
+SKIP: skips.skip_one (N ms)
 RUN: skips.skip_two
 failing.c:LINE: skip: not applicable either
-SKIP: skips.skip_two
+SKIP: skips.skip_two (N ms)
 RUN: skips.passes
-PASS: skips.passes
-SUMMARY: 1 passed, 0 failed, 2 skipped
+PASS: skips.passes (N ms)
+SUMMARY: 1 passed, 0 failed, 2 skipped (N ms)
 ITERATION: 2 of 2
 RUN: skips.skip_one
 failing.c:LINE: skip: not applicable
-SKIP: skips.skip_one
+SKIP: skips.skip_one (N ms)
 RUN: skips.skip_two
 failing.c:LINE: skip: not applicable either
-SKIP: skips.skip_two
+SKIP: skips.skip_two (N ms)
 RUN: skips.passes
-PASS: skips.passes
-SUMMARY: 1 passed, 0 failed, 2 skipped
+PASS: skips.passes (N ms)
+SUMMARY: 1 passed, 0 failed, 2 skipped (N ms)
 REPEAT: 0 of 2 iterations failed
 --- stderr

@@ -5,6 +5,6 @@ RUN: teardown_fails.body
 body-ran
 fixtures.c:LINE: error: 1 == 2
 teardown-ran
-FAIL: teardown_fails.body (1 failure)
-SUMMARY: 0 passed, 1 failed, 0 skipped
+FAIL: teardown_fails.body (1 failure, N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 --- stderr

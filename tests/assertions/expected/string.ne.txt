@@ -5,6 +5,6 @@ RUN: string.ne
 string.c:LINE: error: "abc" != "abc"
   left:  "abc"
   right: "abc"
-FAIL: string.ne (1 failure)
-SUMMARY: 0 passed, 1 failed, 0 skipped
+FAIL: string.ne (1 failure, N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 --- stderr

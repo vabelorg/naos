@@ -22,13 +22,13 @@ The path is relative to the working directory. Under CTest, every test of an exe
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="<program>" tests="<n>" failures="<n>" errors="0" skipped="<n>">
-  <testsuite name="<suite>" tests="<n>" failures="<n>" errors="0" skipped="<n>">
+<testsuites name="<program>" tests="<n>" failures="<n>" errors="0" skipped="<n>" time="<s>">
+  <testsuite name="<suite>" tests="<n>" failures="<n>" errors="0" skipped="<n>" time="<s>">
     <properties>
       <property name="iteration" value="<i>"/>
       <property name="random_seed" value="<seed>"/>
     </properties>
-    <testcase classname="<suite>" name="<test>" file="<file>" line="<line>">
+    <testcase classname="<suite>" name="<test>" time="<s>" file="<file>" line="<line>">
       <failure type="error" message="<text>">...</failure>
       <skipped message="<message>"/>
     </testcase>
@@ -38,14 +38,16 @@ The path is relative to the working directory. Under CTest, every test of an exe
 
 | Element | Written | Attributes |
 |---|---|---|
-| `<testsuites>` | Once, around everything | `name`: the name of the program, `argv[0]` without its directory and without `.exe`. `tests`, `failures`, `skipped`: the test cases of the whole file. `errors`: always `0` |
-| `<testsuite>` | For each suite, in each iteration, in the order run | `name`: the suite. `tests`, `failures`, `skipped`, `errors`: as for `<testsuites>`, for its test cases |
+| `<testsuites>` | Once, around everything | `name`: the name of the program, `argv[0]` without its directory and without `.exe`. `tests`, `failures`, `skipped`: the test cases of the whole file. `errors`: always `0`. `time`: the sum of the times of the test cases of the whole file |
+| `<testsuite>` | For each suite, in each iteration, in the order run | `name`: the suite. `tests`, `failures`, `skipped`, `errors`, `time`: as for `<testsuites>`, for its test cases |
 | `<properties>` | In a `<testsuite>`, when `--naos-repeat` is 2 or more, or with `--naos-shuffle` | Holds `<property name="iteration">` (from 1, with `--naos-repeat` 2 or more) and `<property name="random_seed">` (with `--naos-shuffle`) |
-| `<testcase>` | For each test run | `classname`: the suite. `name`: the test. `file`, `line`: where its first failure or skip happened, left out when there is none |
+| `<testcase>` | For each test run | `classname`: the suite. `name`: the test. `time`: the time of the test. `file`, `line`: where its first failure or skip happened, left out when there is none |
 | `<failure>` | For each failure of a failed test, in the order they happened | `type`: always `error`. `message`: the text of the `error` diagnostic line ([output](output.md#diagnostic-lines)): the expression of the assertion, the message of `NAOS_FAIL`, or the mistake with traces |
 | `<skipped>` | In a skipped test | `message`: the message of `NAOS_SKIP` |
 
-A test case holds the `<failure>` elements when the test failed, one `<skipped>` when it was skipped, and nothing when it passed. A test that fails and then skips has its failures only. The tests that `--naos-fail-fast` left out have no test case. Naos writes no `time`, `timestamp` or `<system-out>`, since it measures no time and does not capture what the tests print.
+A test case holds the `<failure>` elements when the test failed, one `<skipped>` when it was skipped, and nothing when it passed. A test that fails and then skips has its failures only. The tests that `--naos-fail-fast` left out have no test case. Naos writes no `timestamp` and no `<system-out>`, since it does not capture what the tests print.
+
+A `time` is in seconds, with three decimals and rounded down to the millisecond (`time="3.120"`), as the tools of JUnit XML read it. The time of a test case is the time its result line shows on standard output: setup, body and teardown, with the clock that `--help` names ([times](output.md#times)). The time of a suite or of the whole file is the sum of the exact times of its test cases, rounded down once, so it may be a little more than the sum of the times written. The times change from run to run, so the file does too.
 
 The text of a `<failure>` is the diagnostic as standard output writes it: the `error` line, its detail lines with the values, the note and the traces ([output](output.md)). CI services show it as it is, so that a failure reads the same in CI as in a terminal. It is written for people, as standard output is.
 
@@ -58,7 +60,7 @@ The file is UTF-8. Every text is escaped for XML (`&amp;`, `&lt;`, `&gt;`, and `
 Kept compatible is what the common tools that read JUnit XML process:
 
 - The elements `<testsuites>`, `<testsuite>`, `<testcase>`, `<failure>` and `<skipped>`, how they nest, and which test cases and which `<failure>` and `<skipped>` elements are written ([elements](#elements)).
-- Their attributes stated above: `name`, `classname`, the counts `tests`, `failures`, `errors` and `skipped`, `file`, `line`, `type` and `message`, with what they hold and how their text is escaped ([text](#text)).
+- Their attributes stated above: `name`, `classname`, the counts `tests`, `failures`, `errors` and `skipped`, `time`, `file`, `line`, `type` and `message`, with what they hold and how their text is escaped ([text](#text)).
 - When the file is written, and the exit codes ([when the file is written](#when-the-file-is-written)).
 
 Not kept compatible, since the common tools only show it or leave it out: the text of `<failure>`, which follows standard output, the `<properties>` of a suite, and the layout of the file (indentation, line breaks between elements, the order of attributes). A later version may add attributes, elements and formats besides `xml`; a tool should skip what it does not know.
@@ -69,10 +71,10 @@ Four tests of the self tests of Naos (`tests/report/report.c`), run with `--naos
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="naos_selftest_report" tests="4" failures="2" errors="0" skipped="1">
-  <testsuite name="results" tests="4" failures="2" errors="0" skipped="1">
-    <testcase classname="results" name="passes"/>
-    <testcase classname="results" name="fails_twice" file="report.c" line="26">
+<testsuites name="naos_selftest_report" tests="4" failures="2" errors="0" skipped="1" time="0.001">
+  <testsuite name="results" tests="4" failures="2" errors="0" skipped="1" time="0.001">
+    <testcase classname="results" name="passes" time="0.000"/>
+    <testcase classname="results" name="fails_twice" time="0.000" file="report.c" line="26">
       <failure type="error" message="1 == 2">report.c:26: error: 1 == 2
   left:  1
   right: 2
@@ -83,10 +85,10 @@ Four tests of the self tests of Naos (`tests/report/report.c`), run with `--naos
   first difference: offset 5, end of right
 </failure>
     </testcase>
-    <testcase classname="results" name="skips" file="report.c" line="32">
+    <testcase classname="results" name="skips" time="0.000" file="report.c" line="32">
       <skipped message="not here"/>
     </testcase>
-    <testcase classname="results" name="with_context" file="report.c" line="47">
+    <testcase classname="results" name="with_context" time="0.000" file="report.c" line="47">
       <failure type="error" message="0.1 ~= 0.25">report.c:47: error: 0.1 ~= 0.25
   left:  0.1
   right: 0.25

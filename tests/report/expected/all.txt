@@ -2,7 +2,7 @@ args: --naos-output xml:{output} --naos-filter results.*
 exit code: 1
 --- stdout
 RUN: results.passes
-PASS: results.passes
+PASS: results.passes (N ms)
 RUN: results.fails_twice
 report.c:LINE: error: 1 == 2
   left:  1
@@ -11,14 +11,14 @@ report.c:LINE: error: "hello\n" == "hello"
   left:  "hello\n"
   right: "hello"
   first difference: offset 5, end of right
-FAIL: results.fails_twice (2 failures)
+FAIL: results.fails_twice (2 failures, N ms)
 RUN: results.skips
 report.c:LINE: skip: not here
-SKIP: results.skips
+SKIP: results.skips (N ms)
 RUN: results.fails_then_skips
 report.c:LINE: error: 0
 report.c:LINE: skip: later
-FAIL: results.fails_then_skips (1 failure)
+FAIL: results.fails_then_skips (1 failure, N ms)
 RUN: results.with_context
 report.c:LINE: error: 0.1 ~= 0.25
   left:  0.1
@@ -33,7 +33,7 @@ report.c:LINE: error: "ab" == "ac"
   first difference: offset 1, left 0x62, right 0x63
 report.c:LINE: note: inner 2
 report.c:LINE: note: outer
-FAIL: results.with_context (2 failures)
+FAIL: results.with_context (2 failures, N ms)
 RUN: results.too_deep
 report.c:LINE: error: NAOS_TRACE_PUSH beyond 16 levels
 report.c:LINE: error: 0
@@ -54,15 +54,15 @@ report.c:LINE: note: level 3
 report.c:LINE: note: level 2
 report.c:LINE: note: level 1
 report.c:LINE: note: level 0
-FAIL: results.too_deep (2 failures)
-SUMMARY: 1 passed, 4 failed, 1 skipped
+FAIL: results.too_deep (2 failures, N ms)
+SUMMARY: 1 passed, 4 failed, 1 skipped (N ms)
 --- stderr
 --- output
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="naos_selftest_report" tests="6" failures="4" errors="0" skipped="1">
-  <testsuite name="results" tests="6" failures="4" errors="0" skipped="1">
-    <testcase classname="results" name="passes"/>
-    <testcase classname="results" name="fails_twice" file="report.c" line="LINE">
+<testsuites name="naos_selftest_report" tests="6" failures="4" errors="0" skipped="1" time="N.NNN">
+  <testsuite name="results" tests="6" failures="4" errors="0" skipped="1" time="N.NNN">
+    <testcase classname="results" name="passes" time="N.NNN"/>
+    <testcase classname="results" name="fails_twice" time="N.NNN" file="report.c" line="LINE">
       <failure type="error" message="1 == 2">report.c:LINE: error: 1 == 2
   left:  1
   right: 2
@@ -73,14 +73,14 @@ SUMMARY: 1 passed, 4 failed, 1 skipped
   first difference: offset 5, end of right
 </failure>
     </testcase>
-    <testcase classname="results" name="skips" file="report.c" line="LINE">
+    <testcase classname="results" name="skips" time="N.NNN" file="report.c" line="LINE">
       <skipped message="not here"/>
     </testcase>
-    <testcase classname="results" name="fails_then_skips" file="report.c" line="LINE">
+    <testcase classname="results" name="fails_then_skips" time="N.NNN" file="report.c" line="LINE">
       <failure type="error" message="0">report.c:LINE: error: 0
 </failure>
     </testcase>
-    <testcase classname="results" name="with_context" file="report.c" line="LINE">
+    <testcase classname="results" name="with_context" time="N.NNN" file="report.c" line="LINE">
       <failure type="error" message="0.1 ~= 0.25">report.c:LINE: error: 0.1 ~= 0.25
   left:  0.1
   right: 0.25
@@ -97,7 +97,7 @@ report.c:LINE: note: inner 2
 report.c:LINE: note: outer
 </failure>
     </testcase>
-    <testcase classname="results" name="too_deep" file="report.c" line="LINE">
+    <testcase classname="results" name="too_deep" time="N.NNN" file="report.c" line="LINE">
       <failure type="error" message="NAOS_TRACE_PUSH beyond 16 levels">report.c:LINE: error: NAOS_TRACE_PUSH beyond 16 levels
 </failure>
       <failure type="error" message="0">report.c:LINE: error: 0

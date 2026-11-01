@@ -140,12 +140,12 @@ The executable also runs on its own, all its tests in one process. The following
 ```
 $ ./build/clamp_tests
 RUN: clamp.inside_range
-PASS: clamp.inside_range
+PASS: clamp.inside_range (0 ms)
 RUN: clamp.below_range
-PASS: clamp.below_range
+PASS: clamp.below_range (0 ms)
 RUN: clamp.above_range
-PASS: clamp.above_range
-SUMMARY: 3 passed, 0 failed, 0 skipped
+PASS: clamp.above_range (0 ms)
+SUMMARY: 3 passed, 0 failed, 0 skipped (0 ms)
 ```
 
 With a multi-config generator such as Visual Studio, add `--config Debug` to the build and `-C Debug` to `ctest`. The executable is then `build\Debug\clamp_tests.exe`.
@@ -162,12 +162,12 @@ RUN: clamp.inside_range
 clamp_test.c:10: error: 6 == clamp(5, 0, 10)
   left:  6
   right: 5
-FAIL: clamp.inside_range (1 failure)
+FAIL: clamp.inside_range (1 failure, 0 ms)
 RUN: clamp.below_range
-PASS: clamp.below_range
+PASS: clamp.below_range (0 ms)
 RUN: clamp.above_range
-PASS: clamp.above_range
-SUMMARY: 2 passed, 1 failed, 0 skipped
+PASS: clamp.above_range (0 ms)
+SUMMARY: 2 passed, 1 failed, 0 skipped (0 ms)
 ```
 
 Only `inside_range` fails; the other two still pass. A failing test does not stop the rest from running. The failure output reads like this:

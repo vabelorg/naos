@@ -7,6 +7,6 @@ note.c:LINE: error: "a" == "b"
   right: "b"
   first difference: offset 0, left 0x61, right 0x62
   note: before require
-FAIL: note.on_require (1 failure)
-SUMMARY: 0 passed, 1 failed, 0 skipped
+FAIL: note.on_require (1 failure, N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 --- stderr

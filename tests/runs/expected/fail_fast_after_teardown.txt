@@ -5,7 +5,7 @@ RUN: teardown_fails.body
 body-ran
 failing.c:LINE: error: 1 == 2
 teardown-ran
-FAIL: teardown_fails.body (1 failure)
+FAIL: teardown_fails.body (1 failure, N ms)
 FAIL FAST: stopped at the first failure; 1 not run
-SUMMARY: 0 passed, 1 failed, 0 skipped
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 --- stderr

@@ -6,7 +6,7 @@ quiet.c:LINE: error: "hello\n" == "hello"
   left:  "hello\n"
   right: "hello"
   first difference: offset 5, end of right
-FAIL: results.fails (1 failure)
+FAIL: results.fails (1 failure, N ms)
 FAIL FAST: stopped at the first failure; 4 not run
-SUMMARY: 1 passed, 1 failed, 0 skipped
+SUMMARY: 1 passed, 1 failed, 0 skipped (N ms)
 --- stderr

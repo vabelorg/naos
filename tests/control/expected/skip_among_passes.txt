@@ -3,11 +3,11 @@ exit code: 0
 --- stdout
 RUN: skips.skipped_one
 results.c:LINE: skip: not applicable
-SKIP: skips.skipped_one
+SKIP: skips.skipped_one (N ms)
 RUN: skips.skipped_two
 results.c:LINE: skip: not applicable either
-SKIP: skips.skipped_two
+SKIP: skips.skipped_two (N ms)
 RUN: skips.passed
-PASS: skips.passed
-SUMMARY: 1 passed, 0 failed, 2 skipped
+PASS: skips.passed (N ms)
+SUMMARY: 1 passed, 0 failed, 2 skipped (N ms)
 --- stderr

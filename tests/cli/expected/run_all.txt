@@ -2,14 +2,14 @@ args:
 exit code: 0
 --- stdout
 RUN: parser.empty
-PASS: parser.empty
+PASS: parser.empty (N ms)
 RUN: parser.nested
-PASS: parser.nested
+PASS: parser.nested (N ms)
 RUN: parser.slow_big
-PASS: parser.slow_big
+PASS: parser.slow_big (N ms)
 RUN: writer.empty
-PASS: writer.empty
+PASS: writer.empty (N ms)
 RUN: writer.slow_small
-PASS: writer.slow_small
-SUMMARY: 5 passed, 0 failed, 0 skipped
+PASS: writer.slow_small (N ms)
+SUMMARY: 5 passed, 0 failed, 0 skipped (N ms)
 --- stderr

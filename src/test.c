@@ -13,6 +13,7 @@
 
 #include <naos/exit.h>
 
+#include "clock.h"
 #include "context.h"
 #include "diagnostic.h"
 
@@ -51,18 +52,27 @@ static void run_guarded(naos_func_t first, naos_func_t second)
     g_jump_armed = 0;
 }
 
-naos_outcome_t naos_test_run(const naos_suite_t *suite, const naos_test_t *test)
+/*
+ * The time is taken here once, between the events that start and end the test, so that every writer
+ * shows the same: it covers setup, the body and teardown, and not the writing of RUN and the result.
+ */
+naos_outcome_t naos_test_run(const naos_suite_t *suite, const naos_test_t *test, naos_nanoseconds_t *elapsed)
 {
     naos_outcome_t outcome;
+    naos_nanoseconds_t start;
+    naos_nanoseconds_t end;
 
     naos_diagnostic_start_test();
     naos_report_test_start(suite->name, test->name);
+    start = naos_clock_now();
 
     run_guarded(suite->setup, test->func);
     run_guarded(NULL, suite->teardown); /* always runs; a jump out of it ends teardown only */
 
+    end = naos_clock_now();
+    *elapsed = (end > start) ? (end - start) : 0;
     outcome = naos_diagnostic_outcome();
-    naos_report_test_result(suite->name, test->name, outcome, naos_diagnostic_failure_count());
+    naos_report_test_result(suite->name, test->name, outcome, naos_diagnostic_failure_count(), *elapsed);
 
     return outcome;
 }

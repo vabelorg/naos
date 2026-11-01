@@ -93,7 +93,7 @@ if (getenv("LARGE_FILE") == NULL)
 
 ```
 io_test.c:8: skip: LARGE_FILE is not set
-SKIP: io.reads_large_file
+SKIP: io.reads_large_file (0 ms)
 ```
 
 - `NAOS_SKIP` in setup skips every test of the suite at once ([setup and teardown](fixtures.md)).

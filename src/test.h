@@ -14,12 +14,12 @@
 #include "suite_internal.h"
 
 /*
- * Runs one test with its outcome cleared, and returns it. Other static state, of Naos or of the
- * tests, carries over from the previous test. A fatal failure or a skip in setup leaves the body
- * out, and teardown always runs. Writes "RUN: <suite>.<test>" before setup, and the result line
- * after teardown.
+ * Runs one test with its outcome cleared, and returns it, with the time of setup, body and teardown
+ * in *elapsed. Other static state, of Naos or of the tests, carries over from the previous test. A
+ * fatal failure or a skip in setup leaves the body out, and teardown always runs. Writes
+ * "RUN: <suite>.<test>" before setup, and the result line after teardown.
  */
-naos_outcome_t naos_test_run(const naos_suite_t *suite, const naos_test_t *test);
+naos_outcome_t naos_test_run(const naos_suite_t *suite, const naos_test_t *test, naos_nanoseconds_t *elapsed);
 
 /*
  * Leaves setup and the body, or teardown, of the running test through longjmp. Outside a running

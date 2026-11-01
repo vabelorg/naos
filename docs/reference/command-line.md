@@ -22,7 +22,7 @@ Without options, it runs every test once, in one process: the suites in the orde
 - `--naos-fail-fast`: stops after the first failing test, once its teardown has run, and runs no remaining test (with `--naos-repeat`, no remaining iteration either). A skip does not stop it.
 - `--naos-quiet`: leaves out of standard output the tests that pass or skip, and `ITERATION:`. A failing test is written as without it, and the run still ends with its summary ([with `--naos-quiet`](output.md#with---naos-quiet)). The exit code and the file of `--naos-output` do not change.
 - `--naos-output <format>:<path>`: also writes the results of the run to the file `<path>`, in `<format>`, when the run ends. The one format is `xml`, JUnit XML ([JUnit XML](xml.md)). The value is split at the first `:`, so the path may hold one (`xml:C:\out\results.xml`). A missing format or path, an unknown format, and the option given twice are usage errors.
-- `--help`: prints the usage and exits with 0 without running any test.
+- `--help`: prints the usage and exits with 0 without running any test. Its last line says what the [times](output.md#times) of the results measure: `wall-clock time, from a monotonic clock`, or `processor time, from clock(), not wall-clock time` on a system without such a clock.
 
 An option taking a value can also be written `--naos-filter=<value>`. An empty value (`--naos-filter=`) and `=` after an option that takes no value (`--naos-list=1`) are usage errors.
 

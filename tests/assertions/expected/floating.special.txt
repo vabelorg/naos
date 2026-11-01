@@ -14,6 +14,6 @@ floating.c:LINE: error: 1.0 ~= 2.0
   left:  1
   right: 2
   tolerance: nan
-FAIL: floating.special (3 failures)
-SUMMARY: 0 passed, 1 failed, 0 skipped
+FAIL: floating.special (3 failures, N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 --- stderr

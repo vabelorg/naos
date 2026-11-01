@@ -11,6 +11,7 @@
 
 #include <stddef.h>
 
+#include "clock.h"
 #include "context.h"
 
 /* Outcome of one test. */
@@ -59,13 +60,17 @@ typedef struct naos_diagnostic_record
     int trace_count;
 } naos_diagnostic_record_t;
 
-/* Numbers of tests by outcome. */
+/* Numbers of tests by outcome, and the sum of the times they took. */
 typedef struct naos_tally
 {
     size_t passed;
     size_t failed;
     size_t skipped;
+    naos_nanoseconds_t elapsed;
 } naos_tally_t;
+
+/* An empty tally, to initialize one with. */
+#define NAOS_TALLY_EMPTY { 0, 0, 0, 0 }
 
 /* One round of the run: the iteration of --naos-repeat, and the seed of --naos-shuffle. */
 typedef struct naos_round
@@ -88,9 +93,10 @@ typedef struct naos_writer
     void (*round_begin)(const naos_round_t *round);
     void (*test_begin)(const char *suite, const char *test);
     void (*diagnostic)(const naos_diagnostic_record_t *record);
-    void (*test_end)(const char *suite, const char *test, naos_outcome_t outcome, int failure_count);
+    /* elapsed is the time of setup, body and teardown, from test_begin to test_end. */
+    void (*test_end)(const char *suite, const char *test, naos_outcome_t outcome, int failure_count, naos_nanoseconds_t elapsed);
 
-    /* not_run is how many tests --naos-fail-fast left out, this round and later. */
+    /* tally counts the tests run in the round. not_run is how many tests --naos-fail-fast left out, this round and later. */
     void (*round_end)(const naos_round_t *round, const naos_tally_t *tally, size_t not_run);
 
     /* rounds_not_run is how many rounds --naos-fail-fast left out. Returns 0 when it could not write all of it. */

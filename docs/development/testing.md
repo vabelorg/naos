@@ -19,6 +19,7 @@ The self tests of Naos: what they check, how they compare outputs, and how to ad
 | `runs/` | `--naos-shuffle`, `--naos-repeat`, `--naos-fail-fast` | The same |
 | `report/` | The JUnit XML file of `--naos-output` | Output and the file compared |
 | `quiet/` | What `--naos-quiet` leaves out of standard output, and that the JUnit XML file stays the same | Output and the file compared |
+| `timing/` | That the times of the result lines and `SUMMARY:` are measured, setup and teardown included | Regexes: a test that keeps the processor busy for a known time shows at least that |
 | `discovery/` | The messages of `NaosDiscover.cmake` when listing the tests fails | The same |
 | `no_cmake/` | Building without CMake, as [installation](../getting-started/installation.md#without-cmake) describes | Built and run |
 | `examples/` | The projects of `examples/`, and the outputs the documentation quotes from them | Their tests pass; outputs compared |
@@ -42,14 +43,15 @@ RUN: integer.eq
 integer.c:LINE: error: -1 == 2
   left:  -1
   right: 2
-FAIL: integer.eq (1 failure)
-SUMMARY: 0 passed, 1 failed, 0 skipped
+FAIL: integer.eq (1 failure, N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 --- stderr
 ```
 
 So that the content is the same on every platform, only this is replaced before comparing:
 
 - The location of a diagnostic: `<directory>/<file>:<line>: ` (`(<line>)` with MSVC) becomes `<file>:LINE: `, so that editing a test does not change the expected outputs.
+- The time that ends a result line or `SUMMARY:`, `(<n> ms)` or `, <n> ms)`, becomes `N ms`, since it changes from run to run. `timing/` checks that the times are measured.
 - The path of the executable becomes `PROG`. Usage lines, which wrap at a position that depends on the length of the path, are joined into one line.
 - CRs are removed.
 
@@ -57,7 +59,7 @@ A line missing from the expected output is a line that must not appear: no list 
 
 Only output that changes between runs or platforms (pointer values, a seed taken from the time, numbers whose width depends on `long`, output that grows when tests are added) is matched with **regexes** instead (`naos_expect_match`).
 
-A case of a file the executable writes, such as the XML of `--naos-output`, gives `OUTPUT_FILE <name>` to `naos_expect`: `{output}` in its arguments stands for that file in the build directory. The file is removed before the run and compared after it, in a third part `--- output` (`[no file]` when none is written), with the locations made the same in the same way (`file="<file>" line="LINE"`). Where `xmllint` is found, the file must also be well-formed XML; CI installs it on Linux. A test that prints bytes beyond ASCII on standard output gives `FILE_ONLY` as well, so that only the file is compared: CMake reads standard output in the code page of the platform, which makes those bytes differ.
+A case of a file the executable writes, such as the XML of `--naos-output`, gives `OUTPUT_FILE <name>` to `naos_expect`: `{output}` in its arguments stands for that file in the build directory. The file is removed before the run and compared after it, in a third part `--- output` (`[no file]` when none is written), with the locations made the same in the same way (`file="<file>" line="LINE"`) and the times as `time="N.NNN"`; a time in another form stays as it is, and fails the comparison. Where `xmllint` is found, the file must also be well-formed XML; CI installs it on Linux. A test that prints bytes beyond ASCII on standard output gives `FILE_ONLY` as well, so that only the file is compared: CMake reads standard output in the code page of the platform, which makes those bytes differ.
 
 ## Adding a case
 

@@ -4,6 +4,6 @@ exit code: 1
 RUN: teardown_requires.body
 body-ran
 fixtures.c:LINE: error: 3 == 4
-FAIL: teardown_requires.body (1 failure)
-SUMMARY: 0 passed, 1 failed, 0 skipped
+FAIL: teardown_requires.body (1 failure, N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 --- stderr

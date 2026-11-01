@@ -4,6 +4,6 @@ exit code: 1
 RUN: note_before_teardown.leaves_note
 note.c:LINE: error: 1 == 2
 teardown-ran
-FAIL: note_before_teardown.leaves_note (1 failure)
-SUMMARY: 0 passed, 1 failed, 0 skipped
+FAIL: note_before_teardown.leaves_note (1 failure, N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 --- stderr

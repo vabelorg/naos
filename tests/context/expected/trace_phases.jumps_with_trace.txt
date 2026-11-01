@@ -7,6 +7,6 @@ trace.c:LINE: note: body-trace
 trace.c:LINE: note: setup-trace
 trace.c:LINE: error: 1 == 2
 teardown-ran
-FAIL: trace_phases.jumps_with_trace (2 failures)
-SUMMARY: 0 passed, 1 failed, 0 skipped
+FAIL: trace_phases.jumps_with_trace (2 failures, N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 --- stderr

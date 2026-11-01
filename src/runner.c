@@ -38,7 +38,7 @@ static size_t multiply_saturated(size_t a, size_t b)
 }
 
 /*
- * Runs the selected tests once, adding their results to tally. --naos-shuffle
+ * Runs the selected tests once, adding their results and times to tally. --naos-shuffle
  * shuffles the suites, then the tests of each suite, so that the output stays grouped by suite.
  * Every test takes part in the shuffle, selected or not, so that a seed gives the selected tests the
  * same order whatever the filter. With --naos-fail-fast, the round ends after the first failing test,
@@ -48,6 +48,8 @@ static void run_round(const naos_options_t *options, const naos_suite_t *suites,
 {
     const naos_suite_t *suite;
     const naos_test_t *test;
+    naos_outcome_t outcome;
+    naos_nanoseconds_t elapsed;
     size_t i;
     size_t j;
 
@@ -65,7 +67,9 @@ static void run_round(const naos_options_t *options, const naos_suite_t *suites,
                 continue;
             }
 
-            switch (naos_test_run(suite, test))
+            outcome = naos_test_run(suite, test, &elapsed);
+            tally->elapsed += elapsed;
+            switch (outcome)
             {
             case NAOS_OUTCOME_FAIL:
                 tally->failed++;
@@ -90,6 +94,7 @@ static void tally_add(naos_tally_t *total, const naos_tally_t *tally)
     total->passed += tally->passed;
     total->failed += tally->failed;
     total->skipped += tally->skipped;
+    total->elapsed += tally->elapsed;
 }
 
 /* Exit code of the tests tallied: FAIL if any failed, SKIP if all were skipped, PASS otherwise. */
@@ -175,7 +180,7 @@ static int end_round(const naos_options_t *options, const naos_round_t *round, s
 static int run_rounds(const naos_options_t *options, const naos_suite_t *suites, size_t count, size_t selected)
 {
     naos_orders_t orders;
-    naos_tally_t total = { 0, 0, 0 };
+    naos_tally_t total = NAOS_TALLY_EMPTY;
     naos_round_t round;
     unsigned long seed;
     long failed_rounds;
@@ -203,7 +208,7 @@ static int run_rounds(const naos_options_t *options, const naos_suite_t *suites,
     round.shuffled = options->shuffle;
     for (round.index = 1; (round.index <= options->repeat) && (stopped == 0); round.index++)
     {
-        naos_tally_t tally = { 0, 0, 0 };
+        naos_tally_t tally = NAOS_TALLY_EMPTY;
 
         round.seed = seed;
         naos_report_round_begin(&round);

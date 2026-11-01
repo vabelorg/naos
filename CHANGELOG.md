@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Building and testing with GCC of MinGW-w64 on Windows (MSYS2 UCRT64 and MINGW64). Naos formats its output as C99 does there too, and `NAOS_NOTE` and `NAOS_TRACE_PUSH` accept the formats of C99, such as `%zu` ([#3](https://github.com/vabelorg/naos/issues/3)).
 - `--naos-output xml:<path>` writes the results of the run to a JUnit XML file as well, for CI services and other tools: each test with its result, and each failure with its message and its diagnostic as standard output shows it ([#4](https://github.com/vabelorg/naos/issues/4)).
 - `--naos-quiet` leaves out of standard output the tests that pass or skip, so that a failure is not buried among them, in a terminal or for an agent reading the output. A failing test is written as without it, and the run ends with its summary ([#8](https://github.com/vabelorg/naos/issues/8)).
+- The time each test took, setup and teardown included, ends its result line (`PASS: storage.rebuild_index (3120 ms)`), and the total of the iteration ends `SUMMARY:`, so that a slow test, or a test made slower by a change, shows without asking for it. The JUnit XML file of `--naos-output` has the same times as `time`, in seconds. The clock is the monotonic clock of the system, which needs no library to install or link; `--help` names it ([#9](https://github.com/vabelorg/naos/issues/9)).
 
 ### Changed
 

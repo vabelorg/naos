@@ -2,13 +2,13 @@ args: --naos-output xml:{output} --naos-filter results.passes
 exit code: 0
 --- stdout
 RUN: results.passes
-PASS: results.passes
-SUMMARY: 1 passed, 0 failed, 0 skipped
+PASS: results.passes (N ms)
+SUMMARY: 1 passed, 0 failed, 0 skipped (N ms)
 --- stderr
 --- output
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="naos_selftest_report" tests="1" failures="0" errors="0" skipped="0">
-  <testsuite name="results" tests="1" failures="0" errors="0" skipped="0">
-    <testcase classname="results" name="passes"/>
+<testsuites name="naos_selftest_report" tests="1" failures="0" errors="0" skipped="0" time="N.NNN">
+  <testsuite name="results" tests="1" failures="0" errors="0" skipped="0" time="N.NNN">
+    <testcase classname="results" name="passes" time="N.NNN"/>
   </testsuite>
 </testsuites>

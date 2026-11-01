@@ -14,6 +14,6 @@ comparison.c:LINE: error: str
 comparison.c:LINE: error: str_lt
   left:  "a"
   right: "b"
-FAIL: comparison.unknown (4 failures)
-SUMMARY: 0 passed, 1 failed, 0 skipped
+FAIL: comparison.unknown (4 failures, N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 --- stderr

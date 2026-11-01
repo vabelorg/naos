@@ -4,6 +4,6 @@ exit code: 1
 RUN: body_and_teardown_require.fatal_body
 fixtures.c:LINE: error: 1 == 2
 fixtures.c:LINE: error: 3 == 4
-FAIL: body_and_teardown_require.fatal_body (2 failures)
-SUMMARY: 0 passed, 1 failed, 0 skipped
+FAIL: body_and_teardown_require.fatal_body (2 failures, N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 --- stderr

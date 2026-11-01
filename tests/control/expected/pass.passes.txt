@@ -2,6 +2,6 @@ args: --naos-filter pass.passes
 exit code: 0
 --- stdout
 RUN: pass.passes
-PASS: pass.passes
-SUMMARY: 1 passed, 0 failed, 0 skipped
+PASS: pass.passes (N ms)
+SUMMARY: 1 passed, 0 failed, 0 skipped (N ms)
 --- stderr

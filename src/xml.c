@@ -271,19 +271,30 @@ static void open_suite(const char *name)
     suite->tally.passed = 0;
     suite->tally.failed = 0;
     suite->tally.skipped = 0;
+    suite->tally.elapsed = 0;
     suite->start = g_cases.length;
     suite->end = g_cases.length;
     g_suite_count++;
     g_suite_open = 1;
 }
 
-/* Adds the counts of tally as the attributes of <testsuites> or <testsuite>. */
+/* Adds a time as the attribute time: seconds with three decimals, rounded down, as JUnit XML has it. */
+static void add_time(naos_text_t *text, naos_nanoseconds_t elapsed)
+{
+    naos_nanoseconds_t milliseconds;
+
+    milliseconds = elapsed / 1000000ULL;
+    naos_text_add_format(text, " time=\"%llu.%03llu\"", milliseconds / 1000ULL, milliseconds % 1000ULL);
+}
+
+/* Adds the counts and the time of tally as the attributes of <testsuites> or <testsuite>. */
 static void add_counts(naos_text_t *text, const naos_tally_t *tally)
 {
     naos_text_add_format(text, " tests=\"%zu\"", tally->passed + tally->failed + tally->skipped);
     naos_text_add_format(text, " failures=\"%zu\"", tally->failed);
     naos_text_add(text, " errors=\"0\"");
     naos_text_add_format(text, " skipped=\"%zu\"", tally->skipped);
+    add_time(text, tally->elapsed);
 }
 
 /* Adds one suite of one round: its counts, the round it ran in when there are several or shuffled, and its test cases. */
@@ -399,7 +410,7 @@ static void diagnostic(const naos_diagnostic_record_t *record)
     naos_text_add(&g_failures, "</failure>\n");
 }
 
-static void test_end(const char *suite_name, const char *test, naos_outcome_t outcome, int failure_count)
+static void test_end(const char *suite_name, const char *test, naos_outcome_t outcome, int failure_count, naos_nanoseconds_t elapsed)
 {
     naos_xml_suite_t *suite;
 
@@ -416,7 +427,9 @@ static void test_end(const char *suite_name, const char *test, naos_outcome_t ou
     naos_text_add(&g_cases, "\" name=\"");
     add_escaped(&g_cases, test, 1);
     naos_text_add(&g_cases, "\"");
+    add_time(&g_cases, elapsed);
     naos_text_add_bytes(&g_cases, g_location.data, g_location.length);
+    suite->tally.elapsed += elapsed;
 
     switch (outcome)
     {
@@ -454,7 +467,7 @@ static void round_end(const naos_round_t *round, const naos_tally_t *tally, size
 static int end(long failed_rounds, long repeat, long rounds_not_run)
 {
     naos_text_t document = NAOS_TEXT_EMPTY;
-    naos_tally_t total = { 0, 0, 0 };
+    naos_tally_t total = NAOS_TALLY_EMPTY;
     size_t i;
     int written;
 
@@ -467,6 +480,7 @@ static int end(long failed_rounds, long repeat, long rounds_not_run)
         total.passed += g_suites[i].tally.passed;
         total.failed += g_suites[i].tally.failed;
         total.skipped += g_suites[i].tally.skipped;
+        total.elapsed += g_suites[i].tally.elapsed;
     }
 
     naos_text_add(&document, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<testsuites name=\"");

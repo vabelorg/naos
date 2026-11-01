@@ -6,9 +6,9 @@ RUN: mixed.fails
 failing.c:LINE: error: 1 == 2
   left:  1
   right: 2
-FAIL: mixed.fails (1 failure)
+FAIL: mixed.fails (1 failure, N ms)
 FAIL FAST: stopped at the first failure; 5 not run
-SUMMARY: 0 passed, 1 failed, 0 skipped
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 ITERATION FAILED: 1 of 3
 REPEAT: 1 of 3 iterations failed, 2 not run
 --- stderr

@@ -18,17 +18,17 @@ endif()
 #   suite      -> report
 #   check      -> diagnostic, value
 #   control    -> context, diagnostic, test
-#   options    -> order, report
+#   options    -> order, report, clock
 #   runner     -> options, suite, filter, order, test, report
 #   filter     -> suite
-#   test       -> suite, context, diagnostic, report
+#   test       -> suite, context, diagnostic, report, clock
 #   diagnostic -> context, report
 #   report     -> human, xml, writer
 #   human      -> writer, text, value
 #   xml        -> human, writer, text, value
-#   writer     -> context
-# version, order, context, value and text use no other module. writer.h has no .c: it is the events
-# report.c tells and the functions a writer has.
+#   writer     -> context, clock
+# version, order, clock, context, value and text use no other module. writer.h has no .c: it is the
+# events report.c tells and the functions a writer has.
 add_library(naos ${naos_library_type}
     # Public API
     session.c
@@ -42,6 +42,7 @@ add_library(naos ${naos_library_type}
     filter.c
     order.c
     test.c
+    clock.c
     # Writing what happened
     diagnostic.c
     context.c

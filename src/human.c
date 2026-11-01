@@ -294,8 +294,18 @@ static void diagnostic(const naos_diagnostic_record_t *record)
     fflush(stdout);
 }
 
-/* With --naos-quiet, a test that passes or skips leaves no line, and its skips held are dropped. */
-static void test_end(const char *suite, const char *test, naos_outcome_t outcome, int failure_count)
+/* A time in whole milliseconds, rounded down. */
+static naos_nanoseconds_t milliseconds(naos_nanoseconds_t elapsed)
+{
+    return elapsed / 1000000ULL;
+}
+
+/*
+ * The result line ends with the time of the test, in the parentheses that hold the count of failures
+ * of FAIL. With --naos-quiet, a test that passes or skips leaves no line, and its skips held are
+ * dropped.
+ */
+static void test_end(const char *suite, const char *test, naos_outcome_t outcome, int failure_count, naos_nanoseconds_t elapsed)
 {
     if ((g_quiet != 0) && (outcome != NAOS_OUTCOME_FAIL))
     {
@@ -312,20 +322,24 @@ static void test_end(const char *suite, const char *test, naos_outcome_t outcome
     switch (outcome)
     {
     case NAOS_OUTCOME_FAIL:
-        naos_printf("FAIL: %s.%s (%d %s)\n", suite, test, failure_count, (failure_count == 1) ? "failure" : "failures");
+        naos_printf("FAIL: %s.%s (%d %s, %llu ms)\n", suite, test, failure_count, (failure_count == 1) ? "failure" : "failures", milliseconds(elapsed));
         break;
     case NAOS_OUTCOME_SKIP:
-        naos_printf("SKIP: %s.%s\n", suite, test);
+        naos_printf("SKIP: %s.%s (%llu ms)\n", suite, test, milliseconds(elapsed));
         break;
     case NAOS_OUTCOME_PASS:
-        naos_printf("PASS: %s.%s\n", suite, test);
+        naos_printf("PASS: %s.%s (%llu ms)\n", suite, test, milliseconds(elapsed));
         break;
     }
 
     fflush(stdout);
 }
 
-/* The FAIL FAST, SUMMARY and ITERATION FAILED lines; every round ends with its summary, so that a run always says what happened. */
+/*
+ * The FAIL FAST, SUMMARY and ITERATION FAILED lines; every round ends with its summary, so that a run
+ * always says what happened. The time of SUMMARY is the sum of the times of the tests, rounded down
+ * once, so it may be a little more than the sum of the times shown.
+ */
 static void round_end(const naos_round_t *round, const naos_tally_t *tally, size_t not_run)
 {
     if (not_run > 0)
@@ -333,7 +347,7 @@ static void round_end(const naos_round_t *round, const naos_tally_t *tally, size
         naos_printf("FAIL FAST: stopped at the first failure; %zu not run\n", not_run);
     }
 
-    naos_printf("SUMMARY: %zu passed, %zu failed, %zu skipped\n", tally->passed, tally->failed, tally->skipped);
+    naos_printf("SUMMARY: %zu passed, %zu failed, %zu skipped (%llu ms)\n", tally->passed, tally->failed, tally->skipped, milliseconds(tally->elapsed));
 
     if ((round->repeat > 1) && (tally->failed > 0))
     {
