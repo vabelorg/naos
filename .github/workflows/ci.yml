@@ -63,8 +63,10 @@ jobs:
           # A path CMake reads on Windows too (D:/a/... rather than /d/a/...).
           build="$(pwd -W 2>/dev/null || pwd)/build"
           cmake --install build/${{ matrix.preset }} --config Debug --prefix "$build/${{ matrix.preset }}-install"
-          # -Werror=dev: a warning from the installed package would show in every project using it.
-          cmake -S tests/package -B "$build/${{ matrix.preset }}-package" -Werror=dev \
+          # Warnings for the authors as errors: one from the installed package would show in every
+          # project using it. The option depends on the version of CMake: werror-option.cmake.
+          werror="$(cmake -DBINARY_DIR="$build/${{ matrix.preset }}-werror" -P tests/package/werror-option.cmake)" || exit 1
+          cmake -S tests/package -B "$build/${{ matrix.preset }}-package" "$werror" \
             -DCMAKE_PREFIX_PATH="$build/${{ matrix.preset }}-install" -DCMAKE_BUILD_TYPE=Debug
           cmake --build "$build/${{ matrix.preset }}-package" --config Debug
           ctest --test-dir "$build/${{ matrix.preset }}-package" -C Debug --output-on-failure
@@ -110,7 +112,8 @@ jobs:
           # A path CMake reads (D:/a/... rather than /d/a/...).
           build="$(pwd -W)/build"
           cmake --install build/${{ matrix.preset }} --prefix "$build/${{ matrix.preset }}-install"
-          cmake -S tests/package -B "$build/${{ matrix.preset }}-package" -Werror=dev \
+          werror="$(cmake -DBINARY_DIR="$build/${{ matrix.preset }}-werror" -P tests/package/werror-option.cmake)" || exit 1
+          cmake -S tests/package -B "$build/${{ matrix.preset }}-package" "$werror" \
             -DCMAKE_PREFIX_PATH="$build/${{ matrix.preset }}-install" -DCMAKE_BUILD_TYPE=Debug
           cmake --build "$build/${{ matrix.preset }}-package"
           ctest --test-dir "$build/${{ matrix.preset }}-package" --output-on-failure
