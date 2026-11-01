@@ -1,11 +1,11 @@
-args: --naos-output xml:{output} --naos-repeat 2 --naos-shuffle --naos-random-seed 3 --naos-filter results.passes:results.skips:text.utf8
+args: --naos-output xml:{output} --naos-repeat 2 --naos-shuffle --naos-random-seed 3 --naos-filter results.passes:results.skips:text.markup
 exit code: 1
 --- stdout
 ITERATION: 1 of 2
 RANDOM SEED: 3
-RUN: text.utf8
-report.c:LINE: error: 譌･譛ｬ
-FAIL: text.utf8 (1 failure)
+RUN: text.markup
+report.c:LINE: error: <a & "b" 'c'>
+FAIL: text.markup (1 failure)
 RUN: results.skips
 report.c:LINE: skip: not here
 SKIP: results.skips
@@ -20,9 +20,9 @@ PASS: results.passes
 RUN: results.skips
 report.c:LINE: skip: not here
 SKIP: results.skips
-RUN: text.utf8
-report.c:LINE: error: 譌･譛ｬ
-FAIL: text.utf8 (1 failure)
+RUN: text.markup
+report.c:LINE: error: <a & "b" 'c'>
+FAIL: text.markup (1 failure)
 SUMMARY: 1 passed, 1 failed, 1 skipped
 ITERATION FAILED: 2 of 2 (random seed 4)
 REPEAT: 2 of 2 iterations failed
@@ -35,8 +35,8 @@ REPEAT: 2 of 2 iterations failed
       <property name="iteration" value="1"/>
       <property name="random_seed" value="3"/>
     </properties>
-    <testcase classname="text" name="utf8" file="report.c" line="LINE">
-      <failure type="error" message="日本">file: report.c
+    <testcase classname="text" name="markup" file="report.c" line="LINE">
+      <failure type="error" message="&lt;a &amp; &quot;b&quot; &apos;c&apos;&gt;">file: report.c
 line: LINE</failure>
     </testcase>
   </testsuite>
@@ -65,8 +65,8 @@ line: LINE</failure>
       <property name="iteration" value="2"/>
       <property name="random_seed" value="4"/>
     </properties>
-    <testcase classname="text" name="utf8" file="report.c" line="LINE">
-      <failure type="error" message="日本">file: report.c
+    <testcase classname="text" name="markup" file="report.c" line="LINE">
+      <failure type="error" message="&lt;a &amp; &quot;b&quot; &apos;c&apos;&gt;">file: report.c
 line: LINE</failure>
     </testcase>
   </testsuite>

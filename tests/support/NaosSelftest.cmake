@@ -12,13 +12,15 @@
 #   Gives existing targets the strict warnings, when Naos is the top-level project: an enclosing
 #   project that turns NAOS_SELFTEST on keeps its own compilers and flags.
 #
-# naos_expect(<case> <target> [ARGS <arg>...] [OUTPUT_FILE <name>])
+# naos_expect(<case> <target> [ARGS <arg>...] [OUTPUT_FILE <name> [FILE_ONLY]])
 #   Golden case: runs <target> with the arguments and compares them, its exit code, its stdout and
 #   its stderr with expected/<case>.txt, after making the output independent of the platform (see
 #   support/check-output.cmake). Run the case with NAOS_UPDATE_EXPECTED=1 to write the file.
 #   With OUTPUT_FILE, {output} in the arguments stands for the file <name> of the build directory,
 #   which the case removes before the run and compares after it as well; where xmllint is found, a
-#   file the case writes must also be well-formed XML.
+#   file the case writes must also be well-formed XML. With FILE_ONLY as well, stdout and stderr
+#   are not compared: for tests that print bytes beyond ASCII there, which CMake reads in the code
+#   page of the platform.
 #
 # naos_expect_tests(<target> <suite>.<test>...)
 #   One golden case per test, named after it and run with "--naos-filter <suite>.<test>": the case
@@ -76,13 +78,19 @@ function(naos_selftest_run_defines out exe)
 endfunction()
 
 function(naos_expect case target)
-    cmake_parse_arguments(PARSE_ARGV 2 arg "" "OUTPUT_FILE" "ARGS")
+    cmake_parse_arguments(PARSE_ARGV 2 arg "FILE_ONLY" "OUTPUT_FILE" "ARGS")
     if(arg_UNPARSED_ARGUMENTS)
         message(FATAL_ERROR "naos_expect(${case}): unknown arguments: ${arg_UNPARSED_ARGUMENTS}")
+    endif()
+    if(arg_FILE_ONLY AND (NOT DEFINED arg_OUTPUT_FILE))
+        message(FATAL_ERROR "naos_expect(${case}): FILE_ONLY needs OUTPUT_FILE")
     endif()
     naos_selftest_run_defines(defines "$<TARGET_FILE:${target}>" ${arg_ARGS})
     if(DEFINED arg_OUTPUT_FILE)
         list(APPEND defines -D "OUTPUT_FILE=${CMAKE_CURRENT_BINARY_DIR}/${arg_OUTPUT_FILE}")
+        if(arg_FILE_ONLY)
+            list(APPEND defines -D "FILE_ONLY=1")
+        endif()
         if(NAOS_SELFTEST_XMLLINT)
             list(APPEND defines -D "XMLLINT=${NAOS_SELFTEST_XMLLINT}")
         endif()

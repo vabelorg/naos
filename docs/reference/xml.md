@@ -152,4 +152,4 @@ trace: report.c:44: outer</failure>
 </testsuites>
 ```
 
-`tests/report/expected/all.txt` has the whole run, with every kind of escape.
+`tests/report/expected/all.txt` has the whole suite, and `text.txt` every kind of escape.

@@ -1,4 +1,4 @@
-args: --naos-output xml:{output} --naos-filter -crash.*
+args: --naos-output xml:{output} --naos-filter results.*
 exit code: 1
 --- stdout
 RUN: results.passes
@@ -55,33 +55,11 @@ report.c:LINE: note: level 2
 report.c:LINE: note: level 1
 report.c:LINE: note: level 0
 FAIL: results.too_deep (2 failures)
-RUN: text.markup
-report.c:LINE: error: <a & "b" 'c'>
-FAIL: text.markup (1 failure)
-RUN: text.utf8
-report.c:LINE: error: 譌･譛ｬ
-FAIL: text.utf8 (1 failure)
-RUN: text.invalid_utf8
-report.c:LINE: error: bad  and 譌 bytes
-FAIL: text.invalid_utf8 (1 failure)
-RUN: text.control
-report.c:LINE: error: one
-two	three
-FAIL: text.control (1 failure)
-RUN: text.string_value
-report.c:LINE: error: "\xE6\x97\xA5 <&>" == "x"
-  left:  "\xE6\x97\xA5 <&>"
-  right: "x"
-  first difference: offset 0, left 0xE6, right 0x78
-FAIL: text.string_value (1 failure)
-RUN: text.skip_markup
-report.c:LINE: skip: needs <a> & "b"
-SKIP: text.skip_markup
-SUMMARY: 1 passed, 9 failed, 2 skipped
+SUMMARY: 1 passed, 4 failed, 1 skipped
 --- stderr
 --- output
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="naos_selftest_report" tests="12" failures="9" errors="0" skipped="2">
+<testsuites name="naos_selftest_report" tests="6" failures="4" errors="0" skipped="1">
   <testsuite name="results" tests="6" failures="4" errors="0" skipped="1">
     <testcase classname="results" name="passes"/>
     <testcase classname="results" name="fails_twice" file="report.c" line="LINE">
@@ -141,34 +119,6 @@ trace: report.c:LINE: level 3
 trace: report.c:LINE: level 2
 trace: report.c:LINE: level 1
 trace: report.c:LINE: level 0</failure>
-    </testcase>
-  </testsuite>
-  <testsuite name="text" tests="6" failures="5" errors="0" skipped="1">
-    <testcase classname="text" name="markup" file="report.c" line="LINE">
-      <failure type="error" message="&lt;a &amp; &quot;b&quot; &apos;c&apos;&gt;">file: report.c
-line: LINE</failure>
-    </testcase>
-    <testcase classname="text" name="utf8" file="report.c" line="LINE">
-      <failure type="error" message="日本">file: report.c
-line: LINE</failure>
-    </testcase>
-    <testcase classname="text" name="invalid_utf8" file="report.c" line="LINE">
-      <failure type="error" message="bad \xFF and \xE6\x97 bytes">file: report.c
-line: LINE</failure>
-    </testcase>
-    <testcase classname="text" name="control" file="report.c" line="LINE">
-      <failure type="error" message="one&#10;two&#9;three&#13;\x01">file: report.c
-line: LINE</failure>
-    </testcase>
-    <testcase classname="text" name="string_value" file="report.c" line="LINE">
-      <failure type="error" message="&quot;\xE6\x97\xA5 &lt;&amp;&gt;&quot; == &quot;x&quot;">file: report.c
-line: LINE
-left: "\xE6\x97\xA5 &lt;&amp;&gt;"
-right: "x"
-first difference: offset 0, left 0xE6, right 0x78</failure>
-    </testcase>
-    <testcase classname="text" name="skip_markup" file="report.c" line="LINE">
-      <skipped message="needs &lt;a&gt; &amp; &quot;b&quot;"/>
     </testcase>
   </testsuite>
 </testsuites>

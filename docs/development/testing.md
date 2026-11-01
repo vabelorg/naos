@@ -55,7 +55,7 @@ A line missing from the expected output is a line that must not appear: no list 
 
 Only output that changes between runs or platforms (pointer values, a seed taken from the time, numbers whose width depends on `long`, output that grows when tests are added) is matched with **regexes** instead (`naos_expect_match`).
 
-A case of a file the executable writes, such as the XML of `--naos-output`, gives `OUTPUT_FILE <name>` to `naos_expect`: `{output}` in its arguments stands for that file in the build directory. The file is removed before the run and compared after it, in a third part `--- output` (`[no file]` when none is written), with the locations made the same in the same way (`file="<file>" line="LINE"`). Where `xmllint` is found, the file must also be well-formed XML; CI installs it on Linux.
+A case of a file the executable writes, such as the XML of `--naos-output`, gives `OUTPUT_FILE <name>` to `naos_expect`: `{output}` in its arguments stands for that file in the build directory. The file is removed before the run and compared after it, in a third part `--- output` (`[no file]` when none is written), with the locations made the same in the same way (`file="<file>" line="LINE"`). Where `xmllint` is found, the file must also be well-formed XML; CI installs it on Linux. A test that prints bytes beyond ASCII on standard output gives `FILE_ONLY` as well, so that only the file is compared: CMake reads standard output in the code page of the platform, which makes those bytes differ.
 
 ## Adding a case
 

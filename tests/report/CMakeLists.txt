@@ -12,11 +12,14 @@ function(report_case case)
     naos_expect(${case} ${exe} ARGS --naos-output xml:{output} ${ARGN} OUTPUT_FILE ${case}.xml)
 endfunction()
 
-# Every outcome, value, note, trace and escape; the tests of crash end the process.
-report_case(all --naos-filter -crash.*)
+# Every outcome, value, note and trace.
+report_case(all --naos-filter results.*)
+# The escapes. The tests print bytes beyond ASCII on stdout, which CMake reads in the code page of
+# the platform, so only the file is compared.
+naos_expect(text ${exe} ARGS --naos-output xml:{output} --naos-filter text.* OUTPUT_FILE text.xml FILE_ONLY)
 report_case(one_pass --naos-filter results.passes)
 # Each round has its suites, with the iteration and the seed as properties.
-report_case(repeat_shuffle --naos-repeat 2 --naos-shuffle --naos-random-seed 3 --naos-filter results.passes:results.skips:text.utf8)
+report_case(repeat_shuffle --naos-repeat 2 --naos-shuffle --naos-random-seed 3 --naos-filter results.passes:results.skips:text.markup)
 report_case(fail_fast --naos-fail-fast --naos-filter results.*)
 # A process that ends during the run leaves the file empty.
 report_case(crash --naos-filter crash.*)

@@ -152,4 +152,4 @@ trace: report.c:44: outer</failure>
 </testsuites>
 ```
 
-実行全体は、あらゆる種類のエスケープを含めて `tests/report/expected/all.txt` にあります。
+スイート全体は `tests/report/expected/all.txt` に、あらゆる種類のエスケープは `text.txt` にあります。

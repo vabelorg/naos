@@ -11,6 +11,8 @@
 # -D OUTPUT_FILE=<path>   a file the executable writes, which {output} in ARGS stands for: removed
 #                         before the run, and compared after it in a third part (optional)
 # -D XMLLINT=<path>       xmllint, which then checks that the file is well-formed XML (optional)
+# -D FILE_ONLY=1          with OUTPUT_FILE: stdout and stderr are left out of the comparison
+#                         (optional)
 # Regex case:
 # -D EXIT_CODE=<n>        the exit code required
 # -D EXPECT_<i>=<regex>   must match stdout followed by stderr, for i = 0, 1, ... (optional)
@@ -84,7 +86,11 @@ function(check_golden)
     end_stream(stdout)
     end_stream(stderr)
     string(REPLACE ";" " " shown_args "${args}")
-    set(actual "args: ${shown_args}\nexit code: ${code}\n--- stdout\n${stdout}--- stderr\n${stderr}")
+    if(FILE_ONLY)
+        set(actual "args: ${shown_args}\nexit code: ${code}\n")
+    else()
+        set(actual "args: ${shown_args}\nexit code: ${code}\n--- stdout\n${stdout}--- stderr\n${stderr}")
+    endif()
     if(DEFINED OUTPUT_FILE)
         read_output_file()
         string(APPEND actual "--- output\n${output}")
