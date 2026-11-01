@@ -18,6 +18,7 @@
 
 #include <naos/export.h>
 
+#include "format.h"
 #include "order.h"
 #include "report.h"
 
@@ -118,7 +119,7 @@ static size_t print_option_form(FILE *out, const naos_option_entry_t *option)
         return strlen(option->name);
     }
 
-    fprintf(out, "%s %s", option->name, option->value_name);
+    naos_fprintf(out, "%s %s", option->name, option->value_name);
 
     return strlen(option->name) + 1 + strlen(option->value_name);
 }
@@ -133,7 +134,7 @@ static void print_option_help(const char *help)
         fputc(*cursor, stdout);
         if (*cursor == '\n')
         {
-            printf("%*s", NAOS_HELP_COLUMN, "");
+            naos_printf("%*s", NAOS_HELP_COLUMN, "");
         }
     }
 
@@ -146,8 +147,8 @@ static void print_help(const char *program)
     size_t i;
 
     naos_options_print_usage(stdout, program);
-    printf("\n");
-    printf("options (anywhere on the command line):\n");
+    naos_printf("\n");
+    naos_printf("options (anywhere on the command line):\n");
     for (i = 0; i < NAOS_OPTION_COUNT; i++)
     {
         fputs("  ", stdout);
@@ -155,16 +156,16 @@ static void print_help(const char *program)
         if ((length + 2) > NAOS_HELP_COLUMN)
         {
             /* Too long for the column: the help starts on the next line. */
-            printf("\n%*s", NAOS_HELP_COLUMN, "");
+            naos_printf("\n%*s", NAOS_HELP_COLUMN, "");
         }
         else
         {
-            printf("%*s", (int)(NAOS_HELP_COLUMN - length), "");
+            naos_printf("%*s", (int)(NAOS_HELP_COLUMN - length), "");
         }
         print_option_help(g_option_table[i].help);
     }
-    printf("an option that takes a value also takes it after '=': --naos-filter=<patterns>.\n");
-    printf("the other args are left in argv for the program.\n");
+    naos_printf("an option that takes a value also takes it after '=': --naos-filter=<patterns>.\n");
+    naos_printf("the other args are left in argv for the program.\n");
     fflush(stdout);
 }
 
@@ -342,7 +343,7 @@ void naos_options_print_usage(FILE *out, const char *program)
         program = "naos";
     }
 
-    fprintf(out, "%s%s", lead, program);
+    naos_fprintf(out, "%s%s", lead, program);
     column = (sizeof(lead) - 1) + strlen(program);
 
     /* Each "[<option>]" goes on the line it fits on, or else on a new one under the program name. */
@@ -357,7 +358,7 @@ void naos_options_print_usage(FILE *out, const char *program)
 
         if ((column + 1 + width) > NAOS_USAGE_WIDTH)
         {
-            fprintf(out, "\n%*s", (int)(sizeof(lead) - 1), "");
+            naos_fprintf(out, "\n%*s", (int)(sizeof(lead) - 1), "");
             column = sizeof(lead) - 1;
         }
         else

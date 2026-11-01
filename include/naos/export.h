@@ -30,8 +30,14 @@
 #define NAOS_API
 #endif
 
-/* Lets GCC and Clang check the arguments of a printf-like function against its format. */
-#if defined(__GNUC__) || defined(__clang__)
+/*
+ * Lets GCC and Clang check the arguments of a printf-like function against its format. Naos formats
+ * as C99 does on every platform (src/format.h). On MinGW, printf means the formats of the Microsoft
+ * C library, which do not include %zu and others, so the check uses those of GNU (C99) there.
+ */
+#if defined(__MINGW32__) && (defined(__GNUC__) || defined(__clang__))
+#define NAOS_PRINTF_FORMAT(format_index, first_arg_index) __attribute__((format(gnu_printf, format_index, first_arg_index)))
+#elif defined(__GNUC__) || defined(__clang__)
 #define NAOS_PRINTF_FORMAT(format_index, first_arg_index) __attribute__((format(printf, format_index, first_arg_index)))
 #else
 #define NAOS_PRINTF_FORMAT(format_index, first_arg_index)

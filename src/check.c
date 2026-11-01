@@ -8,10 +8,10 @@
 #include <naos/check.h>
 
 #include <math.h>
-#include <stdio.h>
 #include <string.h>
 
 #include "diagnostic.h"
+#include "format.h"
 #include "value.h"
 
 /* Size of the buffer one value is formatted into: more than any %jd, %ju, %p or %zu needs. */
@@ -72,11 +72,11 @@ static void format_pointer(char *buffer, size_t size, const void *ptr)
 {
     if (ptr == NULL)
     {
-        snprintf(buffer, size, "(null)");
+        naos_snprintf(buffer, size, "(null)");
     }
     else
     {
-        snprintf(buffer, size, "%p", ptr);
+        naos_snprintf(buffer, size, "%p", ptr);
     }
 }
 
@@ -124,12 +124,12 @@ static void format_first_difference(char *buffer, size_t size, size_t offset, co
 {
     if ((offset < left_size) && (offset < right_size))
     {
-        snprintf(buffer, size, "offset %zu, left 0x%02X, right 0x%02X", offset, (unsigned int)left[offset], (unsigned int)right[offset]);
+        naos_snprintf(buffer, size, "offset %zu, left 0x%02X, right 0x%02X", offset, (unsigned int)left[offset], (unsigned int)right[offset]);
     }
     else
     {
         /* Only the sizes differ: the difference is where the shorter side ends. */
-        snprintf(buffer, size, "offset %zu, end of %s", offset, (left_size < right_size) ? "left" : "right");
+        naos_snprintf(buffer, size, "offset %zu, end of %s", offset, (left_size < right_size) ? "left" : "right");
     }
 }
 
@@ -195,7 +195,7 @@ static int fail_with_pointer(const void *ptr, const char *expr, const char *file
 
     if (ptr != NULL)
     {
-        snprintf(value_text, sizeof(value_text), "%p", ptr);
+        naos_snprintf(value_text, sizeof(value_text), "%p", ptr);
         naos_diagnostic_add("value", value_text);
     }
 
@@ -227,8 +227,8 @@ int naos_check_int(naos_cmp_t cmp, intmax_t left, intmax_t right, const char *ex
         return passed();
     }
 
-    snprintf(left_text, sizeof(left_text), "%jd", left);
-    snprintf(right_text, sizeof(right_text), "%jd", right);
+    naos_snprintf(left_text, sizeof(left_text), "%jd", left);
+    naos_snprintf(right_text, sizeof(right_text), "%jd", right);
 
     return fail_with_values(left_text, right_text, expr, file, line);
 }
@@ -243,8 +243,8 @@ int naos_check_uint(naos_cmp_t cmp, uintmax_t left, uintmax_t right, const char 
         return passed();
     }
 
-    snprintf(left_text, sizeof(left_text), "%ju", left);
-    snprintf(right_text, sizeof(right_text), "%ju", right);
+    naos_snprintf(left_text, sizeof(left_text), "%ju", left);
+    naos_snprintf(right_text, sizeof(right_text), "%ju", right);
 
     return fail_with_values(left_text, right_text, expr, file, line);
 }
@@ -321,8 +321,8 @@ int naos_check_mem_eq(const void *left, size_t left_size, const void *right, siz
         last_value = difference_text;
     }
 
-    snprintf(left_size_text, sizeof(left_size_text), "%zu", left_size);
-    snprintf(right_size_text, sizeof(right_size_text), "%zu", right_size);
+    naos_snprintf(left_size_text, sizeof(left_size_text), "%zu", left_size);
+    naos_snprintf(right_size_text, sizeof(right_size_text), "%zu", right_size);
 
     naos_diagnostic_begin(NAOS_REPORT_ERROR, file, line, expr);
     naos_diagnostic_add("left size", left_size_text);

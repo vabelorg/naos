@@ -9,7 +9,7 @@ naos_selftest_program(${exe} main.c note.c trace.c)
 
 naos_expect_tests(${exe}
     note.in_loop note.used_up_by_pass note.replaced note.on_require note.on_fail note.on_skip
-    note.cut_short note.with_double note.with_mem note_before_teardown.leaves_note
+    note.cut_short note.c99_formats note.with_double note.with_mem note_before_teardown.leaves_note
     trace.nested trace.popped trace.left_by_jump trace.missing_pop trace.missing_pop_nested
     trace.pop_without_push trace.too_deep trace.too_deep_with_note trace.on_skip
     trace_phases.pops_setup_trace trace_phases.jumps_with_trace trace_teardown.body
