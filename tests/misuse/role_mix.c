@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  *
  * Does not compile, on purpose: a teardown named in NAOS_SET_SETUP and a setup named in
- * NAOS_SET_TEARDOWN. check-misuse.cmake compiles it and expects both mistakes to be reported.
+ * NAOS_SET_TEARDOWN. CheckMisuse.cmake compiles it and expects both mistakes to be reported.
  */
 
 #include <naos/naos.h>

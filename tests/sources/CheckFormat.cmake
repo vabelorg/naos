@@ -10,7 +10,7 @@
 cmake_minimum_required(VERSION 3.21)
 
 if(NOT DEFINED ROOT)
-    message(FATAL_ERROR "check-format.cmake: -D ROOT=<path> is required")
+    message(FATAL_ERROR "CheckFormat.cmake: -D ROOT=<path> is required")
 endif()
 
 file(GLOB files LIST_DIRECTORIES false "${ROOT}/src/*.c" "${ROOT}/src/*.h")

@@ -5,7 +5,7 @@
 # (CMake Warning (dev)) into errors, after checking that it does: CI configures tests/package with
 # it, since such a warning from the installed package would show in every project using it.
 #
-#   cmake -DBINARY_DIR=<dir> -P tests/package/werror-option.cmake
+#   cmake -DBINARY_DIR=<dir> -P tests/package/WerrorOption.cmake
 #
 # CMake 4.4 renamed -Werror=dev to -Werror=author, and prints that -Werror=dev is deprecated. An
 # older CMake ignores -Werror=author without a message, so the option depends on the version.

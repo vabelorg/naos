@@ -15,7 +15,7 @@
 # naos_expect(<case> <target> [ARGS <arg>...] [OUTPUT_FILE <name> [FILE_ONLY]])
 #   Golden case: runs <target> with the arguments and compares them, its exit code, its stdout and
 #   its stderr with expected/<case>.txt, after making the output independent of the platform (see
-#   support/check-output.cmake). Run the case with NAOS_UPDATE_EXPECTED=1 to write the file.
+#   support/CheckOutput.cmake). Run the case with NAOS_UPDATE_EXPECTED=1 to write the file.
 #   With OUTPUT_FILE, {output} in the arguments stands for the file <name> of the build directory,
 #   which the case removes before the run and compares after it as well; where xmllint is found, a
 #   file the case writes must also be well-formed XML. With FILE_ONLY as well, stdout and stderr
@@ -38,7 +38,7 @@
 
 include_guard(GLOBAL)
 
-set(NAOS_SELFTEST_CHECK_SCRIPT "${CMAKE_CURRENT_LIST_DIR}/check-output.cmake")
+set(NAOS_SELFTEST_CHECK_SCRIPT "${CMAKE_CURRENT_LIST_DIR}/CheckOutput.cmake")
 
 # Checks that the files of OUTPUT_FILE are well-formed XML, where it is installed.
 find_program(NAOS_SELFTEST_XMLLINT xmllint)
@@ -63,7 +63,7 @@ function(naos_selftest_program target)
     naos_selftest_strict(${target})
 endfunction()
 
-# Registers the CTest test of a case, running check-output.cmake with the defines given.
+# Registers the CTest test of a case, running CheckOutput.cmake with the defines given.
 function(naos_selftest_add_case case)
     get_filename_component(subject "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
     set(name "naos.${subject}.${case}")

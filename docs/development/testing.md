@@ -23,11 +23,11 @@ The self tests of Naos: what they check, how they compare outputs, and how to ad
 | `discovery/` | The messages of `NaosDiscover.cmake` when listing the tests fails | The same |
 | `no_cmake/` | Building without CMake, as [installation](../getting-started/installation.md#without-cmake) describes | Built and run |
 | `examples/` | The projects of `examples/`, and the outputs the documentation quotes from them | Their tests pass; outputs compared |
-| `docs/` | The relative links and anchors of every Markdown file | `check-links.cmake` |
-| `sources/` | The sources of `src/`: formatted output goes through `format.h` ([coding style](coding-style.md#formatted-output)) | `check-format.cmake` |
+| `docs/` | The relative links and anchors of every Markdown file | `CheckLinks.cmake` |
+| `sources/` | The sources of `src/`: formatted output goes through `format.h` ([coding style](coding-style.md#formatted-output)) | `CheckFormat.cmake` |
 | `misuse/` | Programs that must not compile, such as a teardown named in `NAOS_SET_SETUP` or a setup named in `NAOS_ADD_TEST` | The compiler refuses them and names the mistake |
 
-The helpers are in `tests/support/`: the functions of `NaosSelftest.cmake`, and `check-output.cmake`, which runs one case.
+The helpers are in `tests/support/`: the functions of `NaosSelftest.cmake`, and `CheckOutput.cmake`, which runs one case.
 
 `tests/package/` is not a self test: it is a project that uses the installed package with `find_package(naos <version>)`. CI configures it on its own after installing each build ([building](building.md#installing)).
 

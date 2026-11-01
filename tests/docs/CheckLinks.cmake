@@ -10,7 +10,7 @@
 cmake_minimum_required(VERSION 3.21)
 
 if(NOT DEFINED ROOT)
-    message(FATAL_ERROR "check-links.cmake: -D ROOT=<path> is required")
+    message(FATAL_ERROR "CheckLinks.cmake: -D ROOT=<path> is required")
 endif()
 
 file(GLOB top_files LIST_DIRECTORIES false "${ROOT}/*.md")

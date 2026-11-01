@@ -13,7 +13,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang" AND NOT CMAKE_C_COMPILER_FRONTEND_VAR
             -D "NAOS_DIR=${PROJECT_SOURCE_DIR}"
             -D "WORK_DIR=${CMAKE_CURRENT_BINARY_DIR}/no_cmake"
             -D "EXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
-            -P "${CMAKE_CURRENT_SOURCE_DIR}/no-cmake.cmake"
+            -P "${CMAKE_CURRENT_SOURCE_DIR}/NoCMake.cmake"
     )
     set_tests_properties(naos.no_cmake.build PROPERTIES LABELS naos)
 endif()

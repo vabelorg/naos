@@ -17,7 +17,7 @@ cmake_minimum_required(VERSION 3.21)
 
 foreach(var IN ITEMS ROOT VERSION)
     if(NOT DEFINED ${var})
-        message(FATAL_ERROR "prepare-release.cmake: -D ${var}=... is required")
+        message(FATAL_ERROR "PrepareRelease.cmake: -D ${var}=... is required")
     endif()
 endforeach()
 

@@ -12,7 +12,7 @@ function(naos_misuse_case name)
             -D "INCLUDE_DIR=${PROJECT_SOURCE_DIR}/include"
             -D "SOURCE=${CMAKE_CURRENT_SOURCE_DIR}/${name}.c"
             -D "EXPECT=${ARGN}"
-            -P "${CMAKE_CURRENT_SOURCE_DIR}/check-misuse.cmake"
+            -P "${CMAKE_CURRENT_SOURCE_DIR}/CheckMisuse.cmake"
     )
     set_tests_properties(naos.misuse.${name} PROPERTIES LABELS naos)
 endfunction()

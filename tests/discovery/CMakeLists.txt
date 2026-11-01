@@ -2,15 +2,15 @@
 # SPDX-License-Identifier: MIT
 #
 # Test discovery: when listing the tests fails after a build, the message of NaosDiscover.cmake says
-# why and what to do. fake-list.cmake stands in for the executable, run as its emulator.
+# why and what to do. FakeList.cmake stands in for the executable, run as its emulator.
 
-# Runs NaosDiscover.cmake on fake-list.cmake in mode with the timeout given, and matches its output.
-# The parameter file is the one Naos.cmake writes, with fake-list.cmake as the executable.
+# Runs NaosDiscover.cmake on FakeList.cmake in mode with the timeout given, and matches its output.
+# The parameter file is the one Naos.cmake writes, with FakeList.cmake as the executable.
 function(naos_expect_discovery case mode timeout)
     set(params_file "${CMAKE_CURRENT_BINARY_DIR}/${case}_params.cmake")
     _naos_discovery_params(params
         TARGET "fake_${case}"
-        EXECUTABLE "${CMAKE_CURRENT_SOURCE_DIR}/fake-list.cmake"
+        EXECUTABLE "${CMAKE_CURRENT_SOURCE_DIR}/FakeList.cmake"
         EMULATOR "${CMAKE_COMMAND};-D;MODE=${mode};-P"
         PREFIX ""
         LABELS ""

@@ -58,7 +58,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           cmake -D ROOT=. -D VERSION="$VERSION" -D OUTPUT="$RUNNER_TEMP/notes.md" \
-            -P scripts/release-notes.cmake
+            -P scripts/ReleaseNotes.cmake
           gh release create "v$VERSION" --verify-tag --title "Naos $VERSION" \
             --notes-file "$RUNNER_TEMP/notes.md"
 

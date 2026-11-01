@@ -2,7 +2,7 @@
  * Copyright (c) 2026 The Naos Authors
  * SPDX-License-Identifier: MIT
  *
- * Does not compile, on purpose: a test named in NAOS_SET_SETUP. check-misuse.cmake compiles it and
+ * Does not compile, on purpose: a test named in NAOS_SET_SETUP. CheckMisuse.cmake compiles it and
  * expects the mistake to be reported.
  */
 

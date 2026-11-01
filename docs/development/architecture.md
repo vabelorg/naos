@@ -21,7 +21,7 @@ These decide what goes into Naos, before any feature:
 | `tests/` | The self tests: one directory per subject, with its programs, the `CMakeLists.txt` registering its cases and the expected outputs (`expected/`). See [testing](testing.md) |
 | `examples/` | Complete projects quoted by the documentation, built and run by the self tests |
 | `docs/` | The documentation in English, and its Japanese translation in `docs/ja/` |
-| `scripts/` | Scripts for maintaining Naos, not used by its build: `prepare-release.cmake` and `release-notes.cmake` prepare a release and write its notes, see [releasing](release.md) |
+| `scripts/` | Scripts for maintaining Naos, not used by its build: `PrepareRelease.cmake` and `ReleaseNotes.cmake` prepare a release and write its notes, see [releasing](release.md) |
 | `.github/` | The workflows (CI and the release) and the templates of issues and pull requests |
 
 ## Modules
