@@ -1,6 +1,6 @@
 # Builds Naos and runs its self tests (examples and documentation links included) with each
 # preset of CMakePresets.json, on every platform and compiler supported, then tests the package it
-# installs.
+# installs. MinGW-w64 has a job of its own, since it runs in the shell of MSYS2.
 
 name: CI
 
@@ -68,3 +68,49 @@ jobs:
             -DCMAKE_PREFIX_PATH="$build/${{ matrix.preset }}-install" -DCMAKE_BUILD_TYPE=Debug
           cmake --build "$build/${{ matrix.preset }}-package" --config Debug
           ctest --test-dir "$build/${{ matrix.preset }}-package" -C Debug --output-on-failure
+
+  # GCC of MinGW-w64 in MSYS2: UCRT64 with the C library of current Windows (UCRT), MINGW64 with
+  # the old one (msvcrt), whose default printf does not follow C99 (src/format.h).
+  mingw:
+    name: mingw ${{ matrix.msystem }} (${{ matrix.preset }})
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        msystem: [UCRT64, MINGW64]
+        preset: [default, shared]
+    defaults:
+      run:
+        shell: msys2 {0}
+    env:
+      CMAKE_GENERATOR: Ninja
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{ matrix.msystem }}
+          update: true
+          pacboy: >-
+            gcc:p
+            cmake:p
+            ninja:p
+
+      - name: Configure
+        run: cmake --preset ${{ matrix.preset }}
+
+      - name: Build
+        run: cmake --build --preset ${{ matrix.preset }}
+
+      - name: Test
+        run: ctest --preset ${{ matrix.preset }}
+
+      - name: Test the installed package
+        run: |
+          # A path CMake reads (D:/a/... rather than /d/a/...).
+          build="$(pwd -W)/build"
+          cmake --install build/${{ matrix.preset }} --prefix "$build/${{ matrix.preset }}-install"
+          cmake -S tests/package -B "$build/${{ matrix.preset }}-package" -Werror=dev \
+            -DCMAKE_PREFIX_PATH="$build/${{ matrix.preset }}-install" -DCMAKE_BUILD_TYPE=Debug
+          cmake --build "$build/${{ matrix.preset }}-package"
+          ctest --test-dir "$build/${{ matrix.preset }}-package" --output-on-failure
