@@ -32,7 +32,7 @@ Naos is downloaded at configure time. This is the simplest way, and the one the 
 include(FetchContent)
 FetchContent_Declare(naos
     GIT_REPOSITORY https://github.com/vabelorg/naos.git
-    GIT_TAG v0.1.0
+    GIT_TAG v0.2.0
 )
 FetchContent_MakeAvailable(naos)
 ```
@@ -62,7 +62,7 @@ cmake --install naos/build --config Release --prefix /opt/naos
 Then find it, with the prefix in `CMAKE_PREFIX_PATH` (`-DCMAKE_PREFIX_PATH=/opt/naos`):
 
 ```cmake
-find_package(naos 0.1 REQUIRED)
+find_package(naos 0.2 REQUIRED)
 ```
 
 Which versions it accepts is in the [CMake reference](../reference/cmake.md#package).

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-01
+
 ### Added
 
 - Building and testing with GCC of MinGW-w64 on Windows (MSYS2 UCRT64 and MINGW64). Naos formats its output as C99 does there too, and `NAOS_NOTE` and `NAOS_TRACE_PUSH` accept the formats of C99, such as `%zu` ([#3](https://github.com/vabelorg/naos/issues/3)).
@@ -31,5 +33,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `naos_add_executable()` to register each test with CTest, which runs each one in its own process, in parallel and with a time limit.
 - Installation with `FetchContent`, `add_subdirectory()`, `find_package()`, or the sources alone.
 
-[Unreleased]: https://github.com/vabelorg/naos/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/vabelorg/naos/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/vabelorg/naos/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/vabelorg/naos/releases/tag/v0.1.0
