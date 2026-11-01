@@ -29,6 +29,8 @@ cmake_minimum_required(VERSION 3.21)
 # test program moves no expected output. The directory stops at a quote or a '>' too, since in the
 # XML file a location starts the text of <failure> right after its start tag. The time that ends a
 # result line or SUMMARY, "(<n> ms)" or ", <n> ms)", becomes N ms, since it changes from run to run.
+# The clock that the last line of --help names becomes <clock>, since it depends on the system: either
+# of the two that src/clock.c can name, and only those.
 function(normalize var)
     set(text "${${var}}")
     string(REPLACE "\r" "" text "${text}")
@@ -38,6 +40,7 @@ function(normalize var)
     string(REPLACE "\n       [" " [" text "${text}")
     string(REGEX REPLACE "([^ \n\">]*[/\\\\])?([A-Za-z0-9_]+\\.(c|cpp))(:[0-9]+|\\([0-9]+\\)): " "\\2:LINE: " text "${text}")
     string(REGEX REPLACE "([(]|, )[0-9]+ ms[)]\n" "\\1N ms)\n" text "${text}")
+    string(REGEX REPLACE "\nthe times of the results are (wall-clock time, from a monotonic clock|processor time, from clock[(][)], not wall-clock time)[.]\n" "\nthe times of the results are <clock>.\n" text "${text}")
     if(DEFINED OUTPUT_FILE)
         string(REPLACE "${OUTPUT_FILE}" "{output}" text "${text}")
     endif()

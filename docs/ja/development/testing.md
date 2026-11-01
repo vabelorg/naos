@@ -52,6 +52,7 @@ SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 
 - 診断の場所: `<ディレクトリ>/<ファイル>:<行>: `（MSVC では `(<行>)`）を `<ファイル>:LINE: ` に。テストを編集しても期待する出力が変わらないようにするため
 - 結果の行や `SUMMARY:` の最後の時間 `(<n> ms)` や `, <n> ms)`: `N ms` に。実行のたびに変わるため。時間を測っていることは `timing/` で確かめる
+- `--help` の最後の行が示す時計: `<clock>` に。システムによって変わるため。`wall-clock time, from a monotonic clock` と `processor time, from clock(), not wall-clock time` のどちらかだけを置き換える
 - 実行ファイルのパス: `PROG` に。使い方の行は、パスの長さで折り返し位置が変わるので 1 行につなげる
 - CR を除く
 

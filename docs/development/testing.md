@@ -52,6 +52,7 @@ So that the content is the same on every platform, only this is replaced before 
 
 - The location of a diagnostic: `<directory>/<file>:<line>: ` (`(<line>)` with MSVC) becomes `<file>:LINE: `, so that editing a test does not change the expected outputs.
 - The time that ends a result line or `SUMMARY:`, `(<n> ms)` or `, <n> ms)`, becomes `N ms`, since it changes from run to run. `timing/` checks that the times are measured.
+- The clock that the last line of `--help` names becomes `<clock>`, since it depends on the system: `wall-clock time, from a monotonic clock` or `processor time, from clock(), not wall-clock time`, and only those.
 - The path of the executable becomes `PROG`. Usage lines, which wrap at a position that depends on the length of the path, are joined into one line.
 - CRs are removed.
 
