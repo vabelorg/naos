@@ -99,7 +99,7 @@ cmake -S . -B build && cmake --build build && ctest --test-dir build
 |---|---|
 | **はじめる** | [インストール](docs/ja/getting-started/installation.md) · [クイックスタート](docs/ja/getting-started/quickstart.md) · [チュートリアル](docs/ja/getting-started/tutorial.md) |
 | **使う** | [ガイド](docs/ja/guides/) · [トラブルシューティング](docs/ja/guides/troubleshooting.md) · [サンプル](examples/) |
-| **調べる** | [リファレンス](docs/ja/reference/): テスト、アサーション、コマンドライン、出力、CMake |
+| **調べる** | [リファレンス](docs/ja/reference/): テスト、アサーション、コマンドライン、出力、JUnit XML、CMake |
 
 全体の案内は [docs/ja/](docs/ja/README.md) にあります。
 

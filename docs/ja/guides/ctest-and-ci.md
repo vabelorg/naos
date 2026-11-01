@@ -58,6 +58,13 @@ CI のジョブでは、configure、ビルド、CTest の実行を行います�
   run: ctest --test-dir build -C Debug --output-on-failure --output-junit junit.xml
 ```
 
+CTest のレポートにあるのは、各テストの結果と出力の全体だけです。Naos のテストごとのテストケースと、各失敗のメッセージと場所を得るには、実行ファイルを `--naos-output xml:<path>` で直接実行します。その実行の JUnit XML のファイルを書きます（[JUnit XML](../reference/xml.md)）。実行ファイルの CTest のテストはどれも同じファイルに書くことになるので、実行ファイルごとに別のパスを指定します。
+
+```yaml
+- name: Test
+  run: ./build/my_tests --naos-output xml:my_tests.xml
+```
+
 テストの間の隠れた依存を見つけるため、実行ファイルを `--naos-shuffle --naos-repeat 20` で直接実行するジョブを足すのも有効です（[テストの実行](running-tests.md#テストの間の依存を見つける)）。失敗した回のシード値は `ITERATION FAILED` の行にあるので、手元で同じ順序を再現できます。
 
 ## 失敗した行をエディタで開く
@@ -101,4 +108,4 @@ CI のジョブでは、configure、ビルド、CTest の実行を行います�
 }
 ```
 
-CI で結果を集計するなど、出力を読み取るツールを書く場合は、[出力](../reference/output.md)の形式に従ってください。その形式は互換を保つ対象です。
+これらの行の始まり（`file:line: error: ` と `file:line: note: `）は互換を保つので、problem matcher はバージョンが変わっても使えます。標準出力のそのほかの部分は人向けで、変わることがあります（[出力](../reference/output.md#互換を保つもの)）。CI で結果を集計するなど、結果を集めるツールは `--naos-output` の [JUnit XML](../reference/xml.md) のファイルを読んでください。

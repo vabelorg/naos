@@ -39,6 +39,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # The self tests check that the JUnit XML of --naos-output is well-formed where xmllint is
+      # found; macOS has it, and Ubuntu has it in libxml2-utils.
+      - name: Install xmllint
+        if: runner.os == 'Linux'
+        run: command -v xmllint || { sudo apt-get update && sudo apt-get install -y libxml2-utils; }
+
       - name: Configure
         shell: bash
         run: |

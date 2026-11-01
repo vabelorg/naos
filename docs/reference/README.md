@@ -1,6 +1,6 @@
 # Reference
 
-Every rule of the public API, one part per page. Everything documented here is kept compatible.
+Every rule of the public API, one part per page. Everything documented here is kept compatible, except the lines of standard output: they are written for people and may change, apart from what [output](output.md#what-is-kept-compatible) names.
 
 The functions the macros call (`naos_check_int()`, `naos_fail()` and others), the types they take (`naos_cmp_t`) and the helper macros whose names end with `_` (`NAOS_CHECK_`) are in the headers, and exported by a shared build, only so that the macros work. Do not use them directly. They are kept compatible all the same, as everything Naos makes public: before 1.0 within a minor version, from 1.0 on within a major version ([version](version.md)).
 
@@ -11,5 +11,6 @@ The functions the macros call (`naos_check_int()`, `naos_fail()` and others), th
 | [Failing, skipping and notes](control.md) | How a test stops, `NAOS_FAIL`, `NAOS_SKIP`, `NAOS_NOTE`, `NAOS_TRACE_*` |
 | [Version](version.md) | `NAOS_VERSION_*`, `naos_version_number()`, `naos_version_string()` |
 | [Command line](command-line.md) | The `--naos-*` options and the exit codes |
-| [Output](output.md) | Every line printed, and how values are written |
+| [Output](output.md) | The human-readable output on standard output, and what of it is kept compatible |
+| [JUnit XML](xml.md) | The file of `--naos-output xml:<path>`, the output for tools, and what of it is kept compatible |
 | [CMake](cmake.md) | `naos::naos`, `naos_add_executable()`, `naos_discover_tests()`, options, package |

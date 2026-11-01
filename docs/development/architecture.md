@@ -7,9 +7,9 @@ How the sources of Naos are laid out and how the modules depend on each other, f
 These decide what goes into Naos, before any feature:
 
 - **Easy to adopt, first**: no dependency besides the standard C library, and no compiler extension. A feature that would cost either of them stays out.
-- **The output is a contract**: its lines are read by people and parsed by tools, so their form stays stable and documented ([output](../reference/output.md)).
+- **One output for people, one for tools**: standard output is written for people, and may change in any version to read better. Tools read the JUnit XML file of `--naos-output`: what the common tools of JUnit XML process in it is a contract, and the rest, such as the text of a failure, is for people as standard output is ([JUnit XML](../reference/xml.md#compatibility)). Of standard output, only what tools cannot do without stays stable: the start of a diagnostic line, which editors read, the names of `--naos-list`, which CTest discovery reads, and the exit codes ([output](../reference/output.md#what-is-kept-compatible)).
 - **A documented public API**: only what the [reference](../reference/README.md) documents is public and kept compatible.
-- **A narrow scope**: process isolation, parallel runs, time limits and report formats are left to the caller (CTest, scripts, CI).
+- **A narrow scope**: process isolation, parallel runs and time limits are left to the caller (CTest, scripts, CI). Naos writes one report format, for the results only it knows (where each failure is and what it says); others are added only when a clear need for them shows.
 
 ## Directories
 
@@ -44,8 +44,10 @@ The files form three groups, listed in this order in `src/CMakeLists.txt` and in
 | `test.c` | Running one test: setup, body and teardown, with `setjmp` / `longjmp` |
 | `diagnostic.c` | One diagnostic (begin → gather details → end), and the results of the test |
 | `context.c` | The note (`NAOS_NOTE`) and the stack of traces that go with diagnostics. Prints nothing |
-| `report.c` | The form of every output line (standard output) and the messages of Naos itself (standard error) |
-| `value.c` | How values are written in detail lines (escaped strings, shortest doubles) |
+| `report.c` | Tells the events of the run (a test starts, a diagnostic, a test ends, ...) to every writer on, and writes the names of `--naos-list` and the messages of Naos itself (standard error). `writer.h` declares the events and the functions of a writer |
+| `human.c` | The writer of the human-readable output: the form of every line on standard output, and which lines a run writes |
+| `xml.c` | The writer of the JUnit XML file of `--naos-output xml:<path>`: keeps the results while the tests run and writes the whole file at the end |
+| `value.c` | How values are written (escaped strings, shortest doubles) |
 
 Dependencies go one way and never form a cycle. An arrow points at the module used. `report` is used by every module that prints something (`session`, `suite`, `options`, `runner` and others), and the suites as registered (`suite_internal.h`) by every module that reads them (`runner`, `filter`, `test`), so the diagram leaves those arrows out. The dependency comment of `src/CMakeLists.txt` lists them all.
 
@@ -58,7 +60,8 @@ flowchart LR
   runner --> test --> diagnostic
   test --> context
   diagnostic --> context
-  diagnostic --> report --> value
+  diagnostic --> report --> xml --> human --> value
+  report --> human
   control --> test & diagnostic & context
   check --> diagnostic & value
 ```
@@ -67,7 +70,8 @@ flowchart LR
 
 - **Registration**: `NAOS_TEST`, `NAOS_SETUP` and `NAOS_TEARDOWN` define a function whose name holds its role, `naos_gen_<role>_<name>`. `NAOS_ADD_TEST`, `NAOS_SET_SETUP` and `NAOS_SET_TEARDOWN` accept only a function of their own role, so mixing them up does not compile. `NAOS_SUITE` defines a function `naos_gen_suite_<name>` that registers the tests on a builder (`naos_begin_suite`, `naos_add_test`, `naos_set_*`). `NAOS_ADD_SUITE` hands that function to `naos_add_suite`; `naos_run()` calls them to collect the suites, then checks them all before running any test.
 - **Stopping**: `test.c` runs setup, body and teardown under `setjmp`. A stop (`naos_stop`) jumps straight back to that `setjmp`, from whichever function the macro was used in.
-- **Diagnostics**: every failure goes through `naos_diagnostic_begin()` → `naos_diagnostic_add*()` → `naos_diagnostic_end()`, which adds the note and the traces of `context.c` and prints through `report.c`.
+- **Diagnostics**: every failure goes through `naos_diagnostic_begin()` → `naos_diagnostic_add*()` → `naos_diagnostic_end()`, which adds the note and the traces of `context.c` and tells the whole diagnostic to the writers through `report.c` at its end.
+- **Writers**: what the run writes goes through `report.c`, which tells each event to every writer on, in the same order. The modules that run the tests decide what happened and when; only a writer decides how it looks and which of it is written, so each output can change without the others.
 - **Formatted output**: every formatted output of `src/` goes through `format.h`, which picks C99 conforming functions of the C library (the `__mingw_` ones on MinGW). `NAOS_PRINTF_FORMAT` of `naos/export.h` declares the printf-like functions of Naos with the same formats, so the check of the compiler matches what Naos prints.
 - **State**: shared mutable state lives in `static` variables of each module (`g_` prefix), never in `extern` variables. The one exception is the options, read only after `naos_init`, through `naos_options_get()`.
 - **Discovery**: `naos_add_executable()` adds a `POST_BUILD` command that runs `NaosDiscover.cmake` after each build. The script runs `<exe> --naos-list` and writes a CTest file that registers each line of the output as one test. Parameters go through a file, so nothing needs escaping. When listing fails, the build fails, with the cause and what to do in its message, instead of going on with no test ([troubleshooting](../guides/troubleshooting.md#cmake-and-ctest)).

@@ -1,0 +1,124 @@
+args: --naos-output xml:{output} --naos-filter results.*
+exit code: 1
+--- stdout
+RUN: results.passes
+PASS: results.passes
+RUN: results.fails_twice
+report.c:LINE: error: 1 == 2
+  left:  1
+  right: 2
+report.c:LINE: error: "hello\n" == "hello"
+  left:  "hello\n"
+  right: "hello"
+  first difference: offset 5, end of right
+FAIL: results.fails_twice (2 failures)
+RUN: results.skips
+report.c:LINE: skip: not here
+SKIP: results.skips
+RUN: results.fails_then_skips
+report.c:LINE: error: 0
+report.c:LINE: skip: later
+FAIL: results.fails_then_skips (1 failure)
+RUN: results.with_context
+report.c:LINE: error: 0.1 ~= 0.25
+  left:  0.1
+  right: 0.25
+  tolerance: 0.001
+  note: locale C
+report.c:LINE: note: inner 2
+report.c:LINE: note: outer
+report.c:LINE: error: "ab" == "ac"
+  left size:  2
+  right size: 2
+  first difference: offset 1, left 0x62, right 0x63
+report.c:LINE: note: inner 2
+report.c:LINE: note: outer
+FAIL: results.with_context (2 failures)
+RUN: results.too_deep
+report.c:LINE: error: NAOS_TRACE_PUSH beyond 16 levels
+report.c:LINE: error: 0
+  traces: 1 innermost not kept
+report.c:LINE: note: level 15
+report.c:LINE: note: level 14
+report.c:LINE: note: level 13
+report.c:LINE: note: level 12
+report.c:LINE: note: level 11
+report.c:LINE: note: level 10
+report.c:LINE: note: level 9
+report.c:LINE: note: level 8
+report.c:LINE: note: level 7
+report.c:LINE: note: level 6
+report.c:LINE: note: level 5
+report.c:LINE: note: level 4
+report.c:LINE: note: level 3
+report.c:LINE: note: level 2
+report.c:LINE: note: level 1
+report.c:LINE: note: level 0
+FAIL: results.too_deep (2 failures)
+SUMMARY: 1 passed, 4 failed, 1 skipped
+--- stderr
+--- output
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="naos_selftest_report" tests="6" failures="4" errors="0" skipped="1">
+  <testsuite name="results" tests="6" failures="4" errors="0" skipped="1">
+    <testcase classname="results" name="passes"/>
+    <testcase classname="results" name="fails_twice" file="report.c" line="LINE">
+      <failure type="error" message="1 == 2">report.c:LINE: error: 1 == 2
+  left:  1
+  right: 2
+</failure>
+      <failure type="error" message="&quot;hello\n&quot; == &quot;hello&quot;">report.c:LINE: error: "hello\n" == "hello"
+  left:  "hello\n"
+  right: "hello"
+  first difference: offset 5, end of right
+</failure>
+    </testcase>
+    <testcase classname="results" name="skips" file="report.c" line="LINE">
+      <skipped message="not here"/>
+    </testcase>
+    <testcase classname="results" name="fails_then_skips" file="report.c" line="LINE">
+      <failure type="error" message="0">report.c:LINE: error: 0
+</failure>
+    </testcase>
+    <testcase classname="results" name="with_context" file="report.c" line="LINE">
+      <failure type="error" message="0.1 ~= 0.25">report.c:LINE: error: 0.1 ~= 0.25
+  left:  0.1
+  right: 0.25
+  tolerance: 0.001
+  note: locale C
+report.c:LINE: note: inner 2
+report.c:LINE: note: outer
+</failure>
+      <failure type="error" message="&quot;ab&quot; == &quot;ac&quot;">report.c:LINE: error: "ab" == "ac"
+  left size:  2
+  right size: 2
+  first difference: offset 1, left 0x62, right 0x63
+report.c:LINE: note: inner 2
+report.c:LINE: note: outer
+</failure>
+    </testcase>
+    <testcase classname="results" name="too_deep" file="report.c" line="LINE">
+      <failure type="error" message="NAOS_TRACE_PUSH beyond 16 levels">report.c:LINE: error: NAOS_TRACE_PUSH beyond 16 levels
+</failure>
+      <failure type="error" message="0">report.c:LINE: error: 0
+  traces: 1 innermost not kept
+report.c:LINE: note: level 15
+report.c:LINE: note: level 14
+report.c:LINE: note: level 13
+report.c:LINE: note: level 12
+report.c:LINE: note: level 11
+report.c:LINE: note: level 10
+report.c:LINE: note: level 9
+report.c:LINE: note: level 8
+report.c:LINE: note: level 7
+report.c:LINE: note: level 6
+report.c:LINE: note: level 5
+report.c:LINE: note: level 4
+report.c:LINE: note: level 3
+report.c:LINE: note: level 2
+report.c:LINE: note: level 1
+report.c:LINE: note: level 0
+</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -25,45 +25,61 @@
 #define SCIENTIFIC_SIZE 64
 
 /*
- * Writes one byte of a string value: the escape of C for the bytes that have a short one, \xNN for
- * the other bytes that are not printable ASCII, and the byte itself otherwise. The digits do not
- * depend on the locale, so the same bytes are always written the same way.
+ * The escape of C for the bytes that have a short one, \xNN for the other bytes that are not
+ * printable ASCII, and the byte itself otherwise. The digits do not depend on the locale, so the
+ * same bytes are always written the same way.
  */
-static void print_string_byte(unsigned char byte)
+size_t naos_value_escape_byte(unsigned char byte, char *text)
 {
     static const char hex_digits[] = "0123456789ABCDEF";
+    const char *short_escape;
 
     switch (byte)
     {
     case '\n':
-        fputs("\\n", stdout);
-        return;
-    case '\t':
-        fputs("\\t", stdout);
-        return;
-    case '\r':
-        fputs("\\r", stdout);
-        return;
-    case '"':
-        fputs("\\\"", stdout);
-        return;
-    case '\\':
-        fputs("\\\\", stdout);
-        return;
-    default:
+        short_escape = "\\n";
         break;
+    case '\t':
+        short_escape = "\\t";
+        break;
+    case '\r':
+        short_escape = "\\r";
+        break;
+    case '"':
+        short_escape = "\\\"";
+        break;
+    case '\\':
+        short_escape = "\\\\";
+        break;
+    default:
+        short_escape = NULL;
+        break;
+    }
+
+    if (short_escape != NULL)
+    {
+        text[0] = short_escape[0];
+        text[1] = short_escape[1];
+        text[2] = '\0';
+
+        return 2;
     }
 
     if ((byte < 0x20) || (byte >= 0x7F))
     {
-        fputs("\\x", stdout);
-        fputc(hex_digits[byte >> 4], stdout);
-        fputc(hex_digits[byte & 0x0F], stdout);
+        text[0] = '\\';
+        text[1] = 'x';
+        text[2] = hex_digits[byte >> 4];
+        text[3] = hex_digits[byte & 0x0F];
+        text[4] = '\0';
+
+        return 4;
     }
-    else
-    {
-        fputc(byte, stdout);
-    }
+
+    text[0] = (char)byte;
+    text[1] = '\0';
+
+    return 1;
 }
 
 /*
@@ -193,25 +209,6 @@ static size_t write_exponent(char *text, size_t length, const char *digits, size
     text[length++] = (char)('0' + (magnitude % 10));
 
     return length;
-}
-
-/* Every byte up to the terminating NUL is written; nothing is cut and nothing is buffered. */
-void naos_value_print_string(const char *value)
-{
-    const unsigned char *byte;
-
-    if (value == NULL)
-    {
-        fputs("(null)", stdout);
-        return;
-    }
-
-    fputc('"', stdout);
-    for (byte = (const unsigned char *)value; *byte != '\0'; byte++)
-    {
-        print_string_byte(*byte);
-    }
-    fputc('"', stdout);
 }
 
 /*

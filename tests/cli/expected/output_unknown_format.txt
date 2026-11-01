@@ -1,0 +1,6 @@
+args: --naos-output=json:out.json
+exit code: 2
+--- stdout
+--- stderr
+naos: --naos-output: unknown format: json (the formats: xml)
+usage: PROG [--naos-filter <patterns>] [--naos-list] [--naos-shuffle] [--naos-random-seed <n>] [--naos-repeat <n>] [--naos-fail-fast] [--naos-output <format>:<path>] [--help] [args...]

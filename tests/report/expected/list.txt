@@ -1,0 +1,19 @@
+args: --naos-output xml:{output} --naos-list
+exit code: 0
+--- stdout
+results.passes
+results.fails_twice
+results.skips
+results.fails_then_skips
+results.with_context
+results.too_deep
+text.markup
+text.utf8
+text.invalid_utf8
+text.control
+text.string_value
+text.skip_markup
+crash.exits
+--- stderr
+--- output
+[no file]

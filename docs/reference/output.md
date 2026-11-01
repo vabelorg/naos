@@ -1,6 +1,6 @@
 # Output
 
-While the tests run, Naos writes only three kinds of lines to standard output, and their format is kept compatible. The output of `--naos-list` and `--help`, and the `naos: ...` messages on standard error, are not part of this format. Whatever the tests print themselves comes in between, as it is.
+While the tests run, Naos writes only three kinds of lines to standard output. They are written for people to read, and this page describes them as the current version writes them: apart from what [is kept compatible](#what-is-kept-compatible), they may change in any version, to read better. A tool that reads the results should read the [JUnit XML](xml.md) file of `--naos-output` instead. The output of `--naos-list` and `--help`, and the `naos: ...` messages on standard error, are not part of this output. Whatever the tests print themselves comes in between, as it is.
 
 | Kind | Form | Content |
 |---|---|---|
@@ -90,6 +90,16 @@ A failure or a skip is printed in this order, then standard output is flushed:
 3. `note: <text>`, if a note of `NAOS_NOTE` is there
 4. `traces: <n> innermost not kept`, if more than 16 levels of traces are pushed
 5. A `note` diagnostic line for each trace pushed, the innermost first
+
+## What is kept compatible
+
+Of standard output, only this is kept compatible ([version](version.md)), since tools cannot do without it; the [JUnit XML](xml.md#compatibility) file has its own rules:
+
+- The start of a diagnostic line: the [location](#diagnostic-lines) in its form, then the kind, `error`, `skip` or `note`, and `: `, as editors read them ([open failures in your editor](../guides/ctest-and-ci.md#open-failures-in-your-editor)). The text after it may change.
+- The names printed by `--naos-list`, one per line ([command line](command-line.md#options)), which the CMake functions of Naos read to register the tests with CTest.
+- The [exit codes](command-line.md#exit-codes).
+
+Everything else on this page, such as the flow lines, the detail lines, the order and the summary, may change in any version. The changelog says when it does.
 
 ## Example
 

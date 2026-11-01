@@ -16,12 +16,16 @@
  */
 #define NAOS_VALUE_DOUBLE_SIZE 32
 
+/* Size of a buffer that holds how one byte of a string value is written: \xNN and its NUL. */
+#define NAOS_VALUE_BYTE_SIZE 5
+
 /*
- * Writes a C string of the test to stdout on one line: (null) for NULL, otherwise the bytes between
- * double quotes, with \n, \t, \r, \", \\ and \xNN (two upper-case hex digits) for every other byte
- * below 0x20, 0x7F and every byte from 0x80. Nothing is flushed.
+ * Writes into text, NUL-terminated, how one byte of a C string of the test is written, so that the
+ * string, between double quotes, stays on one line: \n, \t, \r, \", \\ and \xNN (two upper-case hex
+ * digits) for every other byte below 0x20, 0x7F and every byte from 0x80, the byte itself otherwise.
+ * text has NAOS_VALUE_BYTE_SIZE chars. Returns the length written, from 1 to 4.
  */
-void naos_value_print_string(const char *value);
+size_t naos_value_escape_byte(unsigned char byte, char *text);
 
 /*
  * Formats value into buffer as the shortest decimal that reads back to it: plain for decimal

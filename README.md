@@ -97,7 +97,7 @@ The [quickstart](docs/getting-started/quickstart.md) walks through it in five mi
 |---|---|
 | **Start** | [Installation](docs/getting-started/installation.md) · [Quickstart](docs/getting-started/quickstart.md) · [Tutorial](docs/getting-started/tutorial.md) |
 | **Use** | [Guides](docs/guides/) · [Troubleshooting](docs/guides/troubleshooting.md) · [Examples](examples/) |
-| **Look up** | [Reference](docs/reference/): tests, assertions, command line, output, CMake |
+| **Look up** | [Reference](docs/reference/): tests, assertions, command line, output, JUnit XML, CMake |
 
 The whole map is in [docs/](docs/README.md).
 

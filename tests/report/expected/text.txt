@@ -1,0 +1,35 @@
+args: --naos-output xml:{output} --naos-filter text.*
+exit code: 1
+--- output
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="naos_selftest_report" tests="6" failures="5" errors="0" skipped="1">
+  <testsuite name="text" tests="6" failures="5" errors="0" skipped="1">
+    <testcase classname="text" name="markup" file="report.c" line="LINE">
+      <failure type="error" message="&lt;a &amp; &quot;b&quot; &apos;c&apos;&gt;">report.c:LINE: error: &lt;a &amp; "b" 'c'&gt;
+</failure>
+    </testcase>
+    <testcase classname="text" name="utf8" file="report.c" line="LINE">
+      <failure type="error" message="日本">report.c:LINE: error: 日本
+</failure>
+    </testcase>
+    <testcase classname="text" name="invalid_utf8" file="report.c" line="LINE">
+      <failure type="error" message="bad \xFF and \xE6\x97 bytes">report.c:LINE: error: bad \xFF and \xE6\x97 bytes
+</failure>
+    </testcase>
+    <testcase classname="text" name="control" file="report.c" line="LINE">
+      <failure type="error" message="one&#10;two&#9;three&#13;\x01">report.c:LINE: error: one
+two	three&#13;\x01
+</failure>
+    </testcase>
+    <testcase classname="text" name="string_value" file="report.c" line="LINE">
+      <failure type="error" message="&quot;\xE6\x97\xA5 &lt;&amp;&gt;&quot; == &quot;x&quot;">report.c:LINE: error: "\xE6\x97\xA5 &lt;&amp;&gt;" == "x"
+  left:  "\xE6\x97\xA5 &lt;&amp;&gt;"
+  right: "x"
+  first difference: offset 0, left 0xE6, right 0x78
+</failure>
+    </testcase>
+    <testcase classname="text" name="skip_markup" file="report.c" line="LINE">
+      <skipped message="needs &lt;a&gt; &amp; &quot;b&quot;"/>
+    </testcase>
+  </testsuite>
+</testsuites>

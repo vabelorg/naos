@@ -10,6 +10,8 @@
 
 #include <stdio.h>
 
+#include "report.h"
+
 /* Command line, set by naos_options_parse() and only read afterwards. */
 typedef struct naos_options
 {
@@ -20,6 +22,8 @@ typedef struct naos_options
     unsigned long random_seed; /* 0 until given, or when given as 0: chosen at run */
     long repeat;
     int fail_fast;
+    naos_format_t output_format; /* NAOS_FORMAT_NONE without --naos-output */
+    const char *output_path;     /* NULL without --naos-output */
     int help_requested;
     int usage_error;
 } naos_options_t;

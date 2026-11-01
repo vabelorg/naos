@@ -5,7 +5,7 @@ Thank you for your interest in Naos. Bug reports, documentation fixes, translati
 ## Before you start
 
 - **Bugs**: open an [issue](https://github.com/vabelorg/naos/issues/new/choose) with the version, the platform and compiler, a minimal test that shows the problem, and its output.
-- **Features**: open an issue first and describe the problem it solves. Naos keeps a narrow scope on purpose, and its [principles](development/architecture.md#principles) come before features: process isolation, parallel runs and report formats, for example, are left to CTest and CI.
+- **Features**: open an issue first and describe the problem it solves. Naos keeps a narrow scope on purpose, and its [principles](development/architecture.md#principles) come before features: process isolation and parallel runs, for example, are left to CTest and CI, and Naos writes one report format only (JUnit XML).
 - **Security issues**: do not open an issue; report them privately as described in the [security policy](SECURITY.md).
 - **Small fixes** (typos, broken links, clearer wording) can go straight to a pull request.
 
