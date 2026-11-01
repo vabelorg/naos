@@ -42,13 +42,14 @@ function(normalize var)
 endfunction()
 
 # As normalize, for the XML file of --naos-output: the location of a test case and of a failure,
-# file="<file>" line="<line>" and the lines "file: <file>" and "line: <line>", lose the directory
-# and the line number too.
+# file="<file>" line="<line>", the lines "file: <file>" and "line: <line>", and the location of a
+# trace, "at: <file>:<line>", lose the directory and the line number too.
 function(normalize_output var)
     normalize(${var})
     set(text "${${var}}")
     string(REGEX REPLACE "file=\"([^\"]*[/\\\\])?([A-Za-z0-9_]+\\.(c|cpp))\" line=\"[0-9]+\"" "file=\"\\2\" line=\"LINE\"" text "${text}")
     string(REGEX REPLACE "file: ([^\n]*[/\\\\])?([A-Za-z0-9_]+\\.(c|cpp))\nline: [0-9]+" "file: \\2\nline: LINE" text "${text}")
+    string(REGEX REPLACE "\nat: ([^\n]*[/\\\\])?([A-Za-z0-9_]+\\.(c|cpp)):[0-9]+" "\nat: \\2:LINE" text "${text}")
     set(${var} "${text}" PARENT_SCOPE)
 endfunction()
 

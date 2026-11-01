@@ -34,6 +34,13 @@ report.c:LINE: error: "ab" == "ac"
 report.c:LINE: note: inner 2
 report.c:LINE: note: outer
 FAIL: results.with_context (2 failures)
+RUN: results.multiline_context
+report.c:LINE: error: 0
+  note: a
+trace: b\n
+report.c:LINE: note: first
+at: x.c:1
+FAIL: results.multiline_context (1 failure)
 RUN: results.too_deep
 report.c:LINE: error: NAOS_TRACE_PUSH beyond 16 levels
 report.c:LINE: error: 0
@@ -55,12 +62,12 @@ report.c:LINE: note: level 2
 report.c:LINE: note: level 1
 report.c:LINE: note: level 0
 FAIL: results.too_deep (2 failures)
-SUMMARY: 1 passed, 4 failed, 1 skipped
+SUMMARY: 1 passed, 5 failed, 1 skipped
 --- stderr
 --- output
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="naos_selftest_report" tests="6" failures="4" errors="0" skipped="1">
-  <testsuite name="results" tests="6" failures="4" errors="0" skipped="1">
+<testsuites name="naos_selftest_report" tests="7" failures="5" errors="0" skipped="1">
+  <testsuite name="results" tests="7" failures="5" errors="0" skipped="1">
     <testcase classname="results" name="passes"/>
     <testcase classname="results" name="fails_twice" file="report.c" line="LINE">
       <failure type="error" message="1 == 2">file: report.c
@@ -87,15 +94,26 @@ left: 0.1
 right: 0.25
 tolerance: 0.001
 note: locale C
-trace: report.c:LINE: inner 2
-trace: report.c:LINE: outer</failure>
+trace: inner 2
+at: report.c:LINE
+trace: outer
+at: report.c:LINE</failure>
       <failure type="error" message="&quot;ab&quot; == &quot;ac&quot;">file: report.c
 line: LINE
 left size: 2
 right size: 2
 first difference: offset 1, left 0x62, right 0x63
-trace: report.c:LINE: inner 2
-trace: report.c:LINE: outer</failure>
+trace: inner 2
+at: report.c:LINE
+trace: outer
+at: report.c:LINE</failure>
+    </testcase>
+    <testcase classname="results" name="multiline_context" file="report.c" line="LINE">
+      <failure type="error" message="0">file: report.c
+line: LINE
+note: a\ntrace: b\\n\r
+trace: first\nat: x.c:1
+at: report.c:LINE</failure>
     </testcase>
     <testcase classname="results" name="too_deep" file="report.c" line="LINE">
       <failure type="error" message="NAOS_TRACE_PUSH beyond 16 levels">file: report.c
@@ -103,22 +121,38 @@ line: LINE</failure>
       <failure type="error" message="0">file: report.c
 line: LINE
 traces: 1 innermost not kept
-trace: report.c:LINE: level 15
-trace: report.c:LINE: level 14
-trace: report.c:LINE: level 13
-trace: report.c:LINE: level 12
-trace: report.c:LINE: level 11
-trace: report.c:LINE: level 10
-trace: report.c:LINE: level 9
-trace: report.c:LINE: level 8
-trace: report.c:LINE: level 7
-trace: report.c:LINE: level 6
-trace: report.c:LINE: level 5
-trace: report.c:LINE: level 4
-trace: report.c:LINE: level 3
-trace: report.c:LINE: level 2
-trace: report.c:LINE: level 1
-trace: report.c:LINE: level 0</failure>
+trace: level 15
+at: report.c:LINE
+trace: level 14
+at: report.c:LINE
+trace: level 13
+at: report.c:LINE
+trace: level 12
+at: report.c:LINE
+trace: level 11
+at: report.c:LINE
+trace: level 10
+at: report.c:LINE
+trace: level 9
+at: report.c:LINE
+trace: level 8
+at: report.c:LINE
+trace: level 7
+at: report.c:LINE
+trace: level 6
+at: report.c:LINE
+trace: level 5
+at: report.c:LINE
+trace: level 4
+at: report.c:LINE
+trace: level 3
+at: report.c:LINE
+trace: level 2
+at: report.c:LINE
+trace: level 1
+at: report.c:LINE
+trace: level 0
+at: report.c:LINE</failure>
     </testcase>
   </testsuite>
 </testsuites>

@@ -55,9 +55,11 @@ The text of a `<failure>` is lines of `<label>: <value>`, in this order:
 2. The [values](#values) of the assertion, such as `left: <value>` and `right: <value>`; none for `NAOS_FAIL`
 3. `note: <text>`, if a note of `NAOS_NOTE` is there
 4. `traces: <n> innermost not kept`, if more than 16 levels of traces are pushed
-5. `trace: <file>:<line>: <text>` for each trace pushed, the innermost first
+5. For each trace pushed, the innermost first, `trace: <text>` followed by `at: <file>:<line>`, where it was pushed. The line number follows the last `:` of the line, since a file name may hold one
 
 The labels are written as they are, with no space added to line up the values. More lines may be added in a later version: a tool should skip the labels it does not know.
+
+Every value stays on its line and reads back as it was. A string value is written in the [value formats](#value-formats), between double quotes or as `(null)`. Every other value (file names, notes, the texts of traces, the other values of assertions) is written as the [text](#text) rules say, with three escapes more: `\\` for `\`, `\n` for a line feed and `\r` for a carriage return. A note `a` followed by a line `b` is `note: a\nb`, and a Windows file name `C:\src\a.c` is `file: C:\\src\\a.c` there; the `file` attribute of `<testcase>` has it as it is.
 
 ## Values
 
@@ -79,7 +81,7 @@ The labels are written as they are, with no space added to line up the values. M
 The file is UTF-8. Every text is escaped for XML (`&amp;`, `&lt;`, `&gt;`, and `&quot;` and `&apos;` in attributes; line breaks and tabs in attributes as `&#10;` and `&#9;`; carriage returns as `&#13;`).
 
 - **The values of strings** are written as the [value formats](#value-formats) say, which leaves only printable ASCII; the bytes from 0x80 are escaped as `\xNN`.
-- **Other texts** (expressions, the messages of `NAOS_FAIL` and `NAOS_SKIP`, notes, traces and file names) keep valid UTF-8 as it is, so that a message written in any language reads as written. A byte that is not part of valid UTF-8, and a control character that XML 1.0 does not allow (below 0x20, except line breaks, tabs and carriage returns), is written as `\xNN`. Such a text cannot always be told apart from one that holds `\xNN` itself.
+- **Other texts** (expressions, the messages of `NAOS_FAIL` and `NAOS_SKIP`, notes, traces and file names) keep valid UTF-8 as it is, so that a message written in any language reads as written. A byte that is not part of valid UTF-8, and a control character that XML 1.0 does not allow (below 0x20, except line breaks, tabs and carriage returns), is written as `\xNN`. In an attribute, such a text cannot always be told apart from one that holds `\xNN` itself; in the lines of a `<failure>`, where `\` is escaped too, it can.
 
 ## Value formats
 
@@ -138,15 +140,19 @@ left: 0.1
 right: 0.25
 tolerance: 0.001
 note: locale C
-trace: report.c:45: inner 2
-trace: report.c:44: outer</failure>
+trace: inner 2
+at: report.c:45
+trace: outer
+at: report.c:44</failure>
       <failure type="error" message="&quot;ab&quot; == &quot;ac&quot;">file: report.c
 line: 48
 left size: 2
 right size: 2
 first difference: offset 1, left 0x62, right 0x63
-trace: report.c:45: inner 2
-trace: report.c:44: outer</failure>
+trace: inner 2
+at: report.c:45
+trace: outer
+at: report.c:44</failure>
     </testcase>
   </testsuite>
 </testsuites>

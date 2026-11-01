@@ -55,9 +55,11 @@ prog --naos-filter 'parser.*' --naos-output=xml:build/parser.xml
 2. アサーションの[値](#値)。`left: <value>`、`right: <value>` など。`NAOS_FAIL` にはない
 3. `NAOS_NOTE` のメモがあれば `note: <text>`
 4. 16 段を超えて trace を積んでいれば `traces: <n> innermost not kept`
-5. 積んである trace ごとに `trace: <file>:<line>: <text>`（内側から）
+5. 積んである trace ごとに（内側から）、`trace: <text>` と、続けて積んだ場所の `at: <file>:<line>`。ファイル名が `:` を含むことがあるので、行番号は行の最後の `:` の後ろにあります
 
 ラベルはそのまま書き、値を揃える空白は足しません。後のバージョンで行が増えることがあるので、ツールは知らないラベルを読み飛ばしてください。
+
+どの値もその行に収まり、元のとおりに読み戻せます。文字列の値は[値の表記](#値の表記)で書きます（二重引用符で囲むか `(null)`）。ほかの値（ファイル名、メモ、trace の内容、アサーションのほかの値）は[テキスト](#テキスト)の規則で書き、さらに `\` を `\\`、改行を `\n`、復帰を `\r` とエスケープします。メモ `a` の次の行が `b` なら `note: a\nb`、Windows のファイル名 `C:\src\a.c` はそこでは `file: C:\\src\\a.c` になります。`<testcase>` の `file` 属性はそのままです。
 
 ## 値
 
@@ -79,7 +81,7 @@ prog --naos-filter 'parser.*' --naos-output=xml:build/parser.xml
 ファイルは UTF-8 です。テキストはすべて XML 用にエスケープします（`&amp;`、`&lt;`、`&gt;`。属性では `&quot;` と `&apos;` も使い、改行とタブを `&#10;` と `&#9;` にします。復帰は常に `&#13;` です）。
 
 - **文字列の値**は[値の表記](#値の表記)のとおりに書くので、印字できる ASCII だけになります。0x80 以上のバイトは `\xNN` にエスケープします。
-- **ほかのテキスト**（式、`NAOS_FAIL` と `NAOS_SKIP` のメッセージ、メモ、trace、ファイル名）は、正しい UTF-8 ならそのまま書きます。どの言語で書いたメッセージも書いたとおりに読めます。正しい UTF-8 の一部でないバイトと、XML 1.0 で使えない制御文字（改行、タブ、復帰以外の 0x20 未満）は `\xNN` と書きます。そのため、テキスト自身が `\xNN` を含むものとは区別できないことがあります。
+- **ほかのテキスト**（式、`NAOS_FAIL` と `NAOS_SKIP` のメッセージ、メモ、trace、ファイル名）は、正しい UTF-8 ならそのまま書きます。どの言語で書いたメッセージも書いたとおりに読めます。正しい UTF-8 の一部でないバイトと、XML 1.0 で使えない制御文字（改行、タブ、復帰以外の 0x20 未満）は `\xNN` と書きます。属性では、そうしたテキストを、テキスト自身が `\xNN` を含むものと区別できないことがあります。`<failure>` の行では `\` もエスケープするので区別できます。
 
 ## 値の表記
 
@@ -138,15 +140,19 @@ left: 0.1
 right: 0.25
 tolerance: 0.001
 note: locale C
-trace: report.c:45: inner 2
-trace: report.c:44: outer</failure>
+trace: inner 2
+at: report.c:45
+trace: outer
+at: report.c:44</failure>
       <failure type="error" message="&quot;ab&quot; == &quot;ac&quot;">file: report.c
 line: 48
 left size: 2
 right size: 2
 first difference: offset 1, left 0x62, right 0x63
-trace: report.c:45: inner 2
-trace: report.c:44: outer</failure>
+trace: inner 2
+at: report.c:45
+trace: outer
+at: report.c:44</failure>
     </testcase>
   </testsuite>
 </testsuites>

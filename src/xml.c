@@ -40,6 +40,14 @@ typedef struct naos_text
     size_t capacity;
 } naos_text_t;
 
+/* Where a text is added, which decides how it is escaped. */
+typedef enum naos_xml_place
+{
+    NAOS_XML_ATTRIBUTE, /* the value of an attribute */
+    NAOS_XML_TEXT,      /* the text of an element, as it is */
+    NAOS_XML_LINE       /* a value of a line of a <failure>: kept on its line */
+} naos_xml_place_t;
+
 /* The test cases of one suite in one round: g_cases from start to end. */
 typedef struct naos_xml_suite
 {
@@ -116,8 +124,14 @@ static int reserve(naos_text_t *text, size_t more)
     return 1;
 }
 
+/* bytes may be NULL when length is 0, as the data of a text nothing was added to: memcpy may not be called then. */
 static void add_bytes(naos_text_t *text, const char *bytes, size_t length)
 {
+    if (length == 0)
+    {
+        return;
+    }
+
     if (reserve(text, length) != 0)
     {
         memcpy(text->data + text->length, bytes, length);
@@ -241,11 +255,31 @@ static const char *xml_reference(unsigned char byte, int in_attribute)
 }
 
 /*
- * Adds a text of the test or of Naos, such as an expression, a message or a file name, escaped for
- * XML. Valid UTF-8 is kept as it is; a byte that is not part of it, and a control character that
- * XML 1.0 does not allow, is written as \xNN.
+ * The escape of byte in a value of a line of a <failure>, which keeps the value on its line and lets
+ * it be read back: \\, \n and \r. NULL for the other bytes.
  */
-static void add_escaped(naos_text_t *text, const char *value, int in_attribute)
+static const char *line_escape(unsigned char byte)
+{
+    switch (byte)
+    {
+    case '\\':
+        return "\\\\";
+    case '\n':
+        return "\\n";
+    case '\r':
+        return "\\r";
+    default:
+        return NULL;
+    }
+}
+
+/*
+ * Adds a text of the test or of Naos, such as an expression, a message or a file name, escaped for
+ * XML: in an attribute, in the text of an element, or as a value of a line of a <failure>. Valid
+ * UTF-8 is kept as it is; a byte that is not part of it, and a control character that XML 1.0 does
+ * not allow, is written as \xNN.
+ */
+static void add_escaped(naos_text_t *text, const char *value, naos_xml_place_t place)
 {
     char escape[NAOS_VALUE_BYTE_SIZE];
     const unsigned char *byte;
@@ -255,7 +289,12 @@ static void add_escaped(naos_text_t *text, const char *value, int in_attribute)
     byte = (const unsigned char *)value;
     while (*byte != '\0')
     {
-        reference = xml_reference(*byte, in_attribute);
+        reference = (place == NAOS_XML_LINE) ? line_escape(*byte) : NULL;
+        if (reference == NULL)
+        {
+            reference = xml_reference(*byte, place == NAOS_XML_ATTRIBUTE);
+        }
+
         length = utf8_sequence(byte);
         if (reference != NULL)
         {
@@ -293,7 +332,7 @@ static void add_string_value(naos_text_t *text, const char *value)
     for (byte = (const unsigned char *)value; *byte != '\0'; byte++)
     {
         naos_value_escape_byte(*byte, escape);
-        add_escaped(text, escape, 0);
+        add_escaped(text, escape, NAOS_XML_TEXT);
     }
     add(text, "\"");
 }
@@ -349,7 +388,7 @@ static void add_program_name(naos_text_t *text, const char *program)
 
     memcpy(copy, name, length);
     copy[length] = '\0';
-    add_escaped(text, copy, 1);
+    add_escaped(text, copy, NAOS_XML_ATTRIBUTE);
     free(copy);
 }
 
@@ -399,7 +438,7 @@ static void add_counts(naos_text_t *text, const naos_tally_t *tally)
 static void add_suite(naos_text_t *text, const naos_xml_suite_t *suite)
 {
     add(text, "  <testsuite name=\"");
-    add_escaped(text, suite->name, 1);
+    add_escaped(text, suite->name, NAOS_XML_ATTRIBUTE);
     add(text, "\"");
     add_counts(text, &suite->tally);
     add(text, ">\n");
@@ -421,7 +460,11 @@ static void add_suite(naos_text_t *text, const naos_xml_suite_t *suite)
         add(text, "    </properties>\n");
     }
 
-    add_bytes(text, g_cases.data + suite->start, suite->end - suite->start);
+    /* NULL + 0 is undefined too, so the test cases are added only when there are some. */
+    if (suite->end > suite->start)
+    {
+        add_bytes(text, g_cases.data + suite->start, suite->end - suite->start);
+    }
     add(text, "  </testsuite>\n");
 }
 
@@ -473,8 +516,8 @@ static void test_begin(const char *suite, const char *test)
 
 /*
  * The first diagnostic gives the test case its location. A failure becomes a <failure> element whose
- * text holds its location, values, note and traces, one "<label>: <value>" line each; a skip keeps
- * its message for <skipped>.
+ * text holds its location, values, note and traces, one "<label>: <value>" line each, each value
+ * kept on its line (a string value is already); a skip keeps its message for <skipped>.
  */
 static void diagnostic(const naos_diagnostic_record_t *record)
 {
@@ -486,7 +529,7 @@ static void diagnostic(const naos_diagnostic_record_t *record)
     {
         g_has_location = 1;
         add(&g_location, " file=\"");
-        add_escaped(&g_location, record->file, 1);
+        add_escaped(&g_location, record->file, NAOS_XML_ATTRIBUTE);
         add_format(&g_location, "\" line=\"%d\"", record->line);
     }
 
@@ -495,22 +538,22 @@ static void diagnostic(const naos_diagnostic_record_t *record)
         if (g_has_skip == 0)
         {
             g_has_skip = 1;
-            add_escaped(&g_skip, record->text, 1);
+            add_escaped(&g_skip, record->text, NAOS_XML_ATTRIBUTE);
         }
 
         return;
     }
 
     add(&g_failures, "      <failure type=\"error\" message=\"");
-    add_escaped(&g_failures, record->text, 1);
+    add_escaped(&g_failures, record->text, NAOS_XML_ATTRIBUTE);
     add(&g_failures, "\">file: ");
-    add_escaped(&g_failures, record->file, 0);
+    add_escaped(&g_failures, record->file, NAOS_XML_LINE);
     add_format(&g_failures, "\nline: %d", record->line);
 
     for (i = 0; i < record->detail_count; i++)
     {
         add(&g_failures, "\n");
-        add_escaped(&g_failures, record->details[i].label, 0);
+        add_escaped(&g_failures, record->details[i].label, NAOS_XML_LINE);
         add(&g_failures, ": ");
         if (record->details[i].kind == NAOS_DETAIL_STRING)
         {
@@ -518,14 +561,14 @@ static void diagnostic(const naos_diagnostic_record_t *record)
         }
         else
         {
-            add_escaped(&g_failures, record->details[i].value, 0);
+            add_escaped(&g_failures, record->details[i].value, NAOS_XML_LINE);
         }
     }
 
     if (record->note != NULL)
     {
         add(&g_failures, "\nnote: ");
-        add_escaped(&g_failures, record->note, 0);
+        add_escaped(&g_failures, record->note, NAOS_XML_LINE);
     }
 
     if (record->traces_not_kept > 0)
@@ -536,11 +579,13 @@ static void diagnostic(const naos_diagnostic_record_t *record)
 
     for (j = 0; j < record->trace_count; j++)
     {
+        /* The location on a line of its own, read from its last ':', since a file name may hold ': '. */
         trace = record->traces[j];
         add(&g_failures, "\ntrace: ");
-        add_escaped(&g_failures, trace->file, 0);
-        add_format(&g_failures, ":%d: ", trace->line);
-        add_escaped(&g_failures, trace->text, 0);
+        add_escaped(&g_failures, trace->text, NAOS_XML_LINE);
+        add(&g_failures, "\nat: ");
+        add_escaped(&g_failures, trace->file, NAOS_XML_LINE);
+        add_format(&g_failures, ":%d", trace->line);
     }
 
     add(&g_failures, "</failure>\n");
@@ -559,9 +604,9 @@ static void test_end(const char *suite_name, const char *test, naos_outcome_t ou
 
     suite = &g_suites[g_suite_count - 1];
     add(&g_cases, "    <testcase classname=\"");
-    add_escaped(&g_cases, suite_name, 1);
+    add_escaped(&g_cases, suite_name, NAOS_XML_ATTRIBUTE);
     add(&g_cases, "\" name=\"");
-    add_escaped(&g_cases, test, 1);
+    add_escaped(&g_cases, test, NAOS_XML_ATTRIBUTE);
     add(&g_cases, "\"");
     add_bytes(&g_cases, g_location.data, g_location.length);
 
