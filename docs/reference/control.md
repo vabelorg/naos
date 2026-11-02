@@ -62,6 +62,50 @@ Records the test as skipped and stops it, recording no failure; it does not retu
 
 An example is in [writing tests](../guides/writing-tests.md#skip-a-test-whose-conditions-are-not-met).
 
+## A test expected to fail
+
+```c
+NAOS_ADD_TEST_XFAIL(test, reason)
+```
+
+Listed among the entries of `NAOS_SUITE` in place of `NAOS_ADD_TEST`, it registers a test that is expected to fail for now, for `reason`, a string that is not empty: a test written before the code, a known bug not fixed yet, a known problem of one platform. Naos checks the mark: the test passes while it fails, and fails as soon as it passes, so that removing the mark is a step of its own.
+
+| The test… | Result line | Counts as |
+|---|---|---|
+| Records one or more failures: an assertion, `NAOS_FAIL`, in setup, the body or teardown | `XFAIL: <suite>.<test> (<t> ms)` | A pass |
+| Ends with no failure and no skip | `XPASS: <suite>.<test> (<t> ms)`, after a failure at the entry `NAOS_ADD_TEST_XFAIL` | A failure |
+| Skips without failing | `SKIP: <suite>.<test> (<t> ms)` | A skip |
+
+```
+RUN: parser.parses_negative_numbers
+parser_test.c:42: error: passed, but is expected to fail
+  reason: "sign handling not implemented yet"
+XPASS: parser.parses_negative_numbers (0 ms)
+```
+
+- The failures of an `XFAIL` are written as for any test, so that you can see the test fails for the reason you expect, and not for a typo.
+- The failure of an `XPASS` is at the entry `NAOS_ADD_TEST_XFAIL` of the suite, the line to change once the test passes, and its value `reason` is the reason given. It is a failure like the others: the exit code is 1, `--naos-fail-fast` stops at it, and `--naos-quiet` writes it.
+- An `XFAIL` is not a failure: the exit code is 0 when no test failed, even if every other test was skipped, `--naos-fail-fast` goes on, and `--naos-quiet` leaves it out with its failures. `SUMMARY:` counts it as an expected failure ([output](output.md#flow-lines)), and the [JUnit XML](xml.md) file as skipped.
+- A test that runs no assertion did not fail: it is an `XPASS`, whether `--naos-allow-no-assertions` is given or not.
+- A crash is never an expected failure. Run in one process, the run ends as for any test; under CTest, the test fails.
+- `--naos-list` does not mark these tests, so that its names stay as they are; the JUnit XML file tells them apart.
+- An empty or `NULL` reason is reported before any test runs, with exit code 2, as the other mistakes in the suites ([tests and suites](tests.md#suites)).
+- For a failure on one platform only, choose the entry with `#ifdef` outside the suite, since `#ifdef` cannot go between its entries:
+
+```c
+#if defined(_WIN32)
+#define PARSES_PATHS NAOS_ADD_TEST_XFAIL(parses_paths, "drive letters not handled yet")
+#else
+#define PARSES_PATHS NAOS_ADD_TEST(parses_paths)
+#endif
+
+NAOS_SUITE(parser,
+    PARSES_PATHS
+)
+```
+
+An example is in [writing tests](../guides/writing-tests.md#mark-a-test-that-must-fail-for-now).
+
 ## A test that runs no assertion
 
 A test that runs no assertion fails, so that a test that checks nothing does not read as a pass: an empty or unfinished test, a loop over a table with no case, an early `return` before the assertions, or a helper holding them that is never called.

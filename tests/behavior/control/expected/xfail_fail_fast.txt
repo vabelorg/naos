@@ -1,0 +1,27 @@
+args: --naos-fail-fast
+exit code: 1
+--- stdout
+RUN: expected.ok
+PASS: expected.ok (N ms)
+RUN: expected.check_fails
+xfail.c:LINE: error: -42 == 42
+  left:  -42
+  right: 42
+reached-after-check
+XFAIL: expected.check_fails (N ms)
+RUN: expected.require_fails
+xfail.c:LINE: error: g_ready
+XFAIL: expected.require_fails (N ms)
+RUN: expected.fails
+xfail.c:LINE: error: not implemented yet
+XFAIL: expected.fails (N ms)
+RUN: expected.in_helper
+xfail.c:LINE: error: g_ready
+XFAIL: expected.in_helper (N ms)
+RUN: expected.passes
+xfail.c:LINE: error: passed, but is expected to fail
+  reason: "bug #1, \"fixed\" since"
+XPASS: expected.passes (N ms)
+FAIL FAST: stopped at the first failure; 5 not run
+SUMMARY: 1 passed, 1 failed, 0 skipped, 4 expected failures (N ms)
+--- stderr

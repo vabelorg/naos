@@ -1,0 +1,6 @@
+args: xfail_without_reason
+exit code: 2
+--- stdout
+--- stderr
+naos: test xfail_without_reason.empty is expected to fail without a reason
+naos: test xfail_without_reason.null is expected to fail without a reason

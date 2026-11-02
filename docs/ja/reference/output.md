@@ -25,7 +25,9 @@
 | `PASS: <suite>.<test> (<t> ms)` | アサーションを実行し、失敗もスキップもなく終わったとき。`--naos-allow-no-assertions` があれば、アサーションを実行しなくても |
 | `FAIL: <suite>.<test> (<N> failure, <t> ms)` | 失敗を記録したとき。N が 2 以上なら `failures` |
 | `SKIP: <suite>.<test> (<t> ms)` | スキップし、失敗を記録しなかったとき |
-| `SUMMARY: <p> passed, <f> failed, <s> skipped (<t> ms)` | 各回の最後。実行したテストが 1 つや 0 のときも出る。`--naos-fail-fast` で止めたときは、実行したテストだけを数える |
+| `XFAIL: <suite>.<test> (<t> ms)` | [失敗するはずのテスト](control.md#失敗するはずのテスト)が失敗を記録したとき。失敗ではなく、期待どおりの失敗として数える |
+| `XPASS: <suite>.<test> (<t> ms)` | 失敗するはずのテストが、失敗もスキップもなく終わったとき。失敗として数える |
+| `SUMMARY: <p> passed, <f> failed, <s> skipped (<t> ms)` | 各回の最後。実行したテストが 1 つや 0 のときも出る。`--naos-fail-fast` で止めたときは、実行したテストだけを数える。期待どおりの失敗があれば、時間の前に `, <x> expected failure`（x が 2 以上なら `failures`）が入る |
 | `RANDOM SEED: <seed>` | `--naos-shuffle` のとき、各回の最初 |
 | `ITERATION: <i> of <n>` | `--naos-repeat` が 2 以上のとき、各回の前 |
 | `ITERATION FAILED: <i> of <n>` | `--naos-repeat` が 2 以上のとき、失敗した回の後。`--naos-shuffle` なら後ろに ` (random seed <seed>)` |
@@ -46,10 +48,13 @@
 | `PASS:` | 出ない |
 | スキップしたテスト（その `RUN:`、`skip` の行、`SKIP:`） | 出ない。`SUMMARY:` で数える |
 | `FAIL:` と、失敗したテストのすべての診断 | 出る |
+| 期待どおりに失敗したテスト（その `RUN:`、診断、`XFAIL:`） | 出ない。`SUMMARY:` で数える |
+| `XPASS:` と、その `RUN:` と診断 | 出る |
 | `SUMMARY:`、`RANDOM SEED:`、`FAIL FAST:`、`ITERATION FAILED:`、`REPEAT:` | 出る |
 | `ITERATION:` | 出ない |
 
 - スキップしたあと teardown で失敗したテストは `FAIL` です。その `skip` の行はテストが終わるまで保持し、失敗の前に出力します。そのため、失敗したテストは `--naos-quiet` がないときと同じに読めます。
+- 失敗するはずのテストの診断は、テストが終わるまで保持し、`XFAIL` なら捨てます。期待どおりの失敗で、本当の失敗が埋もれないようにするためです。
 - テストが自分で出力したものはそのまま出ますが、前に `RUN:` の行がないので、どのテストが出力したのかは分かりません。
 - `RUN:` を各テストの開始時に出さなくなるので、失敗する前にプロセスを終わらせたテストは、その名前を示す行を残しません。`--naos-output` のファイルは実行の終わりにしか書かないので、そこにも残りません。CTest の下では各テストが別のプロセスで動き、終わったテストは CTest が示します。そうでなければ、同じコマンドを `--naos-quiet` なしで実行し直してください。
 
@@ -116,6 +121,7 @@ GCC 形式の `error` の行は、VS Code の `$gcc` など GCC の診断を読�
 | `*_MEM_EQ` | `left size`、`right size`、続けて `first difference` か `invalid` |
 | `*_TRUE`、`*_FALSE`、`*_NOT_NULL` | なし |
 | アサーションを実行しなかったテスト | `hint` |
+| 失敗するはずなのに成功したテスト | `reason`（文字列） |
 
 `first difference` は `offset N, left 0xXX, right 0xYY` です。一方がもう一方の先頭部分と一致するときは `offset N, end of left` / `end of right` で、N は短いほうの長さです。
 

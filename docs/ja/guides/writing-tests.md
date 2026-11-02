@@ -96,6 +96,40 @@ NAOS_TEST(free_null_is_harmless)
 
 テストを先に書いて本体を後回しにすると、何かを確かめるまでそのテストは失敗します。名前だけでは成功になりません（[アサーションを実行しないテスト](../reference/control.md#アサーションを実行しないテスト)）。
 
+## 今は失敗するはずのテストに印を付ける
+
+コードより先に書いたテストは、はじめは失敗します。まだ直していない既知のバグのテストも同じです。こうしたテストは `NAOS_ADD_TEST_XFAIL` で理由とともに登録します。テストが失敗しているあいだは実行が成功し、成功したとたんに失敗するので、印はコードができたときに外すことになり、ずっと残りません。
+
+```c
+NAOS_TEST(parses_negative_numbers)
+{
+    NAOS_CHECK_INT_EQ(-42, parse_int("-42"));
+}
+
+NAOS_SUITE(parser,
+    NAOS_ADD_TEST(parses_positive_numbers),
+    NAOS_ADD_TEST_XFAIL(parses_negative_numbers, "sign handling not implemented yet")
+)
+```
+
+```
+RUN: parser.parses_negative_numbers
+parser_test.c:3: error: -42 == parse_int("-42")
+  left:  -42
+  right: 42
+XFAIL: parser.parses_negative_numbers (0 ms)
+```
+
+失敗の内容を読んでください。思ったとおりの失敗で、書き間違いによるものではないはずです。`parse_int()` が符号を扱えるようになると、印の場所で実行が失敗します。`NAOS_ADD_TEST` に書き換える行です。
+
+```
+parser_test.c:8: error: passed, but is expected to fail
+  reason: "sign handling not implemented yet"
+XPASS: parser.parses_negative_numbers (0 ms)
+```
+
+`NAOS_SKIP` やスイートから外しておくより、こちらを使ってください。スキップしたテストは、通るようになっても知らせてくれません。setup と teardown も本体と合わせて数え、クラッシュは期待どおりの失敗になりません（[失敗するはずのテスト](../reference/control.md#失敗するはずのテスト)）。
+
 ## 条件がそろわないテストをスキップする
 
 必要なファイルや環境変数がないなど、テストを実行しても意味がない場合は、`NAOS_SKIP` でテストをスキップします。スキップしたテストは失敗として数えられず、結果は `SKIP` と表示されます。

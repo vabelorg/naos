@@ -53,6 +53,44 @@ static void run_guarded(naos_func_t first, naos_func_t second)
 }
 
 /*
+ * The outcome of test once it has ended, teardown included. A test expected to fail is XFAIL after any
+ * failure and XPASS without one, unless it skipped; a test that ran no assertion did not fail, so it
+ * is XPASS rather than failing for the count. A test expected to pass that would pass without having
+ * run an assertion fails, with require_assertion.
+ */
+static naos_outcome_t judge(const naos_test_t *test, int require_assertion)
+{
+    naos_outcome_t outcome;
+
+    outcome = naos_diagnostic_outcome();
+    if (test->xfail_reason == NULL)
+    {
+        if (require_assertion != 0)
+        {
+            naos_diagnostic_check_assertion_ran();
+            outcome = naos_diagnostic_outcome();
+        }
+
+        return outcome;
+    }
+
+    switch (outcome)
+    {
+    case NAOS_OUTCOME_FAIL:
+        return NAOS_OUTCOME_XFAIL;
+    case NAOS_OUTCOME_PASS:
+        naos_diagnostic_unexpected_pass(test->xfail_file, test->xfail_line, test->xfail_reason);
+        return NAOS_OUTCOME_XPASS;
+    case NAOS_OUTCOME_SKIP:
+    case NAOS_OUTCOME_XFAIL:
+    case NAOS_OUTCOME_XPASS:
+        break;
+    }
+
+    return outcome;
+}
+
+/*
  * The time is taken here once, between the events that start and end the test, so that every writer
  * shows the same: it covers setup, the body and teardown, and not the writing of RUN and the result.
  */
@@ -63,7 +101,7 @@ naos_outcome_t naos_test_run(const naos_suite_t *suite, const naos_test_t *test,
     naos_nanoseconds_t end;
 
     naos_diagnostic_start_test();
-    naos_report_test_start(suite->name, test->name);
+    naos_report_test_start(suite->name, test->name, test->xfail_reason);
     start = naos_clock_now();
 
     run_guarded(suite->setup, test->func);
@@ -71,11 +109,7 @@ naos_outcome_t naos_test_run(const naos_suite_t *suite, const naos_test_t *test,
 
     end = naos_clock_now();
     *elapsed = (end > start) ? (end - start) : 0;
-    if (require_assertion != 0)
-    {
-        naos_diagnostic_check_assertion_ran();
-    }
-    outcome = naos_diagnostic_outcome();
+    outcome = judge(test, require_assertion);
     naos_report_test_result(suite->name, test->name, outcome, naos_diagnostic_failure_count(), *elapsed);
 
     return outcome;

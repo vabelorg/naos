@@ -1,0 +1,31 @@
+args: --naos-repeat 2 --naos-filter expected.check_fails:expected.passes
+exit code: 1
+--- stdout
+ITERATION: 1 of 2
+RUN: expected.check_fails
+xfail.c:LINE: error: -42 == 42
+  left:  -42
+  right: 42
+reached-after-check
+XFAIL: expected.check_fails (N ms)
+RUN: expected.passes
+xfail.c:LINE: error: passed, but is expected to fail
+  reason: "bug #1, \"fixed\" since"
+XPASS: expected.passes (N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped, 1 expected failure (N ms)
+ITERATION FAILED: 1 of 2
+ITERATION: 2 of 2
+RUN: expected.check_fails
+xfail.c:LINE: error: -42 == 42
+  left:  -42
+  right: 42
+reached-after-check
+XFAIL: expected.check_fails (N ms)
+RUN: expected.passes
+xfail.c:LINE: error: passed, but is expected to fail
+  reason: "bug #1, \"fixed\" since"
+XPASS: expected.passes (N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped, 1 expected failure (N ms)
+ITERATION FAILED: 2 of 2
+REPEAT: 2 of 2 iterations failed
+--- stderr

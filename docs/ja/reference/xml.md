@@ -42,10 +42,12 @@ prog --naos-filter 'parser.*' --naos-output=xml:build/parser.xml
 | `<testsuite>` | 各回の各スイートごと。実行した順 | `name`: スイート。`tests`、`failures`、`skipped`、`errors`、`time`: `<testsuites>` と同じで、そのテストケースについてのもの |
 | `<properties>` | `--naos-repeat` が 2 以上か、`--naos-shuffle` のときの `<testsuite>` の中 | `<property name="iteration">`（1 から。`--naos-repeat` が 2 以上のとき）と `<property name="random_seed">`（`--naos-shuffle` のとき）を持つ |
 | `<testcase>` | 実行したテストごと | `classname`: スイート。`name`: テスト。`time`: テストの時間。`file`、`line`: 最初の失敗かスキップが起きた場所。どちらもないとき、またはテストが[アサーションを実行しなかった](control.md#アサーションを実行しないテスト)ために失敗したとき（場所がない）は省く |
-| `<failure>` | 失敗したテストの失敗ごと。起きた順 | `type`: 常に `error`。`message`: `error` の診断の行の内容（[出力](output.md#診断の行)）。アサーションの式、`NAOS_FAIL` のメッセージ、trace の書き間違い、`no assertion ran` のどれか |
-| `<skipped>` | スキップしたテストの中 | `message`: `NAOS_SKIP` のメッセージ |
+| `<failure>` | 失敗したテストの失敗ごと。起きた順 | `type`: 常に `error`。`message`: `error` の診断の行の内容（[出力](output.md#診断の行)）。アサーションの式、`NAOS_FAIL` のメッセージ、trace の書き間違い、`no assertion ran`、`passed, but is expected to fail` のどれか |
+| `<skipped>` | スキップしたテスト、または期待どおりに失敗したテストの中 | `message`: `NAOS_SKIP` のメッセージ、または `expected failure: ` に続けて `NAOS_ADD_TEST_XFAIL` の理由 |
 
 テストケースは、テストが失敗したときは `<failure>` 要素を、スキップしたときは `<skipped>` を 1 つ持ち、成功したときは何も持ちません。失敗した後にスキップしたテストは、失敗だけを持ちます。
+
+[失敗するはずのテスト](control.md#失敗するはずのテスト)が失敗したとき（`XFAIL`）は、`<skipped>` を 1 つ持ち、`skipped` に数えます。ツールはこれを失敗とは数えないので終了コードと食い違わず、成功とも表示しません。その失敗は書きません（標準出力にあります）。成功したとき（`XPASS`）は失敗したテストで、標準出力と同じ `<failure>` をスイートの項目の場所で持ち、`failures` に数えます。
 
 `--naos-fail-fast` で実行しなかったテストには、テストケースがありません。Naos はテストが出力したものを取り込まないので、`timestamp` と `<system-out>` は書きません。
 

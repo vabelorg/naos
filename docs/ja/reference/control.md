@@ -62,6 +62,50 @@ NAOS_SKIP(message)
 
 例は[テストを書く](../guides/writing-tests.md#条件がそろわないテストをスキップする)にあります。
 
+## 失敗するはずのテスト
+
+```c
+NAOS_ADD_TEST_XFAIL(test, reason)
+```
+
+`NAOS_SUITE` の項目に `NAOS_ADD_TEST` の代わりに書くと、今は失敗するはずのテストを、その理由 `reason`（空でない文字列）とともに登録します。コードより先に書いたテスト、まだ直していない既知のバグのテスト、1 つのプラットフォームだけの既知の問題などに使います。Naos はこの印を確かめます。テストが失敗しているあいだは成功とし、成功したとたんに失敗とするので、印を外すことが独立した 1 つの手順になります。
+
+| テストが… | 結果の行 | 数え方 |
+|---|---|---|
+| 1 つ以上の失敗を記録した（アサーション、`NAOS_FAIL`。setup、本体、teardown のどこでも） | `XFAIL: <suite>.<test> (<t> ms)` | 成功 |
+| 失敗もスキップもなく終わった | `XPASS: <suite>.<test> (<t> ms)`。その前に `NAOS_ADD_TEST_XFAIL` の項目の場所で失敗を出す | 失敗 |
+| 失敗せずにスキップした | `SKIP: <suite>.<test> (<t> ms)` | スキップ |
+
+```
+RUN: parser.parses_negative_numbers
+parser_test.c:42: error: passed, but is expected to fail
+  reason: "sign handling not implemented yet"
+XPASS: parser.parses_negative_numbers (0 ms)
+```
+
+- `XFAIL` の失敗は、ほかのテストと同じように出力します。テストが思ったとおりの理由で失敗していて、書き間違いで失敗しているのではないことを確かめられます。
+- `XPASS` の失敗の場所は、スイートの `NAOS_ADD_TEST_XFAIL` の項目、つまりテストが通るようになったら書き換える行です。値 `reason` は登録した理由です。ほかの失敗と同じ扱いで、終了コードは 1 になり、`--naos-fail-fast` はここで止まり、`--naos-quiet` でも出力します。
+- `XFAIL` は失敗ではありません。失敗したテストがなければ、ほかのテストがすべてスキップでも終了コードは 0 で、`--naos-fail-fast` は止まらず、`--naos-quiet` はその失敗ごと省きます。`SUMMARY:` は期待どおりの失敗として数え（[出力](output.md#流れの行)）、[JUnit XML](xml.md) のファイルはスキップとして数えます。
+- アサーションを 1 つも実行しなかったテストは失敗していないので、`--naos-allow-no-assertions` の有無にかかわらず `XPASS` です。
+- クラッシュは、期待どおりの失敗にはなりません。1 つのプロセスで実行していれば、ほかのテストと同じように実行が終わります。CTest の下では、そのテストは失敗します。
+- `--naos-list` はこれらのテストに印を付けません。名前をそのままに保つためです。見分けるには JUnit XML のファイルを読みます。
+- 理由が空か `NULL` なら、スイートのほかの誤りと同じく、テストを実行する前に報告し、終了コード 2 で終了します（[テストとスイート](tests.md#スイート)）。
+- 1 つのプラットフォームだけで失敗するなら、`#ifdef` は項目の間に書けないので、スイートの外で `#ifdef` を使って項目を選びます。
+
+```c
+#if defined(_WIN32)
+#define PARSES_PATHS NAOS_ADD_TEST_XFAIL(parses_paths, "drive letters not handled yet")
+#else
+#define PARSES_PATHS NAOS_ADD_TEST(parses_paths)
+#endif
+
+NAOS_SUITE(parser,
+    PARSES_PATHS
+)
+```
+
+例は[テストを書く](../guides/writing-tests.md#今は失敗するはずのテストに印を付ける)にあります。
+
 ## アサーションを実行しないテスト
 
 アサーションを 1 つも実行しないテストは失敗します。何も確かめていないテストが成功に見えないようにするためです。たとえば、本体が空や書きかけのテスト、ケースのない表を回すループ、アサーションの前の `return`、アサーションを持つヘルパーを呼んでいないテストです。

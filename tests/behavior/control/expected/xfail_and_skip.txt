@@ -1,0 +1,11 @@
+args: --naos-filter expected.fails:expected.skips
+exit code: 0
+--- stdout
+RUN: expected.fails
+xfail.c:LINE: error: not implemented yet
+XFAIL: expected.fails (N ms)
+RUN: expected.skips
+xfail.c:LINE: skip: needs a network
+SKIP: expected.skips (N ms)
+SUMMARY: 0 passed, 0 failed, 1 skipped, 1 expected failure (N ms)
+--- stderr

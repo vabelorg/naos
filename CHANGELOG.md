@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `NAOS_PASS()`, an assertion that always passes, for a test whose check is that the code runs, such as one that only checks that a call returns without crashing ([#26](https://github.com/vabelorg/naos/issues/26)).
 - `--naos-allow-no-assertions` lets a test that runs no assertion pass, as before; `ALLOW_NO_ASSERTIONS` of `naos_add_executable()` and `naos_discover_tests()` gives it to every test they register ([#26](https://github.com/vabelorg/naos/issues/26)).
+- `NAOS_ADD_TEST_XFAIL(test, reason)` registers a test expected to fail, such as one written before the code or one for a known bug. It passes as `XFAIL` while it records a failure, in setup, the body or teardown, and fails as `XPASS` once it ends without one, with `error: passed, but is expected to fail` at the entry of the suite, so that removing the mark is a step of its own. `--naos-fail-fast` stops at an `XPASS` only, `--naos-quiet` leaves out an `XFAIL` with its failures, `SUMMARY:` counts the expected failures when there are some, and the JUnit XML file has an `XFAIL` as `<skipped message="expected failure: <reason>"/>` and an `XPASS` as a `<failure>`. An empty or `NULL` reason is a mistake in the suites ([#6](https://github.com/vabelorg/naos/issues/6)).
 
 ### Changed
 

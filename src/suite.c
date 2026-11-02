@@ -264,14 +264,18 @@ void naos_begin_suite(naos_builder_t *builder, const char *name)
     }
 }
 
-void naos_add_test(naos_builder_t *builder, const char *name, naos_func_t func)
+/*
+ * Adds a test to the suite being registered; reason is NULL for a test expected to pass, and
+ * otherwise must not be empty.
+ */
+static void add_test(naos_builder_t *builder, const char *what, const char *name, naos_func_t func, const char *reason, const char *file, int line)
 {
     naos_suite_t *suite;
     naos_test_t *grown;
     size_t index;
     size_t i;
 
-    suite = builder_suite(builder, "naos_add_test");
+    suite = builder_suite(builder, what);
     if (suite == NULL)
     {
         return;
@@ -289,6 +293,12 @@ void naos_add_test(naos_builder_t *builder, const char *name, naos_func_t func)
     if (func == NULL)
     {
         builder_error(builder, "test %s.%s has no function", display_name(suite->name), name);
+        return;
+    }
+
+    if ((reason != NULL) && (reason[0] == '\0'))
+    {
+        builder_error(builder, "test %s.%s is expected to fail without a reason", display_name(suite->name), name);
         return;
     }
 
@@ -311,7 +321,21 @@ void naos_add_test(naos_builder_t *builder, const char *name, naos_func_t func)
     suite->tests = grown;
     suite->tests[suite->count].name = name;
     suite->tests[suite->count].func = func;
+    suite->tests[suite->count].xfail_reason = reason;
+    suite->tests[suite->count].xfail_file = file;
+    suite->tests[suite->count].xfail_line = line;
     suite->count++;
+}
+
+void naos_add_test(naos_builder_t *builder, const char *name, naos_func_t func)
+{
+    add_test(builder, "naos_add_test", name, func, NULL, NULL, 0);
+}
+
+/* A NULL reason is a mistake too: only an empty one would be, if it were passed on as it is. */
+void naos_add_test_xfail(naos_builder_t *builder, const char *name, naos_func_t func, const char *reason, const char *file, int line)
+{
+    add_test(builder, "naos_add_test_xfail", name, func, (reason != NULL) ? reason : "", file, line);
 }
 
 void naos_set_setup(naos_builder_t *builder, naos_func_t func)

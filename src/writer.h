@@ -28,8 +28,10 @@ typedef struct naos_trace
 typedef enum naos_outcome
 {
     NAOS_OUTCOME_PASS,
-    NAOS_OUTCOME_FAIL, /* with the number of failures */
-    NAOS_OUTCOME_SKIP
+    NAOS_OUTCOME_FAIL,  /* with the number of failures */
+    NAOS_OUTCOME_SKIP,
+    NAOS_OUTCOME_XFAIL, /* a test expected to fail that failed: counts as a pass */
+    NAOS_OUTCOME_XPASS  /* a test expected to fail that did not: counts as a failure */
 } naos_outcome_t;
 
 /* Kind of a diagnostic. */
@@ -74,13 +76,14 @@ typedef struct naos_diagnostic_record
 typedef struct naos_tally
 {
     size_t passed;
-    size_t failed;
+    size_t failed;  /* XPASS included */
     size_t skipped;
+    size_t xfailed; /* XFAIL */
     naos_nanoseconds_t elapsed;
 } naos_tally_t;
 
 /* An empty tally, to initialize one with. */
-#define NAOS_TALLY_EMPTY { 0, 0, 0, 0 }
+#define NAOS_TALLY_EMPTY { 0, 0, 0, 0, 0 }
 
 /* One round of the run: the iteration of --naos-repeat, and the seed of --naos-shuffle. */
 typedef struct naos_round
@@ -101,7 +104,8 @@ typedef struct naos_writer
     /* program is argv[0], possibly NULL; path is where to write, or NULL. Returns 0 when it cannot write there. */
     int (*begin)(const char *program, const char *path);
     void (*round_begin)(const naos_round_t *round);
-    void (*test_begin)(const char *suite, const char *test);
+    /* xfail_reason is why the test is expected to fail, or NULL when it is expected to pass. */
+    void (*test_begin)(const char *suite, const char *test, const char *xfail_reason);
     void (*diagnostic)(const naos_diagnostic_record_t *record);
     /* elapsed is the time of setup, body and teardown, from test_begin to test_end. */
     void (*test_end)(const char *suite, const char *test, naos_outcome_t outcome, int failure_count, naos_nanoseconds_t elapsed);

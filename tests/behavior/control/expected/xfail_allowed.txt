@@ -1,0 +1,9 @@
+args: --naos-allow-no-assertions --naos-filter expected.empty
+exit code: 1
+--- stdout
+RUN: expected.empty
+xfail.c:LINE: error: passed, but is expected to fail
+  reason: "nothing checked"
+XPASS: expected.empty (N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
+--- stderr

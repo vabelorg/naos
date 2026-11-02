@@ -16,6 +16,9 @@ typedef struct naos_test
 {
     const char *name;
     naos_func_t func;
+    const char *xfail_reason; /* why the test is expected to fail, or NULL when it is expected to pass */
+    const char *xfail_file;   /* where NAOS_ADD_TEST_XFAIL is, for the diagnostic of an XPASS */
+    int xfail_line;
 } naos_test_t;
 
 typedef struct naos_suite

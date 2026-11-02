@@ -43,10 +43,11 @@ NAOS_TEST(name)
 ```c
 NAOS_SUITE(name, entry, ...)
 NAOS_ADD_TEST(test)
+NAOS_ADD_TEST_XFAIL(test, reason)
 NAOS_DECLARE_SUITE(name);
 ```
 
-`NAOS_SUITE(name, ...)` defines the suite `name` from entries separated by commas: one `NAOS_ADD_TEST(test)` per test (they run in the order listed) and, if needed, [setup and teardown](#setup-and-teardown). Write it after the tests it lists, usually at the end of the file.
+`NAOS_SUITE(name, ...)` defines the suite `name` from entries separated by commas: one `NAOS_ADD_TEST(test)` per test (they run in the order listed), or `NAOS_ADD_TEST_XFAIL(test, reason)` for a test [expected to fail](control.md#a-test-expected-to-fail), and, if needed, [setup and teardown](#setup-and-teardown). Write it after the tests it lists, usually at the end of the file.
 
 `NAOS_DECLARE_SUITE(name);` declares a suite defined in another file, so that this file can register it.
 
@@ -76,7 +77,7 @@ NAOS_MAIN(
 - A suite is defined within one file. A file may define several. Test functions are `static`, so different files can use the same test names.
 - Two suites of the same name in one executable are a link error.
 - `#ifdef` cannot go between the arguments (undefined behavior in C99). Put the tests that depend on the platform in a suite of their own and wrap the whole suite in `#ifdef`.
-- Naos reports the following mistakes on standard error before running any test, all of them at once, and exits with code 2: a name that is empty or holds a character other than a letter, a digit or `_` (names written through the macros are always valid), a test listed twice in one suite, and a suite registered twice.
+- Naos reports the following mistakes on standard error before running any test, all of them at once, and exits with code 2: a name that is empty or holds a character other than a letter, a digit or `_` (names written through the macros are always valid), a test listed twice in one suite, a test expected to fail with an empty or `NULL` reason, and a suite registered twice.
 
 ## Setup and teardown
 

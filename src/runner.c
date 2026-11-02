@@ -30,7 +30,8 @@ static size_t multiply_saturated(size_t a, size_t b)
 
 /*
  * Runs the tests of one round of plan, adding their results and times to tally. With
- * --naos-fail-fast, the round ends after the first failing test, its teardown included.
+ * --naos-fail-fast, the round ends after the first failing test, an XPASS included, with its
+ * teardown; an XFAIL goes on.
  */
 static void run_round(const naos_options_t *options, naos_plan_t *plan, naos_tally_t *tally)
 {
@@ -46,6 +47,7 @@ static void run_round(const naos_options_t *options, naos_plan_t *plan, naos_tal
         switch (outcome)
         {
         case NAOS_OUTCOME_FAIL:
+        case NAOS_OUTCOME_XPASS:
             tally->failed++;
             if (options->fail_fast != 0)
             {
@@ -58,6 +60,9 @@ static void run_round(const naos_options_t *options, naos_plan_t *plan, naos_tal
         case NAOS_OUTCOME_PASS:
             tally->passed++;
             break;
+        case NAOS_OUTCOME_XFAIL:
+            tally->xfailed++;
+            break;
         }
     }
 }
@@ -67,17 +72,21 @@ static void tally_add(naos_tally_t *total, const naos_tally_t *tally)
     total->passed += tally->passed;
     total->failed += tally->failed;
     total->skipped += tally->skipped;
+    total->xfailed += tally->xfailed;
     total->elapsed += tally->elapsed;
 }
 
-/* Exit code of the tests tallied: FAIL if any failed, SKIP if all were skipped, PASS otherwise. */
+/*
+ * Exit code of the tests tallied: FAIL if any failed, SKIP if all were skipped, PASS otherwise; an
+ * expected failure counts as a pass.
+ */
 static int tally_result(const naos_tally_t *tally)
 {
     if (tally->failed > 0)
     {
         return NAOS_EXIT_FAIL;
     }
-    else if ((tally->skipped > 0) && (tally->passed == 0))
+    else if ((tally->skipped > 0) && (tally->passed == 0) && (tally->xfailed == 0))
     {
         return NAOS_EXIT_SKIP;
     }
@@ -106,7 +115,7 @@ static int end_round(const naos_options_t *options, const naos_round_t *round, s
     {
         /* The rest of this round, then every later round; --naos-repeat may make it more than size_t holds. */
         stopped = 1;
-        not_run = add_saturated(selected - (tally->passed + tally->failed + tally->skipped), multiply_saturated(selected, (size_t)(options->repeat - round->index)));
+        not_run = add_saturated(selected - (tally->passed + tally->failed + tally->skipped + tally->xfailed), multiply_saturated(selected, (size_t)(options->repeat - round->index)));
     }
 
     naos_report_round_end(round, tally, not_run);
