@@ -6,6 +6,9 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![C99](https://img.shields.io/badge/C-99-blue.svg)
 
+> [!NOTE]
+> `main` ブランチの README と文書には、互換が切れるものも含め、まだリリースしていない変更が書かれていることがあります。リリースされたバージョンを使うときは、そのタグで読んでください（たとえば[最新のリリース](https://github.com/vabelorg/naos/releases/latest)）。リリース前の変更は[変更履歴](CHANGELOG.md)の `[Unreleased]` にあります（英語）。
+
 C と C++ 向けのテストハーネスです。標準 C ライブラリ以外に依存せず、コンパイラ拡張も使いません。素の C99 で、CMake でビルドし、どのビルドシステムからも使えます。
 
 ```c
