@@ -33,6 +33,12 @@ NAOS_SUITE(valid,
     NAOS_ADD_TEST(same_name)
 )
 
+/* A test expected to fail is a test like any other: its name must not be taken twice either. */
+NAOS_SUITE(xfail_duplicate,
+    NAOS_ADD_TEST(same_name),
+    NAOS_ADD_TEST_XFAIL(same_name, "taken already")
+)
+
 NAOS_SUITE(setup_twice,
     NAOS_SET_SETUP(setup_fixture),
     NAOS_SET_SETUP(setup_fixture),
@@ -73,6 +79,15 @@ static void invalid_test_names(naos_builder_t *builder)
     naos_add_test(builder, "", NAOS_TEST_FUNC_(same_name));
     naos_add_test(builder, NULL, NAOS_TEST_FUNC_(same_name));
     naos_add_test(builder, "Valid_name_9", NAOS_TEST_FUNC_(same_name));
+}
+
+/* A test expected to fail must say why: an empty reason, or none, is reported. */
+static void xfail_without_reason(naos_builder_t *builder)
+{
+    naos_begin_suite(builder, "xfail_without_reason");
+    naos_add_test_xfail(builder, "empty", NAOS_TEST_FUNC_(same_name), "", __FILE__, __LINE__);
+    naos_add_test_xfail(builder, "null", NAOS_TEST_FUNC_(same_name), NULL, __FILE__, __LINE__);
+    naos_add_test_xfail(builder, "with_reason", NAOS_TEST_FUNC_(same_name), "a reason", __FILE__, __LINE__);
 }
 
 static void invalid_suite_name(naos_builder_t *builder)
@@ -128,6 +143,16 @@ static void add_dotted_suite(void)
 static void add_invalid_test_names(void)
 {
     naos_add_suite(invalid_test_names);
+}
+
+static void add_xfail_without_reason(void)
+{
+    naos_add_suite(xfail_without_reason);
+}
+
+static void add_xfail_duplicate(void)
+{
+    NAOS_ADD_SUITE(xfail_duplicate);
 }
 
 static void add_invalid_suite_name(void)
@@ -191,6 +216,8 @@ static const struct case_ cases[] =
     CASE_(dotted_suite),
     CASE_(invalid_test_names),
     CASE_(invalid_suite_name),
+    CASE_(xfail_without_reason),
+    CASE_(xfail_duplicate),
     CASE_(setup_twice),
     CASE_(teardown_twice),
     CASE_(no_begin),

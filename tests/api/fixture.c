@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: MIT
  *
  * naos/suite.h: a suite with setup and teardown. Each test checks that setup has run once more
- * than teardown, which holds both in a full run and when the test runs alone.
+ * than teardown, which holds both in a full run and when the test runs alone. A test expected to
+ * fail, which fails, passes the run.
  */
 
 #include <naos/naos.h>
@@ -38,9 +39,16 @@ NAOS_TEST(condition)
     NAOS_CHECK_TRUE(value == 42);
 }
 
+NAOS_TEST(expected_to_fail)
+{
+    NAOS_CHECK_INT_EQ(teardown_calls + 1, setup_calls);
+    NAOS_CHECK_INT_EQ(43, value);
+}
+
 NAOS_SUITE(fixture,
     NAOS_SET_SETUP(setup),
     NAOS_SET_TEARDOWN(teardown),
     NAOS_ADD_TEST(setup_runs_before_each_test),
-    NAOS_ADD_TEST(condition)
+    NAOS_ADD_TEST(condition),
+    NAOS_ADD_TEST_XFAIL(expected_to_fail, "value is 42, not 43")
 )

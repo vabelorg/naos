@@ -73,7 +73,7 @@ static const char *one_test(const char *path, naos_outcome_t outcome, const naos
     writer = naos_xml_writer();
     NAOS_REQUIRE_INT_EQ(1, writer->begin("prog", path));
     writer->round_begin(&g_one_round);
-    writer->test_begin("s", "t");
+    writer->test_begin("s", "t", NULL);
     if (record != NULL)
     {
         writer->diagnostic(record);
@@ -169,6 +169,50 @@ NAOS_TEST(failure_without_location)
         "    <testcase classname=\"s\" name=\"t\" time=\"0.000\">\n"
         "      <failure type=\"error\" message=\"no assertion ran\">naos: error: no assertion ran\n</failure>\n"
         "    </testcase>\n"));
+}
+
+/*
+ * An expected failure is skipped, its reason escaped in the message, and its failures left out; the
+ * next test, expected to pass, does not keep the reason.
+ */
+NAOS_TEST(expected_failure)
+{
+    naos_diagnostic_record_t record;
+    const naos_writer_t *writer;
+    const char *xml;
+
+    record = record_of(NAOS_DIAGNOSTIC_ERROR, "f.c", 7, "a == b");
+    writer = naos_xml_writer();
+    NAOS_REQUIRE_INT_EQ(1, writer->begin("prog", "unit_xml_xfail.xml"));
+    writer->round_begin(&g_one_round);
+    writer->test_begin("s", "t", "bug <1> & \"2\"");
+    writer->diagnostic(&record);
+    writer->test_end("s", "t", NAOS_OUTCOME_XFAIL, 1, 0);
+    writer->test_begin("s", "u", NULL);
+    writer->test_end("s", "u", NAOS_OUTCOME_PASS, 0, 0);
+    writer->round_end(&g_one_round, &g_no_tally, 0);
+    NAOS_CHECK_INT_EQ(1, writer->end(0, 1, 0));
+    xml = read_back("unit_xml_xfail.xml");
+
+    NAOS_CHECK_TRUE(has(xml, "<testsuite name=\"s\" tests=\"2\" failures=\"0\" errors=\"0\" skipped=\"1\" time=\"0.000\">\n"));
+    NAOS_CHECK_TRUE(has(xml,
+        "    <testcase classname=\"s\" name=\"t\" time=\"0.000\" file=\"f.c\" line=\"7\">\n"
+        "      <skipped message=\"expected failure: bug &lt;1&gt; &amp; &quot;2&quot;\"/>\n"
+        "    </testcase>\n"
+        "    <testcase classname=\"s\" name=\"u\" time=\"0.000\"/>\n"));
+}
+
+/* An unexpected pass is a failure, made of its diagnostic. */
+NAOS_TEST(unexpected_pass)
+{
+    naos_diagnostic_record_t record;
+    const char *xml;
+
+    record = record_of(NAOS_DIAGNOSTIC_ERROR, "f.c", 7, "passed, but is expected to fail");
+    xml = one_test("unit_xml_xpass.xml", NAOS_OUTCOME_XPASS, &record, 0);
+
+    NAOS_CHECK_TRUE(has(xml, "failures=\"1\" errors=\"0\" skipped=\"0\""));
+    NAOS_CHECK_TRUE(has(xml, "<failure type=\"error\" message=\"passed, but is expected to fail\">"));
 }
 
 /* Seconds with three decimals, rounded down to the millisecond. */
@@ -295,15 +339,15 @@ NAOS_TEST(rounds_and_suites)
     NAOS_REQUIRE_INT_EQ(1, writer->begin("prog", "unit_xml_rounds.xml"));
 
     writer->round_begin(&first);
-    writer->test_begin("a", "one");
+    writer->test_begin("a", "one", NULL);
     writer->test_end("a", "one", NAOS_OUTCOME_PASS, 0, 1000000ULL);
-    writer->test_begin("b", "two");
+    writer->test_begin("b", "two", NULL);
     writer->diagnostic(&record);
     writer->test_end("b", "two", NAOS_OUTCOME_FAIL, 1, 2000000ULL);
     writer->round_end(&first, &g_no_tally, 0);
 
     writer->round_begin(&second);
-    writer->test_begin("a", "one");
+    writer->test_begin("a", "one", NULL);
     writer->test_end("a", "one", NAOS_OUTCOME_PASS, 0, 4000000ULL);
     writer->round_end(&second, &g_no_tally, 0);
 
@@ -334,9 +378,9 @@ NAOS_TEST(suite_time_rounded_once)
     writer = naos_xml_writer();
     NAOS_REQUIRE_INT_EQ(1, writer->begin("prog", "unit_xml_sum.xml"));
     writer->round_begin(&g_one_round);
-    writer->test_begin("s", "one");
+    writer->test_begin("s", "one", NULL);
     writer->test_end("s", "one", NAOS_OUTCOME_PASS, 0, 1500000ULL);
-    writer->test_begin("s", "two");
+    writer->test_begin("s", "two", NULL);
     writer->test_end("s", "two", NAOS_OUTCOME_PASS, 0, 1500000ULL);
     writer->round_end(&g_one_round, &g_no_tally, 0);
     NAOS_REQUIRE_INT_EQ(1, writer->end(0, 1, 0));
@@ -365,6 +409,8 @@ NAOS_SUITE(xml,
     NAOS_ADD_TEST(failed_test),
     NAOS_ADD_TEST(failure_without_location),
     NAOS_ADD_TEST(skipped_test),
+    NAOS_ADD_TEST(expected_failure),
+    NAOS_ADD_TEST(unexpected_pass),
     NAOS_ADD_TEST(times),
     NAOS_ADD_TEST(program_name),
     NAOS_ADD_TEST(no_test),

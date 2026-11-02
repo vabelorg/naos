@@ -232,6 +232,13 @@ void naos_diagnostic_check_assertion_ran(void)
     end_with(NAOS_CONTEXT_NONE);
 }
 
+void naos_diagnostic_unexpected_pass(const char *file, int line, const char *reason)
+{
+    naos_diagnostic_begin(NAOS_DIAGNOSTIC_ERROR, file, line, "passed, but is expected to fail");
+    naos_diagnostic_add_string("reason", reason);
+    end_with(NAOS_CONTEXT_NONE);
+}
+
 void naos_diagnostic_misuse(const char *file, int line, const char *message)
 {
     naos_diagnostic_begin(NAOS_DIAGNOSTIC_ERROR, file, line, message);

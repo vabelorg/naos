@@ -96,6 +96,40 @@ NAOS_TEST(free_null_is_harmless)
 
 Write a test first and leave its body for later, and it fails until it checks something: the name alone is not a pass ([a test that runs no assertion](../reference/control.md#a-test-that-runs-no-assertion)).
 
+## Mark a test that must fail for now
+
+A test written before the code fails at first; so does a test for a known bug not fixed yet. Register it with `NAOS_ADD_TEST_XFAIL` and the reason: the run passes while the test fails, and fails as soon as it passes, so that you remove the mark when the code is done, not long after.
+
+```c
+NAOS_TEST(parses_negative_numbers)
+{
+    NAOS_CHECK_INT_EQ(-42, parse_int("-42"));
+}
+
+NAOS_SUITE(parser,
+    NAOS_ADD_TEST(parses_positive_numbers),
+    NAOS_ADD_TEST_XFAIL(parses_negative_numbers, "sign handling not implemented yet")
+)
+```
+
+```
+RUN: parser.parses_negative_numbers
+parser_test.c:3: error: -42 == parse_int("-42")
+  left:  -42
+  right: 42
+XFAIL: parser.parses_negative_numbers (0 ms)
+```
+
+Read the failure: it should be the one you expect, not a typo. Once `parse_int()` handles the sign, the run fails at the mark, the line to change into `NAOS_ADD_TEST`:
+
+```
+parser_test.c:8: error: passed, but is expected to fail
+  reason: "sign handling not implemented yet"
+XPASS: parser.parses_negative_numbers (0 ms)
+```
+
+Prefer it to `NAOS_SKIP` or to leaving the test out of the suite: a skipped test never tells you when it starts passing. Setup and teardown count with the body, and a crash is never an expected failure ([a test expected to fail](../reference/control.md#a-test-expected-to-fail)).
+
 ## Skip a test whose conditions are not met
 
 When running a test makes no sense (a file or an environment variable it needs is missing, for example), skip it with `NAOS_SKIP`. A skipped test is not a failure; its result is `SKIP`.

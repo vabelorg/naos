@@ -23,9 +23,9 @@
 #define TEST_COUNT 8
 
 /* Suites of different sizes, so that the order of the tests needs room for the largest. */
-static naos_test_t g_a_tests[] = { { "t1", NULL }, { "t2", NULL }, { "t3", NULL } };
-static naos_test_t g_b_tests[] = { { "t1", NULL } };
-static naos_test_t g_c_tests[] = { { "t1", NULL }, { "t2", NULL }, { "t3", NULL }, { "t4", NULL } };
+static naos_test_t g_a_tests[] = { { "t1", NULL, NULL, NULL, 0 }, { "t2", NULL, NULL, NULL, 0 }, { "t3", NULL, NULL, NULL, 0 } };
+static naos_test_t g_b_tests[] = { { "t1", NULL, NULL, NULL, 0 } };
+static naos_test_t g_c_tests[] = { { "t1", NULL, NULL, NULL, 0 }, { "t2", NULL, NULL, NULL, 0 }, { "t3", NULL, NULL, NULL, 0 }, { "t4", NULL, NULL, NULL, 0 } };
 
 static naos_suite_t g_suites[] =
 {

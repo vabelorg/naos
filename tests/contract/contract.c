@@ -2,8 +2,8 @@
  * Copyright (c) 2026 The Naos Authors
  * SPDX-License-Identifier: MIT
  *
- * The program of the contract cases: a test of each outcome, the diagnostics of each kind, a test
- * that runs no assertion, and a test that ends the process. The first argument chooses what main() does besides adding the
+ * The program of the contract cases: a test of each outcome, tests expected to fail, the diagnostics
+ * of each kind, a test that runs no assertion, and a test that ends the process. The first argument chooses what main() does besides adding the
  * suites:
  *   no-suites      adds none, for a run with no test registered
  *   mistake        adds a suite with two tests of the same name
@@ -69,6 +69,12 @@ NAOS_SUITE(diagnostic,
     NAOS_ADD_TEST(skip)
 )
 
+/* Tests expected to fail: XFAIL, which passes, and XPASS, which fails. */
+NAOS_SUITE(expecting,
+    NAOS_ADD_TEST_XFAIL(fails, "fails on purpose"),
+    NAOS_ADD_TEST_XFAIL(passes, "passes on purpose")
+)
+
 /* Fails for running no assertion, unless --naos-allow-no-assertions is given. */
 NAOS_TEST(runs)
 {
@@ -119,6 +125,7 @@ int main(int argc, char **argv)
     NAOS_ADD_SUITE(outcome);
     NAOS_ADD_SUITE(skipping);
     NAOS_ADD_SUITE(diagnostic);
+    NAOS_ADD_SUITE(expecting);
     NAOS_ADD_SUITE(unchecked);
     NAOS_ADD_SUITE(crash);
     return naos_run();

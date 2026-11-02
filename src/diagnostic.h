@@ -67,6 +67,13 @@ void naos_diagnostic_pass(void);
 void naos_diagnostic_check_assertion_ran(void);
 
 /*
+ * Called when a test expected to fail has ended, teardown included, without a failure or a skip: it
+ * fails with a diagnostic at file and line, where the test is marked, without note or traces, and
+ * with reason as its one value. file is NULL for no location.
+ */
+void naos_diagnostic_unexpected_pass(const char *file, int line, const char *reason);
+
+/*
  * Tells a misuse of NAOS_TRACE_PUSH or NAOS_TRACE_POP as a failure without values, the note, which
  * is left for the next assertion, or the traces.
  */

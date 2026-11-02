@@ -18,7 +18,8 @@
  * in *elapsed. Other static state, of Naos or of the tests, carries over from the previous test. A
  * fatal failure or a skip in setup leaves the body out, and teardown always runs. Writes
  * "RUN: <suite>.<test>" before setup, and the result line after teardown. With require_assertion, a
- * test that would pass but ran no assertion fails.
+ * test that would pass but ran no assertion fails. A test expected to fail is XFAIL when it fails,
+ * and XPASS, a failure, when it ends without failing or skipping.
  */
 naos_outcome_t naos_test_run(const naos_suite_t *suite, const naos_test_t *test, int require_assertion, naos_nanoseconds_t *elapsed);
 

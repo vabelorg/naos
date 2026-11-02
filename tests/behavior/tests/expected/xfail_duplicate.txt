@@ -1,0 +1,5 @@
+args: xfail_duplicate
+exit code: 2
+--- stdout
+--- stderr
+naos: duplicate test name: xfail_duplicate.same_name

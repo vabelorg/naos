@@ -21,16 +21,19 @@
 /* Size of what put_format() formats: a number with a few chars around it. */
 #define NAOS_HUMAN_NUMBER_SIZE 48
 
-/* --naos-quiet: the tests that pass or skip, and ITERATION:, are left out. */
+/* --naos-quiet: the tests that pass, skip or fail as expected, and ITERATION:, are left out. */
 static int g_quiet = 0;
 
 /*
  * The running test, between test_begin and test_end. With --naos-quiet, its RUN line waits for its
  * first failure, and so do its skips before it, since a failure in teardown may still follow them.
+ * For a test expected to fail, every diagnostic waits for the end of the test, since its failures
+ * are written only when it turns out XPASS.
  */
 static const char *g_suite = NULL;
 static const char *g_test = NULL;
 static int g_in_test = 0;
+static int g_expects_failure = 0;
 static int g_run_written = 0;
 static naos_text_t g_held = NAOS_TEXT_EMPTY;
 
@@ -215,11 +218,12 @@ static void round_begin(const naos_round_t *round)
  * The RUN line is flushed at once, so that the name of the test stays when the process dies in it.
  * With --naos-quiet, it waits for the first failure of the test, if any.
  */
-static void test_begin(const char *suite, const char *test)
+static void test_begin(const char *suite, const char *test, const char *xfail_reason)
 {
     g_suite = suite;
     g_test = test;
     g_in_test = 1;
+    g_expects_failure = (xfail_reason != NULL) ? 1 : 0;
     g_run_written = 0;
     g_held.length = 0;
 
@@ -272,13 +276,14 @@ void naos_human_put_diagnostic(const naos_diagnostic_record_t *record, naos_huma
 
 /*
  * With --naos-quiet, a skip before any failure of its test is held, to be written only when a
- * failure follows. When memory runs out to hold it, it is written at once rather than lost.
+ * failure follows, and so is every diagnostic of a test expected to fail, to be written only when it
+ * is XPASS. When memory runs out to hold one, it is written at once rather than lost.
  */
 static void diagnostic(const naos_diagnostic_record_t *record)
 {
     size_t held;
 
-    if ((g_in_test != 0) && (g_run_written == 0) && (record->kind == NAOS_DIAGNOSTIC_SKIP))
+    if ((g_in_test != 0) && (g_run_written == 0) && ((record->kind == NAOS_DIAGNOSTIC_SKIP) || (g_expects_failure != 0)))
     {
         held = g_held.length;
         naos_human_put_diagnostic(record, put_text, &g_held);
@@ -309,12 +314,12 @@ static naos_nanoseconds_t milliseconds(naos_nanoseconds_t elapsed)
 
 /*
  * The result line ends with the time of the test, in the parentheses that hold the count of failures
- * of FAIL. With --naos-quiet, a test that passes or skips leaves no line, and its skips held are
- * dropped.
+ * of FAIL. With --naos-quiet, a test that passes, skips or is XFAIL leaves no line, and its
+ * diagnostics held are dropped.
  */
 static void test_end(const char *suite, const char *test, naos_outcome_t outcome, int failure_count, naos_nanoseconds_t elapsed)
 {
-    if ((g_quiet != 0) && (outcome != NAOS_OUTCOME_FAIL))
+    if ((g_quiet != 0) && (outcome != NAOS_OUTCOME_FAIL) && (outcome != NAOS_OUTCOME_XPASS))
     {
         g_in_test = 0;
         g_held.length = 0;
@@ -322,7 +327,10 @@ static void test_end(const char *suite, const char *test, naos_outcome_t outcome
         return;
     }
 
-    /* A failure comes with its diagnostic, which wrote the RUN line; this keeps it before FAIL anyway. */
+    /*
+     * A failure comes with its diagnostic, which wrote the RUN line; this keeps it before FAIL anyway,
+     * and writes the diagnostics held of an XPASS.
+     */
     write_run();
     g_in_test = 0;
 
@@ -337,6 +345,12 @@ static void test_end(const char *suite, const char *test, naos_outcome_t outcome
     case NAOS_OUTCOME_PASS:
         naos_printf("PASS: %s.%s (%llu ms)\n", suite, test, milliseconds(elapsed));
         break;
+    case NAOS_OUTCOME_XFAIL:
+        naos_printf("XFAIL: %s.%s (%llu ms)\n", suite, test, milliseconds(elapsed));
+        break;
+    case NAOS_OUTCOME_XPASS:
+        naos_printf("XPASS: %s.%s (%llu ms)\n", suite, test, milliseconds(elapsed));
+        break;
     }
 
     fflush(stdout);
@@ -344,7 +358,8 @@ static void test_end(const char *suite, const char *test, naos_outcome_t outcome
 
 /*
  * The FAIL FAST, SUMMARY and ITERATION FAILED lines; every round ends with its summary, so that a run
- * always says what happened. The time of SUMMARY is the sum of the times of the tests, rounded down
+ * always says what happened. SUMMARY counts the expected failures only when there are some, and an
+ * XPASS among the failed. The time of SUMMARY is the sum of the times of the tests, rounded down
  * once, so it may be a little more than the sum of the times shown.
  */
 static void round_end(const naos_round_t *round, const naos_tally_t *tally, size_t not_run)
@@ -354,7 +369,12 @@ static void round_end(const naos_round_t *round, const naos_tally_t *tally, size
         naos_printf("FAIL FAST: stopped at the first failure; %zu not run\n", not_run);
     }
 
-    naos_printf("SUMMARY: %zu passed, %zu failed, %zu skipped (%llu ms)\n", tally->passed, tally->failed, tally->skipped, milliseconds(tally->elapsed));
+    naos_printf("SUMMARY: %zu passed, %zu failed, %zu skipped", tally->passed, tally->failed, tally->skipped);
+    if (tally->xfailed > 0)
+    {
+        naos_printf(", %zu %s", tally->xfailed, (tally->xfailed == 1) ? "expected failure" : "expected failures");
+    }
+    naos_printf(" (%llu ms)\n", milliseconds(tally->elapsed));
 
     if ((round->repeat > 1) && (tally->failed > 0))
     {

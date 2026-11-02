@@ -19,7 +19,7 @@ naos_selftest_strict(naos_selftest_api)
 # output grows with every test added, so only its end is matched.
 naos_expect_match(run_in_any_order naos_selftest_api EXIT_CODE 0
     ARGS --naos-shuffle --naos-random-seed 54865 --naos-repeat 50
-    EXPECT "REPEAT: 0 of 50 iterations failed.$" REJECT "FAIL")
+    EXPECT "REPEAT: 0 of 50 iterations failed.$" REJECT "[^X]FAIL" "XPASS")
 set_tests_properties(${prefix}run_in_any_order PROPERTIES FIXTURES_REQUIRED naos_trust)
 
 # C++ uses the same headers; the tests are built only when a C++ compiler exists.

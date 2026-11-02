@@ -25,7 +25,9 @@ Whatever the tests print themselves comes in between, as it is.
 | `PASS: <suite>.<test> (<t> ms)` | The test ran an assertion and ended with no failure and no skip, or ran none with `--naos-allow-no-assertions` |
 | `FAIL: <suite>.<test> (<N> failure, <t> ms)` | The test recorded failures; `failures` when N is 2 or more |
 | `SKIP: <suite>.<test> (<t> ms)` | The test was skipped and recorded no failure |
-| `SUMMARY: <p> passed, <f> failed, <s> skipped (<t> ms)` | At the end of each iteration, even when it ran a single test or none. After a stop by `--naos-fail-fast`, only the tests run are counted |
+| `XFAIL: <suite>.<test> (<t> ms)` | The test is [expected to fail](control.md#a-test-expected-to-fail) and recorded failures: counted as an expected failure, not a failure |
+| `XPASS: <suite>.<test> (<t> ms)` | The test is expected to fail and ended with no failure and no skip: counted as failed |
+| `SUMMARY: <p> passed, <f> failed, <s> skipped (<t> ms)` | At the end of each iteration, even when it ran a single test or none. After a stop by `--naos-fail-fast`, only the tests run are counted. With expected failures, `, <x> expected failure` (`failures` when x is 2 or more) comes before the time |
 | `RANDOM SEED: <seed>` | At the start of each iteration, with `--naos-shuffle` |
 | `ITERATION: <i> of <n>` | Before each iteration, when `--naos-repeat` is 2 or more |
 | `ITERATION FAILED: <i> of <n>` | After an iteration that failed, when `--naos-repeat` is 2 or more; followed by ` (random seed <seed>)` with `--naos-shuffle` |
@@ -46,10 +48,13 @@ Within an iteration, the order is `ITERATION:`, `RANDOM SEED:`, each test (from 
 | `PASS:` | No |
 | A test that is skipped: its `RUN:`, `skip` lines and `SKIP:` | No; `SUMMARY:` counts it |
 | `FAIL:`, and every diagnostic of a test that fails | Yes |
+| A test that fails as expected: its `RUN:`, diagnostics and `XFAIL:` | No; `SUMMARY:` counts it |
+| `XPASS:`, its `RUN:` and its diagnostic | Yes |
 | `SUMMARY:`, `RANDOM SEED:`, `FAIL FAST:`, `ITERATION FAILED:`, `REPEAT:` | Yes |
 | `ITERATION:` | No |
 
 - A test that skips, then fails in teardown, is a `FAIL`: its `skip` line is kept until the test ends, and written before the failure. So a failing test reads the same as without `--naos-quiet`.
+- The diagnostics of a test expected to fail are kept until it ends, and dropped when it is an `XFAIL`, so that expected failures do not bury a real one.
 - What a test prints itself is written as it is, but with no `RUN:` line before it to tell which test printed it.
 - `RUN:` is no longer written as each test starts, so a test that ends the process before any failure leaves no line naming it. The file of `--naos-output` is written only when the run ends, so it does not name it either. Under CTest, each test runs in its own process and CTest names the one that ended; otherwise, run the same command again without `--naos-quiet`.
 
@@ -116,6 +121,7 @@ A detail line is two spaces, a label, a colon, one space and the value. `left` a
 | `*_MEM_EQ` | `left size`, `right size`, then `first difference` or `invalid` |
 | `*_TRUE`, `*_FALSE`, `*_NOT_NULL` | none |
 | A test that ran no assertion | `hint` |
+| A test expected to fail that passed | `reason` (a string) |
 
 `first difference` is `offset N, left 0xXX, right 0xYY`. When one side is the beginning of the other, it is `offset N, end of left` or `end of right`, N being the shorter length.
 

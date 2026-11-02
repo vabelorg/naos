@@ -13,6 +13,7 @@
 naos_selftest_program(naos_selftest_suites suites.c)
 foreach(case IN ITEMS
         duplicate_test duplicate_suite dotted_test dotted_suite invalid_test_names invalid_suite_name
+        xfail_without_reason xfail_duplicate
         setup_twice teardown_twice no_begin null_suite many add_in_test add_in_suite)
     naos_expect(${case} naos_selftest_suites ARGS ${case})
 endforeach()

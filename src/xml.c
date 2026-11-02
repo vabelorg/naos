@@ -50,6 +50,7 @@ static naos_text_t g_failures = NAOS_TEXT_EMPTY;
 static naos_text_t g_skip = NAOS_TEXT_EMPTY;
 static int g_has_location = 0;
 static int g_has_skip = 0;
+static const char *g_xfail_reason = NULL;
 
 /* The suites of every round so far, the last one being the suite of the running test. */
 static naos_xml_suite_t *g_suites = NULL;
@@ -361,9 +362,11 @@ static void round_begin(const naos_round_t *round)
 }
 
 /* The tests of a suite run together in a round, so a new name starts a new suite. */
-static void test_begin(const char *suite, const char *test)
+static void test_begin(const char *suite, const char *test, const char *xfail_reason)
 {
     (void)test;
+
+    g_xfail_reason = xfail_reason;
 
     if ((g_suite_open == 0) || (strcmp(g_suites[g_suite_count - 1].name, suite) != 0))
     {
@@ -434,6 +437,7 @@ static void test_end(const char *suite_name, const char *test, naos_outcome_t ou
     switch (outcome)
     {
     case NAOS_OUTCOME_FAIL:
+    case NAOS_OUTCOME_XPASS:
         naos_text_add(&g_cases, ">\n");
         naos_text_add_bytes(&g_cases, g_failures.data, g_failures.length);
         naos_text_add(&g_cases, "    </testcase>\n");
@@ -448,6 +452,13 @@ static void test_end(const char *suite_name, const char *test, naos_outcome_t ou
     case NAOS_OUTCOME_PASS:
         naos_text_add(&g_cases, "/>\n");
         suite->tally.passed++;
+        break;
+    case NAOS_OUTCOME_XFAIL:
+        /* Not a pass to the reader, nor a failure that would fail the run: skipped, as pytest has it. */
+        naos_text_add(&g_cases, ">\n      <skipped message=\"expected failure: ");
+        add_escaped(&g_cases, (g_xfail_reason != NULL) ? g_xfail_reason : "", 1);
+        naos_text_add(&g_cases, "\"/>\n    </testcase>\n");
+        suite->tally.skipped++;
         break;
     }
 

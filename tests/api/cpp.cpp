@@ -114,13 +114,19 @@ NAOS_TEST(setup_runs_before_each_test)
     NAOS_CHECK_INT_GE(setup_calls, 1);
 }
 
+NAOS_TEST(expected_to_fail)
+{
+    NAOS_CHECK_INT_EQ(4, values.size());
+}
+
 NAOS_SUITE(cpp,
     NAOS_SET_SETUP(setup),
     NAOS_SET_TEARDOWN(teardown),
     NAOS_ADD_TEST(assertions),
     NAOS_ADD_TEST(pass_alone),
     NAOS_ADD_TEST(note_and_helpers),
-    NAOS_ADD_TEST(setup_runs_before_each_test)
+    NAOS_ADD_TEST(setup_runs_before_each_test),
+    NAOS_ADD_TEST_XFAIL(expected_to_fail, "three values, not four")
 )
 
 NAOS_MAIN(

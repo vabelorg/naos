@@ -1,0 +1,33 @@
+args: --naos-filter expected.ok:expected.*_fails:expected.fails*:expected.in_helper:in_*.*
+exit code: 0
+--- stdout
+RUN: expected.ok
+PASS: expected.ok (N ms)
+RUN: expected.check_fails
+xfail.c:LINE: error: -42 == 42
+  left:  -42
+  right: 42
+reached-after-check
+XFAIL: expected.check_fails (N ms)
+RUN: expected.require_fails
+xfail.c:LINE: error: g_ready
+XFAIL: expected.require_fails (N ms)
+RUN: expected.fails
+xfail.c:LINE: error: not implemented yet
+XFAIL: expected.fails (N ms)
+RUN: expected.in_helper
+xfail.c:LINE: error: g_ready
+XFAIL: expected.in_helper (N ms)
+RUN: expected.fails_then_skips
+xfail.c:LINE: error: g_ready
+xfail.c:LINE: skip: needs a network
+XFAIL: expected.fails_then_skips (N ms)
+RUN: in_setup.body
+xfail.c:LINE: error: g_ready
+XFAIL: in_setup.body (N ms)
+RUN: in_teardown.body
+reached-body
+xfail.c:LINE: error: g_ready
+XFAIL: in_teardown.body (N ms)
+SUMMARY: 1 passed, 0 failed, 0 skipped, 7 expected failures (N ms)
+--- stderr

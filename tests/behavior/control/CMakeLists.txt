@@ -61,3 +61,22 @@ naos_expect(no_assertion_quiet ${exe} ARGS --naos-quiet --naos-filter none.empty
 naos_expect(no_assertion_fail_fast ${exe} ARGS --naos-fail-fast --naos-filter counted.check_passes:none.*)
 naos_expect(no_assertion_xml ${exe} ARGS --naos-output xml:{output} --naos-filter none.empty:counted.check_passes
     OUTPUT_FILE no_assertion.xml)
+
+# xfail
+# Tests expected to fail: XFAIL counts as a pass, XPASS as a failure with a diagnostic at the mark,
+# a skip stays a skip; how each reads in every output, and what --naos-fail-fast and the exit code
+# make of them.
+
+set(exe naos_selftest_xfail)
+naos_selftest_program(${exe} xfail.c)
+
+naos_expect(xfail_run_all ${exe})
+# Expected failures alone, or with skips, make a passing run: neither 1 nor 77.
+naos_expect(xfail_only ${exe} ARGS --naos-filter expected.ok:expected.*_fails:expected.fails*:expected.in_helper:in_*.*)
+naos_expect(xfail_and_skip ${exe} ARGS --naos-filter expected.fails:expected.skips)
+naos_expect(xfail_allowed ${exe} ARGS --naos-allow-no-assertions --naos-filter expected.empty)
+naos_expect(xfail_quiet ${exe} ARGS --naos-quiet)
+naos_expect(xfail_fail_fast ${exe} ARGS --naos-fail-fast)
+naos_expect(xfail_repeat ${exe} ARGS --naos-repeat 2 --naos-filter expected.check_fails:expected.passes)
+naos_expect(xfail_xml ${exe} ARGS --naos-output xml:{output} --naos-filter expected.*
+    OUTPUT_FILE xfail.xml)

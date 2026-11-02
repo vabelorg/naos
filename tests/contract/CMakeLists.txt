@@ -32,6 +32,10 @@ naos_expect_match(exit_code.skip_among_passes ${exe} EXIT_CODE 0 ARGS --naos-fil
 naos_expect_match(exit_code.fail_among_skips ${exe} EXIT_CODE 1 ARGS --naos-filter outcome.fails:skipping.*)
 naos_expect_match(exit_code.no_assertion ${exe} EXIT_CODE 1 ARGS --naos-filter unchecked.runs)
 naos_expect_match(exit_code.no_assertion_allowed ${exe} EXIT_CODE 0 ARGS --naos-filter unchecked.runs --naos-allow-no-assertions)
+# An expected failure counts as a pass, also among skips; a test expected to fail that passes fails.
+naos_expect_match(exit_code.expected_failure ${exe} EXIT_CODE 0 ARGS --naos-filter expecting.fails)
+naos_expect_match(exit_code.expected_failure_among_skips ${exe} EXIT_CODE 0 ARGS --naos-filter expecting.fails:skipping.*)
+naos_expect_match(exit_code.unexpected_pass ${exe} EXIT_CODE 1 ARGS --naos-filter expecting.passes)
 naos_expect_match(exit_code.no_test_registered ${exe} EXIT_CODE 0 ARGS no-suites)
 naos_expect_match(exit_code.list ${exe} EXIT_CODE 0 ARGS --naos-list)
 naos_expect_match(exit_code.help ${exe} EXIT_CODE 0 ARGS --help)
@@ -72,6 +76,11 @@ naos_selftest_add_test(list.round_trip "${CMAKE_COMMAND}"
     -D "WORK_DIR=${CMAKE_CURRENT_BINARY_DIR}/round_trip"
     -P "${CMAKE_CURRENT_SOURCE_DIR}/ListRoundTrip.cmake")
 
+# The failure of a test expected to fail that passes is at the entry of its suite.
+naos_expect_match(diagnostic.unexpected_pass ${exe} EXIT_CODE 1 ARGS --naos-filter expecting.passes
+    EXPECT "RUN: expecting\\.passes.${path}${at}error: "
+    REJECT "${other_form}")
+
 # The JUnit XML file: its structure, wherever xmllint is found, and when it is written
 # (docs/reference/xml.md#when-the-file-is-written).
 set(schema "${CMAKE_CURRENT_SOURCE_DIR}/junit.xsd")
@@ -87,6 +96,8 @@ contract_xml(repeat_shuffle 1 FILE written SCHEMA "${schema}"
     ARGS --naos-output xml:{output} --naos-repeat 2 --naos-shuffle --naos-random-seed 3 --naos-filter outcome.*)
 contract_xml(fail_fast 1 FILE written SCHEMA "${schema}"
     ARGS --naos-output xml:{output} --naos-fail-fast --naos-filter outcome.*)
+contract_xml(expected_failures 1 FILE written SCHEMA "${schema}"
+    ARGS --naos-output xml:{output} --naos-filter expecting.*)
 contract_xml(all_skipped 77 FILE written SCHEMA "${schema}"
     ARGS --naos-output xml:{output} --naos-filter skipping.*)
 contract_xml(left_empty_by_exit 3 FILE empty ARGS --naos-output xml:{output} --naos-filter crash.*)

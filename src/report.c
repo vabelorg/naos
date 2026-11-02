@@ -74,13 +74,13 @@ void naos_report_round_begin(const naos_round_t *round)
     }
 }
 
-void naos_report_test_start(const char *suite, const char *test)
+void naos_report_test_start(const char *suite, const char *test, const char *xfail_reason)
 {
     size_t i;
 
     for (i = 0; i < writer_count(); i++)
     {
-        g_writers[i]->test_begin(suite, test);
+        g_writers[i]->test_begin(suite, test, xfail_reason);
     }
 }
 

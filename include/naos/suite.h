@@ -66,17 +66,27 @@ typedef void (*naos_suite_func_t)(naos_builder_t *builder);
         (void)(__VA_ARGS__); \
     }
 
-/* Entries of NAOS_SUITE. Each may appear once per suite, except NAOS_ADD_TEST. */
+/*
+ * Entries of NAOS_SUITE. Each may appear once per suite, except NAOS_ADD_TEST and
+ * NAOS_ADD_TEST_XFAIL.
+ *
+ * NAOS_ADD_TEST_XFAIL adds a test expected to fail, for the reason given, a string that is not empty:
+ * the test passes as XFAIL when it records a failure, in setup, the body or teardown, and fails as
+ * XPASS when it ends without one, with a diagnostic at this entry, so that removing the mark is a
+ * step of its own. A test that skips without failing is skipped.
+ */
 #define NAOS_ADD_TEST(name) naos_add_test(builder, #name, NAOS_TEST_FUNC_(name))
+#define NAOS_ADD_TEST_XFAIL(name, reason) naos_add_test_xfail(builder, #name, NAOS_TEST_FUNC_(name), reason, __FILE__, __LINE__)
 #define NAOS_SET_SETUP(name) naos_set_setup(builder, NAOS_SETUP_FUNC_(name))
 #define NAOS_SET_TEARDOWN(name) naos_set_teardown(builder, NAOS_TEARDOWN_FUNC_(name))
 
 /*
  * Registration functions used by the macros above. A suite function calls naos_begin_suite first.
- * The names must outlive naos_run().
+ * The names, the reason and the file must outlive naos_run().
  */
 NAOS_API void naos_begin_suite(naos_builder_t *builder, const char *name);
 NAOS_API void naos_add_test(naos_builder_t *builder, const char *name, naos_func_t func);
+NAOS_API void naos_add_test_xfail(naos_builder_t *builder, const char *name, naos_func_t func, const char *reason, const char *file, int line);
 NAOS_API void naos_set_setup(naos_builder_t *builder, naos_func_t func);
 NAOS_API void naos_set_teardown(naos_builder_t *builder, naos_func_t func);
 

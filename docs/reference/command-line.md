@@ -25,8 +25,8 @@ Without options, it runs every test once, in one process: the suites in the orde
   - The same seed gives the same order on every platform.
 - `--naos-random-seed <n>`: the seed of `--naos-shuffle`, from 1 to 99999. 0, or no seed, picks one from the time. A value out of range or not a number is a usage error. Alone, it changes no order.
 - `--naos-repeat <n>`: runs the selected tests n times (1 or more), to find flaky tests. The exit code is the result of all the iterations together. With `--naos-shuffle`, each iteration adds 1 to the seed (after 99999 comes 1) for a new order.
-- `--naos-fail-fast`: stops after the first failing test, once its teardown has run, and runs no remaining test (with `--naos-repeat`, no remaining iteration either). A skip does not stop it.
-- `--naos-quiet`: leaves out of standard output the tests that pass or skip, and `ITERATION:`. A failing test is written as without it, and the run still ends with its summary ([with `--naos-quiet`](output.md#with---naos-quiet)). The exit code and the file of `--naos-output` do not change.
+- `--naos-fail-fast`: stops after the first failing test, once its teardown has run, and runs no remaining test (with `--naos-repeat`, no remaining iteration either). A skip and an expected failure do not stop it; a test expected to fail that passes does ([a test expected to fail](control.md#a-test-expected-to-fail)).
+- `--naos-quiet`: leaves out of standard output the tests that pass, skip or fail as expected, and `ITERATION:`. A failing test is written as without it, and the run still ends with its summary ([with `--naos-quiet`](output.md#with---naos-quiet)). The exit code and the file of `--naos-output` do not change.
 - `--naos-allow-no-assertions`: lets a test that runs no assertion pass. Without it, such a test fails ([a test that runs no assertion](control.md#a-test-that-runs-no-assertion)).
 - `--naos-output <format>:<path>`: also writes the results of the run to the file `<path>`, in `<format>`, when the run ends. The one format is `xml`, JUnit XML ([JUnit XML](xml.md)).
   - The value is split at the first `:`, so the path may hold one (`xml:C:\out\results.xml`).
@@ -53,8 +53,8 @@ $ prog --naos-shuffle --naos-random-seed 4242 --naos-repeat 20
 
 | Code | Meaning |
 |---|---|
-| 0 | No test failed, and not every test run was skipped (a run with no test at all included). Or `--naos-list` or `--help` was given (and the suites hold no mistake) |
-| 1 | At least one test failed (a test that ran no assertion included), memory could not be allocated, or the file of `--naos-output` could not be written |
+| 0 | No test failed, and not every test run was skipped (a run with no test at all included). A test that fails as [expected](control.md#a-test-expected-to-fail) is not a failure, and is not skipped. Or `--naos-list` or `--help` was given (and the suites hold no mistake) |
+| 1 | At least one test failed (a test that ran no assertion, and a test expected to fail that passed, included), memory could not be allocated, or the file of `--naos-output` could not be written |
 | 2 | Usage error: a mistake in the arguments or the suites, a call out of order, or a file of `--naos-output` that cannot be opened |
 | 77 | Every test run was skipped |
 
