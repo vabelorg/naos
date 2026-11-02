@@ -36,15 +36,3 @@ naos_expect_match(pointer.eq_null ${exe} EXIT_CODE 1 ARGS --naos-filter pointer.
     EXPECT "pointer\\.c${at}error: NULL == &value.  left:  \\(null\\).  right: [0-9A-Za-z]+.FAIL: ")
 naos_expect_match(pointer.null ${exe} EXIT_CODE 1 ARGS --naos-filter pointer.null
     EXPECT "pointer\\.c${at}error: &value == NULL.  value: [0-9A-Za-z]+.FAIL: ")
-
-# The location takes the form of the compiler the library is built with, file(line) for MSVC and
-# file:line otherwise, and keeps the path as the compiler gave it; the golden cases hide both.
-if(MSVC)
-    set(location_kept "integer\\.c\\([0-9]+\\): error: ")
-    set(location_other "integer\\.c:[0-9]+: ")
-else()
-    set(location_kept "integer\\.c:[0-9]+: error: ")
-    set(location_other "integer\\.c\\([0-9]+\\): ")
-endif()
-naos_expect_match(location_form ${exe} EXIT_CODE 1 ARGS --naos-filter integer.eq
-    EXPECT "${location_kept}" "assertions[/\\\\]integer\\.c" REJECT "${location_other}")

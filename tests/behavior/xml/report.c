@@ -3,17 +3,10 @@
  * SPDX-License-Identifier: MIT
  *
  * Tests whose results the JUnit XML file of --naos-output holds: each outcome, values, notes and
- * traces, the text that XML must escape, and a process ending in the middle of a test.
+ * traces, and the text that XML must escape.
  */
 
 #include <naos/naos.h>
-
-#include <stdlib.h>
-
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#endif
 
 NAOS_TEST(passes)
 {
@@ -119,30 +112,7 @@ NAOS_SUITE(text,
     NAOS_ADD_TEST(skip_markup)
 )
 
-/*
- * Ends the process with exit code 3 without writing out the buffers of stdio. _Exit of the Windows
- * CRT still writes them out, and only TerminateProcess leaves them.
- */
-static void exit_without_flush(void)
-{
-#ifdef _WIN32
-    TerminateProcess(GetCurrentProcess(), 3);
-#endif
-    _Exit(3);
-}
-
-/* The full run leaves this suite out, since its test ends the process. */
-NAOS_TEST(exits)
-{
-    exit_without_flush();
-}
-
-NAOS_SUITE(crash,
-    NAOS_ADD_TEST(exits)
-)
-
 NAOS_MAIN(
     NAOS_ADD_SUITE(results),
-    NAOS_ADD_SUITE(text),
-    NAOS_ADD_SUITE(crash)
+    NAOS_ADD_SUITE(text)
 )

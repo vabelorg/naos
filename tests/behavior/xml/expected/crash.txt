@@ -1,6 +1,0 @@
-args: --naos-output xml:{output} --naos-filter crash.*
-exit code: 3
---- stdout
-RUN: crash.exits
---- stderr
---- output

@@ -23,4 +23,4 @@ set_target_properties(naos_selftest_unit PROPERTIES
 naos_selftest_strict(naos_selftest_unit)
 naos_selftest_prefix(prefix)
 naos_selftest_labels(labels)
-naos_discover_tests(naos_selftest_unit PREFIX "${prefix}" LABELS ${labels})
+naos_discover_tests(naos_selftest_unit PREFIX "${prefix}" LABELS ${labels} PROPERTIES FIXTURES_REQUIRED naos_trust)

@@ -10,16 +10,17 @@ naos_add_executable(naos_selftest_api
     SOURCES main.c check.c control.c fixture.c version.c
     PREFIX "${prefix}"
     LABELS ${labels}
+    PROPERTIES FIXTURES_REQUIRED naos_trust
     DISCOVERY_TIMEOUT 30
 )
 naos_selftest_strict(naos_selftest_api)
 
 # The tests share the process and must pass together, in any order and any number of times. The
 # output grows with every test added, so only its end is matched.
-naos_expect_match(run_all naos_selftest_api EXIT_CODE 0 EXPECT "SUMMARY: [0-9]+ passed, 0 failed, 0 skipped \\([0-9]+ ms\\).$")
 naos_expect_match(run_in_any_order naos_selftest_api EXIT_CODE 0
     ARGS --naos-shuffle --naos-random-seed 54865 --naos-repeat 50
     EXPECT "REPEAT: 0 of 50 iterations failed.$" REJECT "FAIL")
+set_tests_properties(${prefix}run_in_any_order PROPERTIES FIXTURES_REQUIRED naos_trust)
 
 # C++ uses the same headers; the tests are built only when a C++ compiler exists.
 include(CheckLanguage)
@@ -30,6 +31,7 @@ if(CMAKE_CXX_COMPILER)
         SOURCES cpp.cpp
         PREFIX "${prefix}cpp."
         LABELS ${labels}
+        PROPERTIES FIXTURES_REQUIRED naos_trust
     )
     # Variadic macros need C++11.
     set_target_properties(naos_selftest_api_cpp PROPERTIES

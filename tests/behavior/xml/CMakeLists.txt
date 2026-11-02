@@ -25,10 +25,6 @@ report_case(one_pass --naos-filter results.passes)
 # Each round has its suites, with the iteration and the seed as properties.
 report_case(repeat_shuffle --naos-repeat 2 --naos-shuffle --naos-random-seed 3 --naos-filter results.passes:results.skips:text.markup)
 report_case(fail_fast --naos-fail-fast --naos-filter results.*)
-# A process that ends during the run leaves the file empty.
-report_case(crash --naos-filter crash.*)
-# --naos-list and --help run no test and write no file.
-report_case(list --naos-list)
-report_case(help --help)
-
+# When the file is written is a contract (contract/); the message of a file that cannot be opened is
+# written for people.
 naos_expect(cannot_open ${exe} ARGS --naos-output xml:{output} OUTPUT_FILE no_such_directory/out.xml)
