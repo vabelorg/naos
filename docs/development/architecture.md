@@ -28,45 +28,71 @@ These decide what goes into Naos, before any feature:
 
 `src/` is split into one file per concern. A file that implements a public header has its name (`naos/control.h` ↔ `control.c`); the others declare what they share in an internal header of the same name (`diagnostic.c` ↔ `diagnostic.h`). Only an internal header that has a public header of the same name gets `_internal.h` (`suite_internal.h`).
 
-The files form three groups, listed in this order in `src/CMakeLists.txt` and in the table below: the public API (`session.c` to `version.c`), running the tests (`options.c` to `test.c`) and writing what happened (`diagnostic.c` to `value.c`). A new file goes into its group.
+The files form four layers, from the top: the run, the tests, the output and the shared parts. A file uses only files of its own layer or of a layer below it, never one above, so the layers never form a cycle. `src/CMakeLists.txt` and the table below list the files in this order. A new file goes into the layer of what it does, and a dependency that would go up is a sign that a part of the file belongs to a lower layer.
+
+| Layer | Files | What it is for |
+|---|---|---|
+| 1. The run | `session`, `options`, `runner`, `filter`, `order`, `version` | What happens once for the whole process: the order of the calls of the user, the command line, the choice and order of the tests, the rounds |
+| 2. The tests | `suite`, `test`, `control`, `check`, `diagnostic`, `context` | The tests as registered, and what happens in one of them: setup, body and teardown, the assertions, the stops, the note and the traces, and the outcome they add up to |
+| 3. The output | `report`, `writer.h`, `human`, `xml`, `text` | The events of the run, and how each writer writes them. `writer.h` holds every type the writers are told, such as the outcome and the trace |
+| 4. Shared parts | `clock`, `value`, `format.h` | What layers above use without depending on any other module: the time, how values are written, the formatted output |
+
+A file that implements a public header goes into the layer of what it does, not into a layer of its own: `session.c` and `version.c` are in the run, `suite.c`, `control.c` and `check.c` in the tests.
 
 | File | Role |
 |---|---|
 | `session.c` | `naos/session.h`: the order of `naos_init` → `NAOS_ADD_SUITE` → `naos_run` |
-| `suite.c` | `naos/suite.h`: registering suites, and finding their mistakes before the run |
-| `check.c` | `naos/check.h`: the comparisons of the assertions, and the values printed when they fail |
-| `control.c` | `naos/control.h`: `NAOS_NOTE`, `NAOS_TRACE_*`, and the stops of `NAOS_FAIL`, `NAOS_SKIP` and `NAOS_REQUIRE_*` |
-| `version.c` | `naos/version.h`: the version at run time |
 | `options.c` | The command line (`--naos-*`): parsing, help and usage |
 | `runner.c` | The whole run, with repeat, shuffle and fail fast, and the summary |
 | `filter.c` | Matching the patterns of `--naos-filter` |
 | `order.c` | The order and the seed of `--naos-shuffle` (its own xorshift generator) |
+| `version.c` | `naos/version.h`: the version at run time |
+| `suite.c` | `naos/suite.h`: registering suites, and finding their mistakes before the run |
 | `test.c` | Running one test: setup, body and teardown, with `setjmp` / `longjmp`, and its time |
-| `clock.c` | The clock that times the tests: the monotonic clock of the operating system, or `clock()`. The only file that depends on the platform |
+| `control.c` | `naos/control.h`: `NAOS_NOTE`, `NAOS_TRACE_*`, and the stops of `NAOS_FAIL`, `NAOS_SKIP` and `NAOS_REQUIRE_*` |
+| `check.c` | `naos/check.h`: the comparisons of the assertions, and the values printed when they fail |
 | `diagnostic.c` | One diagnostic (begin → gather details → end), and the results of the test |
 | `context.c` | The note (`NAOS_NOTE`) and the stack of traces that go with diagnostics. Prints nothing |
 | `report.c` | Tells the events of the run (a test starts, a diagnostic, a test ends, ...) to every writer on, and writes the names of `--naos-list` and the messages of Naos itself (standard error). `writer.h` declares the events and the functions of a writer |
 | `human.c` | The writer of the human-readable output: the form of every line on standard output, and which lines a run writes |
 | `xml.c` | The writer of the JUnit XML file of `--naos-output xml:<path>`: keeps the results while the tests run and writes the whole file at the end |
 | `text.c` | A text that grows as it is added to, for the writers that keep what they write until later |
+| `clock.c` | The clock that times the tests: the monotonic clock of the operating system, or `clock()`. The only file that depends on the platform |
 | `value.c` | How values are written (escaped strings, shortest doubles) |
 
-Dependencies go one way and never form a cycle. An arrow points at the module used. `report` is used by every module that prints something (`session`, `suite`, `options`, `runner` and others), and the suites as registered (`suite_internal.h`) by every module that reads them (`runner`, `filter`, `test`), so the diagram leaves those arrows out. The dependency comment of `src/CMakeLists.txt` lists them all.
+The layers are a single line, each using every layer below it: the tests use the output because a test writes what happens in it at once (`RUN:` before setup, each failure as it happens), so that what a crashed test wrote is not lost. An arrow points at the module used. `report` is used by every module that prints something (`session`, `suite`, `options`, `runner` and others), and the suites as registered (`suite_internal.h`) by every module that reads them (`runner`, `filter`, `test`), so the diagram leaves those arrows out but `session --> suite`. The dependency comment of `src/CMakeLists.txt` lists them all.
 
 ```mermaid
-flowchart LR
-  session --> options --> order
+flowchart TB
+  subgraph run["1. The run"]
+    session --> options --> order
+    session --> runner
+    runner --> options & filter & order
+  end
+  subgraph tests["2. The tests"]
+    test --> diagnostic --> context
+    test --> context
+    control --> test & diagnostic & context
+    check --> diagnostic
+    suite
+  end
+  subgraph output["3. The output"]
+    report --> xml --> human
+    report --> human
+    xml & human --> text
+    writer["writer.h"]
+  end
+  subgraph shared["4. Shared parts"]
+    clock
+    value
+  end
   session --> suite
-  session --> runner
-  runner --> filter & order
-  runner --> test --> diagnostic
-  test --> context & clock
-  diagnostic --> context
-  diagnostic --> report --> xml --> human --> value
-  xml & human --> text
-  report --> human
-  control --> test & diagnostic & context
-  check --> diagnostic & value
+  runner --> test
+  diagnostic --> report
+  context --> writer
+  test & options --> clock
+  check & human & xml --> value
+  writer --> clock
 ```
 
 ## Key mechanisms

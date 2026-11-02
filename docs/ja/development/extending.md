@@ -46,7 +46,7 @@
 
 ## ソースファイルを足す
 
-先頭に著作権表示と `SPDX-License-Identifier: MIT`、続けてそのファイルの責務の短いコメントを書き、`src/CMakeLists.txt` の該当する群に足します。新しいモジュールやモジュール間の新しい依存は、[アーキテクチャ](architecture.md)と `src/CMakeLists.txt` の依存のコメントも直します。
+先頭に著作権表示と `SPDX-License-Identifier: MIT`、続けてそのファイルの責務の短いコメントを書き、`src/CMakeLists.txt` の該当する層に足します（[アーキテクチャ](architecture.md#モジュール)）。新しいモジュールやモジュール間の新しい依存は、[アーキテクチャ](architecture.md)と `src/CMakeLists.txt` の依存のコメントも直します。
 
 ## バージョンを変える
 

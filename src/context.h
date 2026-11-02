@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: MIT
  *
  * The context the diagnostics of the running test are written with: the note of NAOS_NOTE and the
- * stack of NAOS_TRACE_PUSH. Only keeps them; diagnostic.c writes them and reports their misuse.
+ * stack of NAOS_TRACE_PUSH. Only keeps them; diagnostic.c writes them and reports their misuse. A trace
+ * is kept as the writers take it (naos_trace_t of writer.h).
  */
 
 #ifndef NAOS_CONTEXT_H
@@ -11,22 +12,14 @@
 
 #include <stdarg.h>
 
+#include "writer.h" /* naos_trace_t */
+
 /* Size of the note buffer: longer notes are cut short, ending in "...". */
 #define NAOS_CONTEXT_NOTE_SIZE 512
 
 /* Traces kept; deeper pushes are only counted. The string form is for the messages. */
 #define NAOS_CONTEXT_TRACE_DEPTH 16
 #define NAOS_CONTEXT_TRACE_DEPTH_STRING "16"
-
-/* Size of the text of one trace: longer ones are cut short, ending in "...". */
-#define NAOS_CONTEXT_TRACE_SIZE 256
-
-typedef struct naos_trace
-{
-    const char *file;
-    int line;
-    char text[NAOS_CONTEXT_TRACE_SIZE];
-} naos_trace_t;
 
 /*
  * Starts setup and the body, or teardown, without a note or trace: the ones left by the previous

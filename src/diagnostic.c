@@ -164,7 +164,7 @@ void naos_diagnostic_misuse(const char *file, int line, const char *message)
 void naos_diagnostic_check_traces_popped(void)
 {
     static const char prefix[] = "NAOS_TRACE_PUSH without NAOS_TRACE_POP: ";
-    char message[NAOS_CONTEXT_TRACE_SIZE + sizeof(prefix)];
+    char message[NAOS_TRACE_TEXT_SIZE + sizeof(prefix)];
     const naos_trace_t *innermost;
 
     if (naos_context_trace_depth() == 0)
