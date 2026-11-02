@@ -60,8 +60,9 @@ foreach(component IN ITEMS new_major new_minor new_patch)
     if(${component} GREATER_EQUAL 256)
         message(FATAL_ERROR "VERSION '${VERSION}': each component must be < 256")
     endif()
+    # Without leading zeros, as the tag and the macros have it: in C, 08 is not a number.
+    math(EXPR ${component} "${${component}}")
 endforeach()
-# Without leading zeros, as the tag and the macros have it.
 set(VERSION "${new_major}.${new_minor}.${new_patch}")
 
 naos_read_version("${version_header}")
