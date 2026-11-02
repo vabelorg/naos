@@ -14,7 +14,7 @@ Naos をプロジェクトに取り込む方法です。CMake を使う 3 通り
 
 ## CMake を使う場合
 
-次のどの方法でも、ターゲット `naos::naos` と、関数 `naos_add_executable()`・`naos_discover_tests()` が使えるようになります（[CMake のリファレンス](../reference/cmake.md)）。あとはテストの実行ファイルを作り、CTest から実行します。
+次のどの方法でも、ターゲット `Naos::naos` と、関数 `naos_add_executable()`・`naos_discover_tests()` が使えるようになります（[CMake のリファレンス](../reference/cmake.md)）。あとはテストの実行ファイルを作り、CTest から実行します。
 
 ```cmake
 enable_testing()   # または include(CTest)
@@ -30,11 +30,11 @@ configure の時点で Naos をダウンロードします。いちばん簡単�
 
 ```cmake
 include(FetchContent)
-FetchContent_Declare(naos
+FetchContent_Declare(Naos
     GIT_REPOSITORY https://github.com/vabelorg/naos.git
     GIT_TAG v0.2.0
 )
-FetchContent_MakeAvailable(naos)
+FetchContent_MakeAvailable(Naos)
 ```
 
 `GIT_TAG` はリリースのタグに固定してください。
@@ -62,7 +62,7 @@ cmake --install naos/build --config Release --prefix /opt/naos
 インストール先を `CMAKE_PREFIX_PATH` に入れて（`-DCMAKE_PREFIX_PATH=/opt/naos`）、見つけます。
 
 ```cmake
-find_package(naos 0.2 REQUIRED)
+find_package(Naos 0.2 REQUIRED)
 ```
 
 どのバージョンを受け付けるかは [CMake のリファレンス](../reference/cmake.md#パッケージ)にあります。

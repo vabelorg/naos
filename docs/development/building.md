@@ -11,12 +11,14 @@ How to build Naos from its sources and run its self tests. To use Naos in a proj
 
 ## With the presets
 
-`CMakePresets.json` has two presets, each building in `build/<preset>/`:
+`CMakePresets.json` has four presets, each building in `build/<preset>/`:
 
 | Preset | Builds |
 |---|---|
 | `default` | A static library, Debug, with the self tests |
 | `shared` | A shared library (DLL), Debug, with the self tests |
+| `release` | A static library, Release (optimized), with the self tests |
+| `sanitize` | A static library, Debug, with the self tests, built and run with AddressSanitizer and UndefinedBehaviorSanitizer. GCC and Clang only |
 
 ```sh
 cmake --preset default
@@ -24,7 +26,7 @@ cmake --build --preset default
 ctest --preset default
 ```
 
-The same with `shared` checks the shared build. Run both before sending a change that touches the library or the CMake files.
+The same with `shared` checks the shared build. Run both before sending a change that touches the library or the CMake files. `release` shows what only the optimizer finds: `test.c` stops a test with `longjmp`, which an optimized build must survive, and some warnings of GCC, such as `-Wclobbered`, need it. `sanitize` finds memory mistakes and undefined behavior in the library and the tests; CI runs both.
 
 With MinGW-w64 on Windows, run them in the shell of MSYS2 (UCRT64 or MINGW64), with its `gcc`, `cmake` and `ninja` packages and `CMAKE_GENERATOR=Ninja`, as CI does.
 
@@ -48,13 +50,16 @@ The options are in the [CMake reference](../reference/cmake.md#options).
 
 ## Running some self tests
 
-Every self test has a CTest name starting with `naos.` and the label `naos`; the [tests of the examples](testing.md#examples-and-documentation) are named after their executables.
+Every self test has a CTest name starting with `naos.`, the label `naos` and the label of its layer; the [tests of the examples](testing.md#examples-and-documentation) are named after their executables ([names and labels](testing.md#names-and-labels)).
 
 ```sh
-ctest --preset default -R '^naos\.cli\.'          # one subject
-ctest --preset default -R '^naos\.docs\.links$'   # the links of the documentation
-ctest --preset default -j8                        # in parallel
+ctest --preset default -L contract                             # one layer
+ctest --preset default -R '^naos\.behavior\.command-line\.'   # one area
+ctest --preset default -LE slow                                # all but the cases that build a project
+ctest --preset default -j8                                     # in parallel
 ```
+
+The checks that need no build, such as the links of the documentation, are not self tests: see [lint](testing.md#lint).
 
 [Testing](testing.md) explains the self tests and how to add one.
 
@@ -64,12 +69,20 @@ ctest --preset default -j8                        # in parallel
 cmake --install build/default --prefix /tmp/naos-install
 ```
 
-The layout installed is in the [CMake reference](../reference/cmake.md#package). A project can then use it with `find_package(naos)` and `-DCMAKE_PREFIX_PATH=/tmp/naos-install`. `tests/package/` is such a project; CI builds and tests it against each package installed.
+The layout installed is in the [CMake reference](../reference/cmake.md#package). A project can then use it with `find_package(Naos)` and `-DCMAKE_PREFIX_PATH=/tmp/naos-install`. `tests/consumer/` is such a project; `cmake -D PRESET=<preset> -P scripts/TestPackage.cmake` installs a preset built and tests the project against it, as CI does for each build.
 
 ## Without CMake
 
-The library must also build with nothing but a compiler; the self test `naos.no_cmake.build` checks it as [installation](../getting-started/installation.md#without-cmake) describes, on GCC-compatible compilers.
+The library must also build with nothing but a compiler; the self test `naos.build.no_cmake.build` checks it as [installation](../getting-started/installation.md#without-cmake) describes, on GCC-compatible compilers.
 
 ## Continuous integration
 
-`.github/workflows/ci.yml` builds and tests every push and pull request with the presets, on Linux (GCC and Clang), macOS (Clang) and Windows (MSVC, and GCC of MinGW-w64 in the UCRT64 and MINGW64 environments of MSYS2), each as a static and a shared library. A change is merged only when every job passes.
+`.github/workflows/ci.yml` checks every push and pull request. Each of its steps is a command that runs the same locally:
+
+| Job | Runs |
+|---|---|
+| `lint` | `cmake -D ROOT=. -P scripts/Lint.cmake` ([lint](testing.md#lint)) |
+| `test` | Configure, build and `ctest` with a preset, then `cmake -D PRESET=<preset> -P scripts/TestPackage.cmake` ([installing](#installing)), but with `sanitize`. GCC on Linux with `default`, `shared`, `release` and `sanitize`, and with `default` and CMake 3.21, the oldest CMake supported; Clang on Linux with `default` and `release`; Clang on macOS with `default` and `shared`; MSVC with `default`, `shared` and `release` |
+| `mingw` | The same with GCC of MinGW-w64 in MSYS2: UCRT64 with `default` and `shared`, MINGW64 with `default`. MINGW64 is there for the old C library of Windows, msvcrt, whose printf does not follow C99 ([coding style](coding-style.md#formatted-output)) |
+
+A change is merged only when every job passes.

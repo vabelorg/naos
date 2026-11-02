@@ -33,7 +33,7 @@ A pull request that makes a change users can see adds an entry under `## [Unrele
 
 ## At a release
 
-The workflows of [releasing](release.md) do this, with `scripts/prepare-release.cmake` and `release-notes.cmake`:
+The workflows of [releasing](release.md) do this, with `scripts/PrepareRelease.cmake` and `ReleaseNotes.cmake`:
 
 1. Rename `## [Unreleased]` to `## [<version>] - <YYYY-MM-DD>`, and add an empty `## [Unreleased]` above it.
 2. Update the links at the end of the file: `[Unreleased]` compares the new tag with `HEAD`, and `[<version>]` points to the release.

@@ -66,7 +66,7 @@ GCC、Clang、MSVC は `NAOS_FAIL` が戻らないことを知っていますが
 - 制限時間を超えた: エミュレータの下などでは `DISCOVERY_TIMEOUT` を延ばします（[CMake](../reference/cmake.md#naos_discover_tests)）。
 - 共有ライブラリが見つからない: Windows では、出力なしで `Exit code 0xc0000135` となります。列挙の前に、DLL を実行ファイルの隣か `PATH` の通った場所に置きます（[共有ライブラリ](shared-library.md#ビルド時に-dll-が見つかるようにする)）。
 
-**`find_package(naos 0.2)` がインストールしたバージョンを受け付けない**
+**`find_package(Naos 0.2)` がインストールしたバージョンを受け付けない**
 
 1.0 より前は、0.2.x だけを受け付けます。プロジェクトが求めるマイナーバージョンをインストールするか、プロジェクトの側を更新します。
 

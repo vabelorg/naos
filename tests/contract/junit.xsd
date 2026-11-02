@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2026 The Naos Authors
+  SPDX-License-Identifier: MIT
+
+  The JUnit XML file that Naos writes, as docs/reference/xml.md states it: the elements, how they
+  nest, and the attributes it keeps compatible, with the form of their values. The text of
+  <failure> and the <properties> of a suite are not kept compatible, so only their place is
+  checked here. A change to this file is a change to what Naos keeps compatible.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <!-- Seconds, with three decimals: time="3.120". -->
+  <xs:simpleType name="seconds">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[0-9]+\.[0-9]{3}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="zero">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:attributeGroup name="counts">
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="tests" type="xs:nonNegativeInteger" use="required"/>
+    <xs:attribute name="failures" type="xs:nonNegativeInteger" use="required"/>
+    <xs:attribute name="errors" type="zero" use="required"/>
+    <xs:attribute name="skipped" type="xs:nonNegativeInteger" use="required"/>
+    <xs:attribute name="time" type="seconds" use="required"/>
+  </xs:attributeGroup>
+
+  <xs:element name="testsuites">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="testsuite" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="counts"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="testsuite">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="properties" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="property" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="name" type="xs:string" use="required"/>
+                  <xs:attribute name="value" type="xs:string" use="required"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element ref="testcase" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="counts"/>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- A passed test holds nothing, a failed one its failures, a skipped one one <skipped>. -->
+  <xs:element name="testcase">
+    <xs:complexType>
+      <xs:choice minOccurs="0">
+        <xs:element name="failure" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:string">
+                <xs:attribute name="type" type="xs:string" use="required" fixed="error"/>
+                <xs:attribute name="message" type="xs:string" use="required"/>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="skipped">
+          <xs:complexType>
+            <xs:attribute name="message" type="xs:string" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+      <xs:attribute name="classname" type="xs:string" use="required"/>
+      <xs:attribute name="name" type="xs:string" use="required"/>
+      <xs:attribute name="time" type="seconds" use="required"/>
+      <xs:attribute name="file" type="xs:string"/>
+      <xs:attribute name="line" type="xs:positiveInteger"/>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

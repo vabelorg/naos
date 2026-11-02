@@ -1,12 +1,12 @@
 # CMake
 
-What a CMake project gets from Naos: the target `naos::naos`, two functions that make test executables and register their tests with CTest, and a few options. [Installation](../getting-started/installation.md) tells how to bring Naos into a project.
+What a CMake project gets from Naos: the target `Naos::naos`, two functions that make test executables and register their tests with CTest, and a few options. [Installation](../getting-started/installation.md) tells how to bring Naos into a project.
 
 ## Target
 
 | Target | Content |
 |---|---|
-| `naos::naos` | The library, with its include directory `include/` and the C99 requirement. Shared, it also carries the definition `NAOS_SHARED` |
+| `Naos::naos` | The library, with its include directory `include/` and the C99 requirement. Shared, it also carries the definition `NAOS_SHARED` |
 
 - Debug builds are named with the suffix `d` (`naosd.lib`, `libnaosd.a`), so that they can sit beside release builds.
 - A shared build exports only the public functions (`C_VISIBILITY_PRESET hidden`). Its `SOVERSION` is `0.<minor>` before 1.0 and `<major>` from 1.0 on.
@@ -26,7 +26,7 @@ naos_add_executable(<target>
 )
 ```
 
-Makes the executable `<target>` from the `SOURCES`, links it to `naos::naos` and the `LIBRARIES` (privately), and registers each of its tests with CTest. The arguments other than `SOURCES` and `LIBRARIES` are those of [`naos_discover_tests()`](#naos_discover_tests).
+Makes the executable `<target>` from the `SOURCES`, links it to `Naos::naos` and the `LIBRARIES` (privately), and registers each of its tests with CTest. The arguments other than `SOURCES` and `LIBRARIES` are those of [`naos_discover_tests()`](#naos_discover_tests).
 
 ```cmake
 naos_add_executable(my_tests SOURCES main.c parser_test.c LIBRARIES my_lib)
@@ -61,6 +61,7 @@ Registers each test of an executable made with `add_executable()`, which must ca
 The tests are listed after each build of the executable, by running it with `--naos-list`. Adding or removing a test needs no new configure.
 
 - Until the executable is built, CTest has a single failing test in place of its tests, `<prefix>NOT_BUILT`. It carries the `LABELS` too, so that `ctest -L` does not miss it. The same happens with a multi-config generator for a configuration that is not built, chosen with `-C`.
+- A change to the arguments (`PREFIX`, `LABELS`, `PROPERTIES`, `DISCOVERY_TIMEOUT`) links the executable again at the next build, which lists its tests again, with the single-config Ninja and Makefile generators. With other generators, such as Visual Studio, Xcode and Ninja Multi-Config, the tests keep what they had until the executable is built again.
 - When listing fails, the build fails, with the reason and what to do in its message. After the time limit, it says to raise `DISCOVERY_TIMEOUT`; otherwise it tells what to do when a shared library (DLL) is not found ([shared library](../guides/shared-library.md)). On Windows, a missing DLL gives no output, only `Exit code 0xc0000135`; in that case the message names the cause outright.
 - Commands added to the target with `add_custom_command(TARGET ... POST_BUILD)` run in the order added. Add one that must run before the listing (copying a DLL, for example) after `add_executable()` and before `naos_discover_tests()`; with `naos_add_executable()`, the listing always comes first.
 
@@ -74,13 +75,13 @@ The tests are listed after each build of the executable, by running it with `--n
 
 ## Package
 
-After `cmake --install`, `find_package(naos)` finds Naos and gives `naos::naos` and the functions above.
+After `cmake --install`, `find_package(Naos)` finds Naos and gives `Naos::naos` and the functions above.
 
 ```cmake
-find_package(naos 0.2 REQUIRED)
+find_package(Naos 0.2 REQUIRED)
 ```
 
-Before 1.0, a version asks for the same minor version: `find_package(naos 0.2)` accepts 0.2.x only. From 1.0 on, it asks for the same major version.
+Before 1.0, a version asks for the same minor version: `find_package(Naos 0.2)` accepts 0.2.x only. From 1.0 on, it asks for the same major version.
 
 The installed files, under the install prefix:
 
@@ -89,7 +90,7 @@ The installed files, under the install prefix:
 | `include/naos/` | The public headers |
 | `lib/` (`bin/` for a DLL) | The library |
 | `bin/` | The PDB of a DLL built with MSVC in Debug or RelWithDebInfo |
-| `lib/cmake/naos/` | `naos-config.cmake`, `naos-config-version.cmake`, `naos-targets*.cmake`, `Naos.cmake`, `NaosDiscover.cmake` |
+| `lib/cmake/Naos/` | `NaosConfig.cmake`, `NaosConfigVersion.cmake`, `NaosTargets*.cmake`, `Naos.cmake`, `NaosDiscover.cmake` |
 | `share/licenses/naos/LICENSE` | The license |
 
 The directories follow `GNUInstallDirs` (`CMAKE_INSTALL_LIBDIR` and so on).

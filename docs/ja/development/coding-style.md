@@ -65,7 +65,7 @@ static size_t add_saturated(size_t a, size_t b)
 
 ## 書式付きの出力
 
-`src/` では、書式付きの出力関数を `format.h` を通して呼びます。`naos_printf`・`naos_fprintf`・`naos_vfprintf`・`naos_snprintf`・`naos_vsnprintf` を使い、`printf` などを直接は呼びません。これらはどのプラットフォームでも C99 のとおりに書式を扱います。MinGW の既定の関数はそうではありません（`%zu`、`%jd`、`%e` の指数）。書式を取らない関数（`puts`・`fputs`・`fputc`）は直接呼びます。`naos.sources.format` がこれを確かめます。
+`src/` では、書式付きの出力関数を `format.h` を通して呼びます。`naos_printf`・`naos_fprintf`・`naos_vfprintf`・`naos_snprintf`・`naos_vsnprintf` を使い、`printf` などを直接は呼びません。これらはどのプラットフォームでも C99 のとおりに書式を扱います。MinGW の既定の関数はそうではありません（`%zu`、`%jd`、`%e` の指数）。書式を取らない関数（`puts`・`fputs`・`fputc`）は直接呼びます。`scripts/CheckPrintfCalls.cmake` がこれを確かめます（[lint](testing.md#lint)）。
 
 ## コメント
 
@@ -78,7 +78,7 @@ static size_t add_saturated(size_t a, size_t b)
 
 - コマンドは小文字、インデントは空白 4 文字。
 - 利用者向けの関数は `naos_*`、内部用は `_naos_*`。
-- ファイル名は使われ方で決める。`include()` で読み込むモジュールは CMake 本体のモジュールにならって `Naos<名前>.cmake`（`NaosVersion.cmake`）、`cmake -P` で実行するスクリプトは小文字の単語を `-` でつなぐ（`prepare-release.cmake`、`check-output.cmake`）。パッケージの設定ファイルは `find_package()` が探す名前にする（`naos-config.cmake`）。
+- ファイル名は CMake 本体のモジュールにならって、パッケージの設定ファイル（`NaosConfig.cmake`）も含めアッパーキャメルケースにする。`include()` で読み込むモジュールと、利用者向けにインストールするスクリプトは `Naos` で始める（`NaosVersion.cmake`、`NaosDiscover.cmake`）。Naos のビルド・テスト・ワークフローだけが `cmake -P` で実行するスクリプトは `Naos` を付けない（`PrepareRelease.cmake`、`RunCase.cmake`）。
 - ファイルの先頭に著作権表示と、何のためのファイルで、どう使われるかのコメントを書く。
 
 ## サンプル

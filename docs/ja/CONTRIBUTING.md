@@ -33,7 +33,7 @@ ctest --preset default
 3. 自己テストを足すか直す。動作の変更には、それがないと失敗するテストを付ける。
 4. 同じ変更で文書を直す。API、出力、CMake の関数を変えたら、リファレンスを直す。英語のページは同じ変更で直し、日本語訳（`docs/ja/`）は後のプルリクエストで追いついてもよい（[文書の書き方](development/docs-style.md#言語)）。
 5. 利用者に見える変更なら、`CHANGELOG.md` の `[Unreleased]` に項目を足す（[変更履歴](development/changelog.md)）。
-6. `default` と `shared` の両方のプリセットで自己テストを実行する。
+6. プリセット `default` と `shared` で、`src/` の変更なら `release` と `sanitize` でも自己テストを実行する（[ビルド](development/building.md#プリセットを使う)）。ビルドが要らない検査 `cmake -D ROOT=. -P scripts/Lint.cmake` も実行する。
 
 ## コミットとプルリクエスト
 

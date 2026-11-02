@@ -40,5 +40,5 @@ A rule is stated once, in the reference. Guides and tutorials show how to use it
 ## Links
 
 - Relative links between pages (`../reference/cmake.md#options`), so that they work on GitHub and in a clone.
-- Links to sections use the id GitHub gives the heading: lowercase, punctuation removed, spaces made `-`. Renaming a heading breaks the links to it; the self test `naos.docs.links` finds them.
+- Links to sections use the id GitHub gives the heading: lowercase, punctuation removed, spaces made `-`. Renaming a heading breaks the links to it; `scripts/CheckMarkdownLinks.cmake` finds them ([lint](testing.md#lint)).
 - Code comments and CMake files that point to the documentation name the English page.

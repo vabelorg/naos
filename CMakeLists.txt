@@ -7,9 +7,9 @@
 #
 #   cmake/Naos.cmake          naos_add_executable() and naos_discover_tests(), for the users
 #   cmake/NaosDiscover.cmake  the build-time script those run to register the tests with CTest
-#   cmake/naos-config.cmake.in, cmake/NaosInstall.cmake  the package for find_package(naos)
+#   cmake/NaosConfig.cmake.in, cmake/NaosInstall.cmake  the package for find_package(Naos)
 #   cmake/NaosVersion.cmake   the version and what follows from it
-#   src/                      the library, naos::naos
+#   src/                      the library, Naos::naos
 #   tests/                    the self tests
 
 cmake_minimum_required(VERSION 3.21)

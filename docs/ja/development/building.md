@@ -11,12 +11,14 @@ Naos をソースからビルドし、自己テストを実行する方法です
 
 ## プリセットを使う
 
-`CMakePresets.json` には 2 つのプリセットがあり、それぞれ `build/<preset>/` にビルドします。
+`CMakePresets.json` には 4 つのプリセットがあり、それぞれ `build/<preset>/` にビルドします。
 
 | プリセット | ビルドするもの |
 |---|---|
 | `default` | 静的ライブラリ、Debug、自己テスト付き |
 | `shared` | 共有ライブラリ（DLL）、Debug、自己テスト付き |
+| `release` | 静的ライブラリ、Release（最適化あり）、自己テスト付き |
+| `sanitize` | 静的ライブラリ、Debug、自己テスト付き。AddressSanitizer と UndefinedBehaviorSanitizer でビルドして実行する。GCC と Clang のみ |
 
 ```sh
 cmake --preset default
@@ -24,7 +26,7 @@ cmake --build --preset default
 ctest --preset default
 ```
 
-`shared` で同じことをすると、共有ビルドを確かめられます。ライブラリや CMake のファイルに触れる変更は、送る前に両方で実行してください。
+`shared` で同じことをすると、共有ビルドを確かめられます。ライブラリや CMake のファイルに触れる変更は、送る前に両方で実行してください。`release` は最適化でしか見つからないものを示します。`test.c` は `longjmp` でテストを止めるので、最適化したビルドでも成り立たなければならず、GCC の `-Wclobbered` のように最適化が要る警告もあります。`sanitize` はライブラリとテストのメモリの誤りと未定義動作を見つけます。CI は両方を実行します。
 
 Windows の MinGW-w64 では、CI と同じく、MSYS2 のシェル（UCRT64 または MINGW64）で、その `gcc`・`cmake`・`ninja` のパッケージを入れ、`CMAKE_GENERATOR=Ninja` にして実行します。
 
@@ -48,13 +50,16 @@ ctest --test-dir build --output-on-failure
 
 ## 一部の自己テストを実行する
 
-自己テストの CTest 名はすべて `naos.` で始まり、ラベル `naos` が付いています。[サンプルのテスト](testing.md#サンプルとドキュメント)は、実行ファイルの名前で始まります。
+自己テストの CTest 名はすべて `naos.` で始まり、ラベル `naos` と層のラベルが付いています。[サンプルのテスト](testing.md#サンプルとドキュメント)は、実行ファイルの名前で始まります（[名前とラベル](testing.md#名前とラベル)）。
 
 ```sh
-ctest --preset default -R '^naos\.cli\.'          # 1 つの観点
-ctest --preset default -R '^naos\.docs\.links$'   # 文書のリンク
-ctest --preset default -j8                        # 並列
+ctest --preset default -L contract                             # 1 つの層
+ctest --preset default -R '^naos\.behavior\.command-line\.'   # 1 つの領域
+ctest --preset default -LE slow                                # プロジェクトをビルドするケース以外すべて
+ctest --preset default -j8                                     # 並列
 ```
+
+文書のリンクのように、ビルドを必要としない検査は自己テストではありません（[lint](testing.md#lint)）。
 
 自己テストの仕組みと足し方は[テスト](testing.md)にあります。
 
@@ -64,12 +69,20 @@ ctest --preset default -j8                        # 並列
 cmake --install build/default --prefix /tmp/naos-install
 ```
 
-インストールされる配置は [CMake のリファレンス](../reference/cmake.md#パッケージ)にあります。プロジェクトからは `find_package(naos)` と `-DCMAKE_PREFIX_PATH=/tmp/naos-install` で使えます。`tests/package/` がそのようなプロジェクトで、CI はインストールしたパッケージごとにこれをビルドしてテストします。
+インストールされる配置は [CMake のリファレンス](../reference/cmake.md#パッケージ)にあります。プロジェクトからは `find_package(Naos)` と `-DCMAKE_PREFIX_PATH=/tmp/naos-install` で使えます。`tests/consumer/` がそのようなプロジェクトです。`cmake -D PRESET=<preset> -P scripts/TestPackage.cmake` が、ビルドしたプリセットをインストールしてこのプロジェクトをテストします。CI もビルドごとにこれを実行します。
 
 ## CMake を使わない場合
 
-ライブラリは、コンパイラだけでもビルドできなければなりません。自己テスト `naos.no_cmake.build` が、GCC 互換のコンパイラで、[インストール](../getting-started/installation.md#cmake-を使わない場合)に書いたとおりにビルドして確かめます。
+ライブラリは、コンパイラだけでもビルドできなければなりません。自己テスト `naos.build.no_cmake.build` が、GCC 互換のコンパイラで、[インストール](../getting-started/installation.md#cmake-を使わない場合)に書いたとおりにビルドして確かめます。
 
 ## 継続的インテグレーション
 
-`.github/workflows/ci.yml` は、すべての push とプルリクエストを、プリセットを使って Linux（GCC と Clang）、macOS（Clang）、Windows（MSVC と、MSYS2 の UCRT64・MINGW64 環境の MinGW-w64 の GCC）で、それぞれ静的ライブラリと共有ライブラリとしてビルドしてテストします。すべてのジョブが通った変更だけをマージします。
+`.github/workflows/ci.yml` は、すべての push とプルリクエストを確かめます。どのステップも、手元でも同じように実行できるコマンドです。
+
+| ジョブ | 実行するもの |
+|---|---|
+| `lint` | `cmake -D ROOT=. -P scripts/Lint.cmake`（[lint](testing.md#lint)） |
+| `test` | プリセットで configure、ビルド、`ctest`。続いて `sanitize` 以外では `cmake -D PRESET=<preset> -P scripts/TestPackage.cmake`（[インストールする](#インストールする)）。Linux の GCC で `default`、`shared`、`release`、`sanitize`、および `default` を対応するいちばん古い CMake 3.21 で。Linux の Clang で `default` と `release`。macOS の Clang で `default` と `shared`。MSVC で `default`、`shared`、`release` |
+| `mingw` | 同じことを MSYS2 の MinGW-w64 の GCC で。UCRT64 で `default` と `shared`、MINGW64 で `default`。MINGW64 は、printf が C99 に従わない Windows の古い C ライブラリ msvcrt のためにある（[コーディングスタイル](coding-style.md#書式付きの出力)） |
+
+すべてのジョブが通った変更だけをマージします。

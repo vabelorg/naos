@@ -8,14 +8,14 @@ project(naos_quickstart LANGUAGES C)
 
 enable_testing()
 
-# Inside the self tests of Naos, naos::naos is already there; on its own, the example fetches it.
-if(NOT TARGET naos::naos)
+# Inside the self tests of Naos, Naos::naos is already there; on its own, the example fetches it.
+if(NOT TARGET Naos::naos)
     include(FetchContent)
-    FetchContent_Declare(naos
+    FetchContent_Declare(Naos
         GIT_REPOSITORY https://github.com/vabelorg/naos.git
         GIT_TAG v0.2.0
     )
-    FetchContent_MakeAvailable(naos)
+    FetchContent_MakeAvailable(Naos)
 endif()
 
 add_library(clamp clamp.c)

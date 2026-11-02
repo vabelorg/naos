@@ -13,4 +13,4 @@ The functions the macros call (`naos_check_int()`, `naos_fail()` and others), th
 | [Command line](command-line.md) | The `--naos-*` options and the exit codes |
 | [Output](output.md) | The human-readable output on standard output, and what of it is kept compatible |
 | [JUnit XML](xml.md) | The file of `--naos-output xml:<path>`, the output for tools, and what of it is kept compatible |
-| [CMake](cmake.md) | `naos::naos`, `naos_add_executable()`, `naos_discover_tests()`, options, package |
+| [CMake](cmake.md) | `Naos::naos`, `naos_add_executable()`, `naos_discover_tests()`, options, package |

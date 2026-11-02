@@ -14,7 +14,7 @@ Every change is built and tested on Linux (GCC and Clang), macOS (Clang) and Win
 
 ## With CMake
 
-Each way below gives the target `naos::naos` and the functions `naos_add_executable()` and `naos_discover_tests()` ([CMake reference](../reference/cmake.md)). Then make the test executable and let CTest run it:
+Each way below gives the target `Naos::naos` and the functions `naos_add_executable()` and `naos_discover_tests()` ([CMake reference](../reference/cmake.md)). Then make the test executable and let CTest run it:
 
 ```cmake
 enable_testing()   # or include(CTest)
@@ -30,11 +30,11 @@ Naos is downloaded at configure time. This is the simplest way, and the one the 
 
 ```cmake
 include(FetchContent)
-FetchContent_Declare(naos
+FetchContent_Declare(Naos
     GIT_REPOSITORY https://github.com/vabelorg/naos.git
     GIT_TAG v0.2.0
 )
-FetchContent_MakeAvailable(naos)
+FetchContent_MakeAvailable(Naos)
 ```
 
 Pin `GIT_TAG` to a release tag.
@@ -62,7 +62,7 @@ cmake --install naos/build --config Release --prefix /opt/naos
 Then find it, with the prefix in `CMAKE_PREFIX_PATH` (`-DCMAKE_PREFIX_PATH=/opt/naos`):
 
 ```cmake
-find_package(naos 0.2 REQUIRED)
+find_package(Naos 0.2 REQUIRED)
 ```
 
 Which versions it accepts is in the [CMake reference](../reference/cmake.md#package).

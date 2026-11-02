@@ -16,9 +16,9 @@ The entries under `[Unreleased]` in `CHANGELOG.md` decide it, as [changelog](cha
 2. In the Actions tab, run **Release PR** with the version. Tick **dry_run** first to see the changes and the notes in the summary of the run, without opening anything.
 3. The workflow opens the pull request `Release <version>`. It:
    - sets the version in `include/naos/version.h`, its only home: CMake derives the rest from it;
-   - for a new minor or major version, updates the tag used by `FetchContent` (`GIT_TAG v…`) and the minor version named in `find_package(naos 0.0)` in the README files, the documentation and the examples;
+   - for a new minor or major version, updates the tag used by `FetchContent` (`GIT_TAG v…`) and the minor version named in `find_package(Naos 0.0)` in the README files, the documentation and the examples;
    - closes the changelog: renames `[Unreleased]` to the version and its date, and updates the links at the end of `CHANGELOG.md`.
-4. CI runs on the pull request: the self tests with both presets, and a project that uses the installed package with `find_package(naos <version>)` (`tests/package/`). Review the changes and merge.
+4. CI runs on the pull request: lint, which tests the release scripts too, the self tests with every preset and platform, and a project that uses the installed package with `find_package(Naos <version>)` (`tests/consumer/`, with `scripts/TestPackage.cmake`). Review the changes and merge.
 5. Merging runs **Release**: it tags the merge commit `v<version>`, creates the GitHub release with the section of this version in `CHANGELOG.md` as its notes, and deletes the branch.
 
 For 1.0, the workflow warns that the text on compatibility in the README files and the documentation must change by hand (from the same minor version to the same major version): push the fix to the pull request before merging.
@@ -32,8 +32,8 @@ For 1.0, the workflow warns that the text on compatibility in the README files a
 The workflows run two CMake scripts that also work locally, from the root of Naos:
 
 ```sh
-cmake -D ROOT=. -D VERSION=0.1.0 -P scripts/prepare-release.cmake
-cmake -D ROOT=. -D VERSION=0.1.0 -D OUTPUT=notes.md -P scripts/release-notes.cmake
+cmake -D ROOT=. -D VERSION=0.1.0 -P scripts/PrepareRelease.cmake
+cmake -D ROOT=. -D VERSION=0.1.0 -D OUTPUT=notes.md -P scripts/ReleaseNotes.cmake
 ```
 
 The first changes the files as in step 3, the second writes the notes of the release. Then commit as `Release <version>`, tag, push and create the GitHub release from the tag with these notes:

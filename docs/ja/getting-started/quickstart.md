@@ -93,11 +93,11 @@ project(quickstart LANGUAGES C)
 enable_testing()
 
 include(FetchContent)
-FetchContent_Declare(naos
+FetchContent_Declare(Naos
     GIT_REPOSITORY https://github.com/vabelorg/naos.git
     GIT_TAG v0.2.0
 )
-FetchContent_MakeAvailable(naos)
+FetchContent_MakeAvailable(Naos)
 
 add_library(clamp clamp.c)
 target_include_directories(clamp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

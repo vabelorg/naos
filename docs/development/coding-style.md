@@ -65,7 +65,7 @@ A blank line between groups, each group in alphabetical order. Public headers ar
 
 ## Formatted output
 
-`src/` calls the formatted output functions through `format.h`: `naos_printf`, `naos_fprintf`, `naos_vfprintf`, `naos_snprintf` and `naos_vsnprintf`, never `printf` and the others directly. They format as C99 does on every platform, which the default functions of MinGW do not (`%zu`, `%jd`, the exponent of `%e`). Functions without a format (`puts`, `fputs`, `fputc`) are called directly. `naos.sources.format` checks it.
+`src/` calls the formatted output functions through `format.h`: `naos_printf`, `naos_fprintf`, `naos_vfprintf`, `naos_snprintf` and `naos_vsnprintf`, never `printf` and the others directly. They format as C99 does on every platform, which the default functions of MinGW do not (`%zu`, `%jd`, the exponent of `%e`). Functions without a format (`puts`, `fputs`, `fputc`) are called directly. `scripts/CheckPrintfCalls.cmake` checks it ([lint](testing.md#lint)).
 
 ## Comments
 
@@ -78,7 +78,7 @@ A blank line between groups, each group in alphabetical order. Public headers ar
 
 - Lowercase commands, four spaces of indentation.
 - Functions for users are `naos_*`; internal ones are `_naos_*`.
-- Files follow how they are used: a module read with `include()` is `Naos<Name>.cmake` (`NaosVersion.cmake`), as the modules of CMake are; a script run with `cmake -P` is in lowercase words joined by `-` (`prepare-release.cmake`, `check-output.cmake`). The package configuration has the name `find_package()` looks for (`naos-config.cmake`).
+- Files are in UpperCamelCase, as the modules of CMake are, the package configuration included (`NaosConfig.cmake`): a module read with `include()` starts with `Naos` (`NaosVersion.cmake`), and so does a script installed for users (`NaosDiscover.cmake`); the scripts run with `cmake -P` by the build, the tests and the workflows of Naos only do not (`PrepareRelease.cmake`, `RunCase.cmake`).
 - A file starts with the copyright notice and a comment on what it is for and how it is used.
 
 ## Examples

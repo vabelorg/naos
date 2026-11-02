@@ -10,7 +10,7 @@
 #     [LABELS <label>...]
 #     [PROPERTIES <name> <value>...]
 #     [DISCOVERY_TIMEOUT <seconds>])  # limit for "<exe> --naos-list", default 60
-#   Creates a test executable linked to naos::naos and registers each of its tests with CTest.
+#   Creates a test executable linked to Naos::naos and registers each of its tests with CTest.
 #
 # naos_discover_tests(<target> [PREFIX ...] [LABELS ...] [PROPERTIES ...] [DISCOVERY_TIMEOUT ...])
 #   Registers the tests of an existing executable target that calls naos_init() and naos_run().
@@ -114,6 +114,14 @@ function(_naos_discover caller target prefix labels properties timeout)
         OUTPUT "${tests_file}"
     )
     file(GENERATE OUTPUT "${params_file}" CONTENT "${params}")
+    # A change to the arguments rewrites the parameter file, which then links the executable again,
+    # and so lists its tests again: without it, the tests kept their old names, labels and
+    # properties until the executable changed. file(GENERATE) leaves an unchanged file as it is.
+    # Only the Ninja and Makefile generators honor LINK_DEPENDS; with a multi-config one, the path
+    # holds $<CONFIG>, which LINK_DEPENDS is not known to expand from CMake 3.21 on, so it is left out.
+    if(NOT multi_config)
+        set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS "${params_file}")
+    endif()
 
     add_custom_command(TARGET ${target} POST_BUILD
         COMMAND "${CMAKE_COMMAND}" -D "NAOS_PARAMS=${params_file}" -P "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/NaosDiscover.cmake"
@@ -163,7 +171,7 @@ function(naos_add_executable target)
     endif()
 
     add_executable(${target} ${arg_SOURCES})
-    target_link_libraries(${target} PRIVATE naos::naos ${arg_LIBRARIES})
+    target_link_libraries(${target} PRIVATE Naos::naos ${arg_LIBRARIES})
 
     _naos_discover(naos_add_executable ${target}
         "${arg_PREFIX}" "${arg_LABELS}" "${arg_PROPERTIES}" "${arg_DISCOVERY_TIMEOUT}")

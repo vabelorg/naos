@@ -8,13 +8,13 @@ project(naos_cpp LANGUAGES C CXX)
 
 enable_testing()
 
-if(NOT TARGET naos::naos)
+if(NOT TARGET Naos::naos)
     include(FetchContent)
-    FetchContent_Declare(naos
+    FetchContent_Declare(Naos
         GIT_REPOSITORY https://github.com/vabelorg/naos.git
         GIT_TAG v0.2.0
     )
-    FetchContent_MakeAvailable(naos)
+    FetchContent_MakeAvailable(Naos)
 endif()
 
 naos_add_executable(cpp_tests SOURCES words_test.cpp)

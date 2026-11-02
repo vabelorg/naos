@@ -16,9 +16,9 @@ Naos のバージョンをリリースする手順です。リリースは `main
 2. Actions タブで、バージョンを入れて **Release PR** を実行する。先に **dry_run** にチェックを入れて実行すると、何も作らずに、変更とリリースノートを実行のサマリで見られる。
 3. ワークフローがプルリクエスト `Release <version>` を作る。中身は次のとおり。
    - `include/naos/version.h` にバージョンを書く。バージョンを書くのはここだけで、残りは CMake がそこから導く。
-   - 新しいマイナーかメジャーのバージョンなら、README と文書とサンプルで、`FetchContent` が使うタグ（`GIT_TAG v…`）と、`find_package(naos 0.0)` に書いたマイナーバージョンを更新する。
+   - 新しいマイナーかメジャーのバージョンなら、README と文書とサンプルで、`FetchContent` が使うタグ（`GIT_TAG v…`）と、`find_package(Naos 0.0)` に書いたマイナーバージョンを更新する。
    - 変更履歴を閉じる。`[Unreleased]` をバージョンと日付に変え、`CHANGELOG.md` の末尾のリンクを更新する。
-4. プルリクエストで CI が走る。両方のプリセットでの自己テストと、インストールしたパッケージを `find_package(naos <version>)` で使うプロジェクト（`tests/package/`）のテストです。変更を確かめてマージする。
+4. プルリクエストで CI が走る。リリースのスクリプトもテストする lint、すべてのプリセットとプラットフォームでの自己テスト、インストールしたパッケージを `find_package(Naos <version>)` で使うプロジェクト（`tests/consumer/`。`scripts/TestPackage.cmake` で）のテストです。変更を確かめてマージする。
 5. マージすると **Release** が走る。マージコミットに `v<version>` のタグを付け、`CHANGELOG.md` のこのバージョンの節をリリースノートにして GitHub のリリースを作り、ブランチを消す。
 
 1.0 のときは、README と文書にある互換性の説明（同じマイナーバージョンから、同じメジャーバージョンへ）を手で直す必要があると、ワークフローが警告します。マージの前に、直したものをプルリクエストに push してください。
@@ -32,8 +32,8 @@ Naos のバージョンをリリースする手順です。リリースは `main
 ワークフローが実行する 2 つの CMake スクリプトは、手元でも Naos のルートで実行できます。
 
 ```sh
-cmake -D ROOT=. -D VERSION=0.1.0 -P scripts/prepare-release.cmake
-cmake -D ROOT=. -D VERSION=0.1.0 -D OUTPUT=notes.md -P scripts/release-notes.cmake
+cmake -D ROOT=. -D VERSION=0.1.0 -P scripts/PrepareRelease.cmake
+cmake -D ROOT=. -D VERSION=0.1.0 -D OUTPUT=notes.md -P scripts/ReleaseNotes.cmake
 ```
 
 1 つ目は手順 3 のとおりにファイルを書き換え、2 つ目はリリースノートを書き出します。その後、`Release <version>` としてコミットし、タグを付けて push し、そのノートでタグから GitHub のリリースを作ります。

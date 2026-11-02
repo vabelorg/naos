@@ -1,2 +1,4 @@
-build/
+# The build directories of the presets, and of an example built on its own.
+/build/
+examples/*/build/
 CMakeUserPresets.json
