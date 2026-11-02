@@ -8,22 +8,13 @@
 #include <naos/naos.h>
 
 #include <stddef.h>
-#include <string.h>
 
 #include "filter.h"
 
 /* Whether filter selects the test suite_name.test_name. */
 static int selects(const char *filter, const char *suite_name, const char *test_name)
 {
-    naos_suite_t suite;
-    naos_test_t test;
-
-    memset(&suite, 0, sizeof(suite));
-    memset(&test, 0, sizeof(test));
-    suite.name = suite_name;
-    test.name = test_name;
-
-    return naos_filter_matches(&suite, &test, filter);
+    return naos_filter_matches(filter, suite_name, test_name);
 }
 
 NAOS_TEST(no_filter_selects_all)

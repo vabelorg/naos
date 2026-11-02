@@ -51,7 +51,7 @@ static const char *read_back(const char *path)
 }
 
 /* A record of kind for text, at file and line, with nothing else. */
-static naos_diagnostic_record_t record_of(naos_report_kind_t kind, const char *file, int line, const char *text)
+static naos_diagnostic_record_t record_of(naos_diagnostic_kind_t kind, const char *file, int line, const char *text)
 {
     naos_diagnostic_record_t record;
 
@@ -91,7 +91,7 @@ static const char *failure_of(const char *path, const char *text)
 {
     naos_diagnostic_record_t record;
 
-    record = record_of(NAOS_REPORT_ERROR, "f.c", 7, text);
+    record = record_of(NAOS_DIAGNOSTIC_ERROR, "f.c", 7, text);
 
     return one_test(path, NAOS_OUTCOME_FAIL, &record, 0);
 }
@@ -146,7 +146,7 @@ NAOS_TEST(skipped_test)
     naos_diagnostic_record_t record;
     const char *xml;
 
-    record = record_of(NAOS_REPORT_SKIP, "f.c", 9, "not here");
+    record = record_of(NAOS_DIAGNOSTIC_SKIP, "f.c", 9, "not here");
     xml = one_test("unit_xml_skipped.xml", NAOS_OUTCOME_SKIP, &record, 0);
 
     NAOS_CHECK_TRUE(has(xml, "skipped=\"1\" time=\"0.000\">\n"));
@@ -276,7 +276,7 @@ NAOS_TEST(rounds_and_suites)
     const char *xml;
 
     writer = naos_xml_writer();
-    record = record_of(NAOS_REPORT_ERROR, "f.c", 7, "x");
+    record = record_of(NAOS_DIAGNOSTIC_ERROR, "f.c", 7, "x");
     NAOS_REQUIRE_INT_EQ(1, writer->begin("prog", "unit_xml_rounds.xml"));
 
     writer->round_begin(&first);
@@ -337,7 +337,7 @@ NAOS_TEST(next_file_starts_clean)
     naos_diagnostic_record_t record;
     const char *xml;
 
-    record = record_of(NAOS_REPORT_ERROR, "f.c", 7, "first");
+    record = record_of(NAOS_DIAGNOSTIC_ERROR, "f.c", 7, "first");
     (void)one_test("unit_xml_first.xml", NAOS_OUTCOME_FAIL, &record, 0);
     xml = one_test("unit_xml_second.xml", NAOS_OUTCOME_PASS, NULL, 0);
 

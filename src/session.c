@@ -9,8 +9,9 @@
 
 #include <stdlib.h>
 
+#include "message.h"
 #include "options.h"
-#include "report.h"
+#include "plan.h"
 #include "runner.h"
 #include "suite_internal.h"
 
@@ -45,7 +46,7 @@ static int check_phase(naos_phase_t expected, const char *what)
         return 1;
     }
 
-    naos_report_error("%s %s; the order is naos_init(), NAOS_ADD_SUITE, naos_run()", what, when[g_phase]);
+    naos_message("%s %s; the order is naos_init(), NAOS_ADD_SUITE, naos_run()", what, when[g_phase]);
 
     return 0;
 }
@@ -77,6 +78,7 @@ int naos_run(void)
 {
     const naos_options_t *options;
     naos_builder_t builder;
+    naos_plan_t plan;
     int result;
 
     if (check_phase(NAOS_PHASE_ADDING, "naos_run()") == 0)
@@ -101,7 +103,15 @@ int naos_run(void)
         }
         else if (options->help_requested == 0)
         {
-            result = naos_runner_run(options, builder.suites, builder.count);
+            result = naos_plan_make(&plan, options, builder.suites, builder.count);
+            if ((result == NAOS_EXIT_PASS) && (options->list_only != 0))
+            {
+                naos_plan_list(&plan);
+            }
+            else if (result == NAOS_EXIT_PASS)
+            {
+                result = naos_runner_run(options, &plan);
+            }
         }
     }
 

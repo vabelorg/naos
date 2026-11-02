@@ -16,7 +16,7 @@
 /* Size of the text of one trace: longer ones are cut short, ending in "...". */
 #define NAOS_TRACE_TEXT_SIZE 256
 
-/* One trace of NAOS_TRACE_PUSH, where it was pushed and its text. context.c keeps them in this form. */
+/* One trace of NAOS_TRACE_PUSH, where it was pushed and its text. diagnostic.c keeps them in this form. */
 typedef struct naos_trace
 {
     const char *file;
@@ -33,12 +33,12 @@ typedef enum naos_outcome
 } naos_outcome_t;
 
 /* Kind of a diagnostic. */
-typedef enum naos_report_kind
+typedef enum naos_diagnostic_kind
 {
-    NAOS_REPORT_ERROR, /* "error" */
-    NAOS_REPORT_SKIP,  /* "skip" */
-    NAOS_REPORT_NOTE   /* "note": a trace, in the human-readable output only */
-} naos_report_kind_t;
+    NAOS_DIAGNOSTIC_ERROR, /* "error" */
+    NAOS_DIAGNOSTIC_SKIP,  /* "skip" */
+    NAOS_DIAGNOSTIC_NOTE   /* "note": a trace, in the human-readable output only */
+} naos_diagnostic_kind_t;
 
 /* How the value of a detail is written. */
 typedef enum naos_detail_kind
@@ -58,7 +58,7 @@ typedef struct naos_detail
 /* One failure or skip, with what goes with it; everything is borrowed for the event only. */
 typedef struct naos_diagnostic_record
 {
-    naos_report_kind_t kind; /* NAOS_REPORT_ERROR or NAOS_REPORT_SKIP */
+    naos_diagnostic_kind_t kind; /* NAOS_DIAGNOSTIC_ERROR or NAOS_DIAGNOSTIC_SKIP */
     const char *file;
     int line;
     const char *text; /* the expression or the message; not NULL */

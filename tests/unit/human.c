@@ -44,7 +44,7 @@ static const char *lines_of(const naos_diagnostic_record_t *record)
 }
 
 /* A record of kind for text, at f.c:3, with the details given and nothing else. */
-static naos_diagnostic_record_t record_of(naos_report_kind_t kind, const char *text, const naos_detail_t *details, size_t count)
+static naos_diagnostic_record_t record_of(naos_diagnostic_kind_t kind, const char *text, const naos_detail_t *details, size_t count)
 {
     naos_diagnostic_record_t record;
 
@@ -63,7 +63,7 @@ NAOS_TEST(error_line)
 {
     naos_diagnostic_record_t record;
 
-    record = record_of(NAOS_REPORT_ERROR, "a == b", NULL, 0);
+    record = record_of(NAOS_DIAGNOSTIC_ERROR, "a == b", NULL, 0);
     NAOS_CHECK_STR_EQ(AT(3) "error: a == b\n", lines_of(&record));
 }
 
@@ -71,7 +71,7 @@ NAOS_TEST(skip_line)
 {
     naos_diagnostic_record_t record;
 
-    record = record_of(NAOS_REPORT_SKIP, "not here", NULL, 0);
+    record = record_of(NAOS_DIAGNOSTIC_SKIP, "not here", NULL, 0);
     NAOS_CHECK_STR_EQ(AT(3) "skip: not here\n", lines_of(&record));
 }
 
@@ -80,7 +80,7 @@ NAOS_TEST(file_and_text_as_given)
 {
     naos_diagnostic_record_t record;
 
-    record = record_of(NAOS_REPORT_ERROR, "\"x\"\t\\", NULL, 0);
+    record = record_of(NAOS_DIAGNOSTIC_ERROR, "\"x\"\t\\", NULL, 0);
     record.file = "dir/sub dir\\f.c";
 #if defined(_MSC_VER)
     NAOS_CHECK_STR_EQ("dir/sub dir\\f.c(3): error: \"x\"\t\\\n", lines_of(&record));
@@ -100,7 +100,7 @@ NAOS_TEST(left_lines_up_with_right)
     };
     naos_diagnostic_record_t record;
 
-    record = record_of(NAOS_REPORT_ERROR, "e", details, 4);
+    record = record_of(NAOS_DIAGNOSTIC_ERROR, "e", details, 4);
     NAOS_CHECK_STR_EQ(AT(3) "error: e\n  left size:  3\n  right size: 4\n  left:  1\n  right: 2\n", lines_of(&record));
 }
 
@@ -115,7 +115,7 @@ NAOS_TEST(left_alone_not_aligned)
     };
     naos_diagnostic_record_t record;
 
-    record = record_of(NAOS_REPORT_ERROR, "e", alone, 4);
+    record = record_of(NAOS_DIAGNOSTIC_ERROR, "e", alone, 4);
     NAOS_CHECK_STR_EQ(AT(3) "error: e\n  left: 1\n  right size: 2\n  leftover: 3\n  tolerance: 4\n", lines_of(&record));
 }
 
@@ -129,7 +129,7 @@ NAOS_TEST(string_values)
     };
     naos_diagnostic_record_t record;
 
-    record = record_of(NAOS_REPORT_ERROR, "e", details, 3);
+    record = record_of(NAOS_DIAGNOSTIC_ERROR, "e", details, 3);
     NAOS_CHECK_STR_EQ(AT(3) "error: e\n"
                       "  left:  \"a\\\"b\\\\c\\n\\t\\r\\x01\\x7F\\xC3\\xA9\"\n"
                       "  right: (null)\n"
@@ -157,7 +157,7 @@ NAOS_TEST(note_and_traces)
     traces[0] = &inner;
     traces[1] = &outer;
 
-    record = record_of(NAOS_REPORT_ERROR, "e", details, 1);
+    record = record_of(NAOS_DIAGNOSTIC_ERROR, "e", details, 1);
     record.note = "the note";
     record.traces_not_kept = 2;
     record.traces = traces;
@@ -185,7 +185,7 @@ NAOS_TEST(traces_of_a_skip)
     memcpy(trace.text, "while skipping", sizeof("while skipping"));
     traces[0] = &trace;
 
-    record = record_of(NAOS_REPORT_SKIP, "no", NULL, 0);
+    record = record_of(NAOS_DIAGNOSTIC_SKIP, "no", NULL, 0);
     record.traces = traces;
     record.trace_count = 1;
     NAOS_CHECK_STR_EQ(AT(3) "skip: no\n" AT(2) "note: while skipping\n", lines_of(&record));

@@ -15,7 +15,7 @@
 
 #include <naos/exit.h>
 
-#include "report.h"
+#include "message.h"
 #include "suite_internal.h"
 
 /*
@@ -95,7 +95,7 @@ static void builder_error(naos_builder_t *builder, const char *format, ...)
     va_list args;
 
     va_start(args, format);
-    naos_report_error_v(format, args);
+    naos_message_v(format, args);
     va_end(args);
 
     builder->error_count++;
@@ -212,7 +212,7 @@ static int build_suites(naos_builder_t *builder, const naos_suite_func_t *suites
 
     if (g_out_of_memory != 0)
     {
-        naos_report_error("out of memory while preparing the suites");
+        naos_message("out of memory while preparing the suites");
 
         return NAOS_EXIT_FAIL;
     }

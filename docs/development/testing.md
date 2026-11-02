@@ -10,7 +10,7 @@ Naos is a test harness, so most of its self tests cannot let Naos judge them: a 
 |---|---|---|
 | `contract/` | Exit codes, regexes and an XML schema, never a golden file | What Naos keeps compatible ([output](../reference/output.md#what-is-kept-compatible), [JUnit XML](../reference/xml.md#compatibility)): the exit codes, the start of a diagnostic line, the names of `--naos-list`, and the JUnit XML file |
 | `api/` | Naos itself | The public API, used as a project uses it, in C and C++. One file per public header |
-| `unit/` | Naos itself | The internal modules: those whose results depend only on their arguments (`value`, `filter`, `order`, `text`), and the writers driven through their events (the JUnit XML file of `xml`, the diagnostics of `human`). One file per module |
+| `unit/` | Naos itself | The internal modules: those whose results depend only on their arguments (`value`, `filter`, `shuffle`, `text`, and `plan`, whose order the seed of each round decides), and the writers driven through their events (the JUnit XML file of `xml`, the diagnostics of `human`). One file per module |
 | `behavior/` | Golden files ([below](#cases-compared-with-an-output)) | Everything the [reference](../reference/README.md) states about running tests, one directory per page: `tests/`, `assertions/`, `control/`, `command-line/`, `output/`, `xml/` |
 | `build/` | The compiler and CMake | Programs that must not compile (`misuse/`), the messages of test discovery (`discovery/`), the [CMake functions](../reference/cmake.md#functions) (`functions/`), and Naos added with `add_subdirectory()` (`subproject/`) |
 | `examples/` | Both | The projects of `examples/`, and the outputs the documentation quotes ([below](#examples-and-documentation)) |

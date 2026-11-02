@@ -16,36 +16,36 @@ endif()
 # The files form four layers, listed below from the top. A file uses only files of its own layer or
 # of a layer below it, never one above, so the layers never form a cycle
 # (docs/development/architecture.md tells what each layer is for):
-#   1. The run:        session, options, runner, filter, order, version
-#   2. The tests:      suite, test, control, check, diagnostic, context
+#   1. The run:        session, options, plan, runner, filter, shuffle, version
+#   2. The tests:      suite, test, control, check, diagnostic
 #   3. The output:     report, writer.h, human, xml, text
-#   4. Shared parts:   clock, value, format.h
+#   4. Shared parts:   message, clock, value, format.h
 #
 # Dependencies go one way ("a -> b" means a uses b; docs/development/architecture.md draws the main
 # ones). All of them:
-#   session    -> options, suite, runner, report
-#   options    -> order, report, clock
-#   runner     -> options, suite, filter, order, test, report
-#   filter     -> suite
-#   suite      -> report
-#   test       -> suite, context, diagnostic, report, clock
-#   control    -> context, diagnostic, test
+#   session    -> options, plan, runner, suite, message
+#   options    -> shuffle, report, message, clock
+#   plan       -> options, filter, shuffle, suite, message
+#   runner     -> options, plan, shuffle, test, report
+#   suite      -> message
+#   test       -> suite, diagnostic, report, message, clock
+#   control    -> test, diagnostic
 #   check      -> diagnostic, value
-#   diagnostic -> context, report
-#   context    -> writer
-#   report     -> human, xml, writer
-#   human      -> writer, text, value
-#   xml        -> human, writer, text, value
+#   diagnostic -> report
+#   report     -> writer, human, xml, message
 #   writer     -> clock
-# version, order, text, clock and value use no other module. writer.h has no .c: it is the
-# events report.c tells and the functions a writer has.
+#   human      -> writer, text, value
+#   xml        -> writer, human, text, value
+# filter, shuffle, version, text, message, clock and value use no other module. writer.h has no .c:
+# it is the events report.c tells and the functions a writer has.
 add_library(naos ${naos_library_type}
     # 1. The run
     session.c
     options.c
+    plan.c
     runner.c
     filter.c
-    order.c
+    shuffle.c
     version.c
     # 2. The tests
     suite.c
@@ -53,13 +53,13 @@ add_library(naos ${naos_library_type}
     control.c
     check.c
     diagnostic.c
-    context.c
     # 3. The output
     report.c
     human.c
     xml.c
     text.c
     # 4. Shared parts
+    message.c
     clock.c
     value.c
 )

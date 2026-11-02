@@ -2,16 +2,15 @@
  * Copyright (c) 2026 The Naos Authors
  * SPDX-License-Identifier: MIT
  *
- * Telling the events of a run to every writer on, the names of --naos-list, and the messages of Naos
- * itself on stderr (report.h).
+ * Telling the events of a run to every writer on (report.h).
  */
 
 #include "report.h"
 
 #include <stdio.h>
 
-#include "format.h"
 #include "human.h"
+#include "message.h"
 #include "xml.h"
 
 /* Most writers on at once: the human-readable one, and the one of --naos-output. */
@@ -39,13 +38,13 @@ static size_t writer_count(void)
 }
 
 /* The human-readable writer, first in g_writers, writes to stdout and never fails; only the one of --naos-output can. */
-int naos_report_begin(const char *program, naos_format_t format, const char *path, int quiet)
+int naos_report_begin(const char *program, naos_output_format_t format, const char *path, int quiet)
 {
     size_t i;
 
     writer_count();
     naos_human_set_quiet(quiet);
-    if (format == NAOS_FORMAT_XML)
+    if (format == NAOS_OUTPUT_XML)
     {
         g_writers[g_writer_count] = naos_xml_writer();
         g_writer_count++;
@@ -56,7 +55,7 @@ int naos_report_begin(const char *program, naos_format_t format, const char *pat
     {
         if (g_writers[i]->begin(program, (i == 0) ? NULL : path) == 0)
         {
-            naos_report_error("cannot open the file of --naos-output: %s", path);
+            naos_message("cannot open the file of --naos-output: %s", path);
 
             return 0;
         }
@@ -126,7 +125,7 @@ int naos_report_end(long failed_rounds, long repeat, long rounds_not_run)
     {
         if (g_writers[i]->end(failed_rounds, repeat, rounds_not_run) == 0)
         {
-            naos_report_error("cannot write the file of --naos-output, or out of memory for it: %s", g_output_path);
+            naos_message("cannot write the file of --naos-output, or out of memory for it: %s", g_output_path);
             written = 0;
         }
     }
@@ -134,30 +133,7 @@ int naos_report_end(long failed_rounds, long repeat, long rounds_not_run)
     return written;
 }
 
-void naos_report_test_name(const char *suite, const char *test)
-{
-    naos_printf("%s.%s\n", suite, test);
-}
-
 void naos_report_flush(void)
 {
     fflush(stdout);
-}
-
-void naos_report_error(const char *format, ...)
-{
-    va_list args;
-
-    va_start(args, format);
-    naos_report_error_v(format, args);
-    va_end(args);
-}
-
-void naos_report_error_v(const char *format, va_list args)
-{
-    fflush(stdout);
-    fputs("naos: ", stderr);
-    naos_vfprintf(stderr, format, args);
-    fputc('\n', stderr);
-    fflush(stderr);
 }
