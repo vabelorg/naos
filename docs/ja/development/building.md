@@ -11,12 +11,14 @@ Naos をソースからビルドし、自己テストを実行する方法です
 
 ## プリセットを使う
 
-`CMakePresets.json` には 2 つのプリセットがあり、それぞれ `build/<preset>/` にビルドします。
+`CMakePresets.json` には 4 つのプリセットがあり、それぞれ `build/<preset>/` にビルドします。
 
 | プリセット | ビルドするもの |
 |---|---|
 | `default` | 静的ライブラリ、Debug、自己テスト付き |
 | `shared` | 共有ライブラリ（DLL）、Debug、自己テスト付き |
+| `release` | 静的ライブラリ、Release（最適化あり）、自己テスト付き |
+| `sanitize` | 静的ライブラリ、Debug、自己テスト付き。AddressSanitizer と UndefinedBehaviorSanitizer でビルドして実行する。GCC と Clang のみ |
 
 ```sh
 cmake --preset default
@@ -24,7 +26,7 @@ cmake --build --preset default
 ctest --preset default
 ```
 
-`shared` で同じことをすると、共有ビルドを確かめられます。ライブラリや CMake のファイルに触れる変更は、送る前に両方で実行してください。
+`shared` で同じことをすると、共有ビルドを確かめられます。ライブラリや CMake のファイルに触れる変更は、送る前に両方で実行してください。`release` は最適化でしか見つからないものを示します。`test.c` は `longjmp` でテストを止めるので、最適化したビルドでも成り立たなければならず、GCC の `-Wclobbered` のように最適化が要る警告もあります。`sanitize` はライブラリとテストのメモリの誤りと未定義動作を見つけます。CI は両方を実行します。
 
 Windows の MinGW-w64 では、CI と同じく、MSYS2 のシェル（UCRT64 または MINGW64）で、その `gcc`・`cmake`・`ninja` のパッケージを入れ、`CMAKE_GENERATOR=Ninja` にして実行します。
 

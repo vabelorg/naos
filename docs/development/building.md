@@ -11,12 +11,14 @@ How to build Naos from its sources and run its self tests. To use Naos in a proj
 
 ## With the presets
 
-`CMakePresets.json` has two presets, each building in `build/<preset>/`:
+`CMakePresets.json` has four presets, each building in `build/<preset>/`:
 
 | Preset | Builds |
 |---|---|
 | `default` | A static library, Debug, with the self tests |
 | `shared` | A shared library (DLL), Debug, with the self tests |
+| `release` | A static library, Release (optimized), with the self tests |
+| `sanitize` | A static library, Debug, with the self tests, built and run with AddressSanitizer and UndefinedBehaviorSanitizer. GCC and Clang only |
 
 ```sh
 cmake --preset default
@@ -24,7 +26,7 @@ cmake --build --preset default
 ctest --preset default
 ```
 
-The same with `shared` checks the shared build. Run both before sending a change that touches the library or the CMake files.
+The same with `shared` checks the shared build. Run both before sending a change that touches the library or the CMake files. `release` shows what only the optimizer finds: `test.c` stops a test with `longjmp`, which an optimized build must survive, and some warnings of GCC, such as `-Wclobbered`, need it. `sanitize` finds memory mistakes and undefined behavior in the library and the tests; CI runs both.
 
 With MinGW-w64 on Windows, run them in the shell of MSYS2 (UCRT64 or MINGW64), with its `gcc`, `cmake` and `ninja` packages and `CMAKE_GENERATOR=Ninja`, as CI does.
 
