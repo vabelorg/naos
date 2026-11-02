@@ -2,17 +2,24 @@
  * Copyright (c) 2026 The Naos Authors
  * SPDX-License-Identifier: MIT
  *
- * The diagnostics of the running test, and the outcome they add up to.
+ * The diagnostics of the running test, what goes with them (the note of NAOS_NOTE and the stack of
+ * NAOS_TRACE_PUSH), and the outcome they add up to.
  *
  * A diagnostic is told in three steps: naos_diagnostic_begin() counts it, naos_diagnostic_add*()
  * collect its values, and naos_diagnostic_end() tells all of it to the writers with the note and the
- * traces of context.h. One diagnostic is open at a time.
+ * traces. One diagnostic is open at a time.
  */
 
 #ifndef NAOS_DIAGNOSTIC_H
 #define NAOS_DIAGNOSTIC_H
 
+#include <stdarg.h>
+
 #include "report.h"
+
+/* Traces kept; deeper pushes are only counted. The string form is for the messages. */
+#define NAOS_DIAGNOSTIC_TRACE_DEPTH 16
+#define NAOS_DIAGNOSTIC_TRACE_DEPTH_STRING "16"
 
 /* Starts the outcome of a new test: no failure and no skip. */
 void naos_diagnostic_start_test(void);
@@ -63,5 +70,23 @@ void naos_diagnostic_misuse(const char *file, int line, const char *message);
  * outside it go with it.
  */
 void naos_diagnostic_check_traces_popped(void);
+
+/*
+ * Starts setup and the body, or teardown, without a note or trace: the ones left by the previous
+ * part would read as if they belonged to this one.
+ */
+void naos_diagnostic_clear_context(void);
+
+/* Formats the note as vsnprintf does, replacing one not yet used; a NULL format makes it empty. */
+void naos_diagnostic_set_note(const char *format, va_list args);
+
+/*
+ * Pushes a trace at file and line, formatted as naos_diagnostic_set_note() does. Returns 0 when the
+ * stack is full: the push is then counted, so that the pops stay balanced, but not kept.
+ */
+int naos_diagnostic_push_trace(const char *file, int line, const char *format, va_list args);
+
+/* Pops the innermost trace. Returns 0, changing nothing, when none is pushed. */
+int naos_diagnostic_pop_trace(void);
 
 #endif

@@ -16,7 +16,7 @@
 /* Size of the text of one trace: longer ones are cut short, ending in "...". */
 #define NAOS_TRACE_TEXT_SIZE 256
 
-/* One trace of NAOS_TRACE_PUSH, where it was pushed and its text. context.c keeps them in this form. */
+/* One trace of NAOS_TRACE_PUSH, where it was pushed and its text. diagnostic.c keeps them in this form. */
 typedef struct naos_trace
 {
     const char *file;

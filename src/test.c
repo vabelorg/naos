@@ -14,7 +14,6 @@
 #include <naos/exit.h>
 
 #include "clock.h"
-#include "context.h"
 #include "diagnostic.h"
 #include "message.h"
 
@@ -34,7 +33,7 @@ static int g_jump_armed = 0;
  */
 static void run_guarded(naos_func_t first, naos_func_t second)
 {
-    naos_context_clear();
+    naos_diagnostic_clear_context();
     g_jump_armed = 1;
     if (setjmp(g_jump) == 0)
     {

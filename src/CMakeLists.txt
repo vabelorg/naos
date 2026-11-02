@@ -17,7 +17,7 @@ endif()
 # of a layer below it, never one above, so the layers never form a cycle
 # (docs/development/architecture.md tells what each layer is for):
 #   1. The run:        session, options, plan, runner, filter, shuffle, version
-#   2. The tests:      suite, test, control, check, diagnostic, context
+#   2. The tests:      suite, test, control, check, diagnostic
 #   3. The output:     report, writer.h, human, xml, text
 #   4. Shared parts:   message, clock, value, format.h
 #
@@ -28,11 +28,10 @@ endif()
 #   plan       -> options, filter, shuffle, suite, message
 #   runner     -> options, plan, shuffle, test, report
 #   suite      -> message
-#   test       -> suite, diagnostic, context, report, message, clock
-#   control    -> test, diagnostic, context
+#   test       -> suite, diagnostic, report, message, clock
+#   control    -> test, diagnostic
 #   check      -> diagnostic, value
-#   diagnostic -> context, report
-#   context    -> writer
+#   diagnostic -> report
 #   report     -> writer, human, xml, message
 #   writer     -> clock
 #   human      -> writer, text, value
@@ -54,7 +53,6 @@ add_library(naos ${naos_library_type}
     control.c
     check.c
     diagnostic.c
-    context.c
     # 3. The output
     report.c
     human.c
