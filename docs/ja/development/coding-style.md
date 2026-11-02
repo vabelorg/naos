@@ -65,7 +65,7 @@ static size_t add_saturated(size_t a, size_t b)
 
 ## 書式付きの出力
 
-`src/` では、書式付きの出力関数を `format.h` を通して呼びます。`naos_printf`・`naos_fprintf`・`naos_vfprintf`・`naos_snprintf`・`naos_vsnprintf` を使い、`printf` などを直接は呼びません。これらはどのプラットフォームでも C99 のとおりに書式を扱います。MinGW の既定の関数はそうではありません（`%zu`、`%jd`、`%e` の指数）。書式を取らない関数（`puts`・`fputs`・`fputc`）は直接呼びます。`naos.sources.format` がこれを確かめます。
+`src/` では、書式付きの出力関数を `format.h` を通して呼びます。`naos_printf`・`naos_fprintf`・`naos_vfprintf`・`naos_snprintf`・`naos_vsnprintf` を使い、`printf` などを直接は呼びません。これらはどのプラットフォームでも C99 のとおりに書式を扱います。MinGW の既定の関数はそうではありません（`%zu`、`%jd`、`%e` の指数）。書式を取らない関数（`puts`・`fputs`・`fputc`）は直接呼びます。`scripts/CheckFormat.cmake` がこれを確かめます（[lint](testing.md#lint)）。
 
 ## コメント
 

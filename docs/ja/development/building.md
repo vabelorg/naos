@@ -52,9 +52,10 @@ ctest --test-dir build --output-on-failure
 
 ```sh
 ctest --preset default -R '^naos\.cli\.'          # 1 つの観点
-ctest --preset default -R '^naos\.docs\.links$'   # 文書のリンク
 ctest --preset default -j8                        # 並列
 ```
+
+文書のリンクのように、ビルドを必要としない検査は自己テストではありません（[lint](testing.md#lint)）。
 
 自己テストの仕組みと足し方は[テスト](testing.md)にあります。
 

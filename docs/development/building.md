@@ -52,9 +52,10 @@ Every self test has a CTest name starting with `naos.` and the label `naos`; the
 
 ```sh
 ctest --preset default -R '^naos\.cli\.'          # one subject
-ctest --preset default -R '^naos\.docs\.links$'   # the links of the documentation
 ctest --preset default -j8                        # in parallel
 ```
+
+The checks that need no build, such as the links of the documentation, are not self tests: see [lint](testing.md#lint).
 
 [Testing](testing.md) explains the self tests and how to add one.
 

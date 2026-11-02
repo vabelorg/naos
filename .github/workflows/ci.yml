@@ -1,6 +1,6 @@
-# Builds Naos and runs its self tests (examples and documentation links included) with each
-# preset of CMakePresets.json, on every platform and compiler supported, then tests the package it
-# installs. MinGW-w64 has a job of its own, since it runs in the shell of MSYS2.
+# Checks what needs no build once (lint), then builds Naos and runs its self tests (examples
+# included) with each preset of CMakePresets.json, on every platform and compiler supported, then
+# tests the package it installs. MinGW-w64 has a job of its own, since it runs in the shell of MSYS2.
 
 name: CI
 
@@ -13,6 +13,19 @@ permissions:
   contents: read
 
 jobs:
+  # The checks that read the sources only, the same on every platform: docs/development/testing.md#lint.
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Links of the documentation
+        run: cmake -D ROOT=. -P scripts/CheckLinks.cmake
+
+      - name: Formatted output of src/
+        run: cmake -D ROOT=. -P scripts/CheckFormat.cmake
+
   test:
     name: ${{ matrix.toolchain }} (${{ matrix.preset }})
     runs-on: ${{ matrix.os }}

@@ -23,8 +23,6 @@ The self tests of Naos: what they check, how they compare outputs, and how to ad
 | `discovery/` | The messages of `NaosDiscover.cmake` when listing the tests fails | The same |
 | `no_cmake/` | Building without CMake, as [installation](../getting-started/installation.md#without-cmake) describes | Built and run |
 | `examples/` | The projects of `examples/`, and the outputs the documentation quotes from them | Their tests pass; outputs compared |
-| `docs/` | The relative links and anchors of every Markdown file | `CheckLinks.cmake` |
-| `sources/` | The sources of `src/`: formatted output goes through `format.h` ([coding style](coding-style.md#formatted-output)) | `CheckFormat.cmake` |
 | `misuse/` | Programs that must not compile, such as a teardown named in `NAOS_SET_SETUP` or a setup named in `NAOS_ADD_TEST` | The compiler refuses them and names the mistake |
 
 The helpers are in `tests/support/`: the functions of `NaosSelftest.cmake`, and `CheckOutput.cmake`, which runs one case.
@@ -78,4 +76,18 @@ The projects of `examples/` are complete projects that users can copy. Each fetc
 
 The outputs that the documentation quotes are golden cases of `tests/examples/` (`naos.examples.quickstart`, for example). When an example or its output changes, update the documentation that quotes it (the Japanese translation may follow later, as in [documentation style](docs-style.md#languages)).
 
-`naos.docs.links` checks that every relative link of the Markdown files leads to a file that exists, and every `#anchor` to a heading of that file. It runs with the other self tests.
+The links of the documentation are checked by a [lint](#lint) script, not by a self test.
+
+## Lint
+
+Checks that read the sources and need no build are scripts of `scripts/`, not self tests: they would otherwise wait for the whole build, and run again with every preset and compiler of CI for the same result. The `lint` job of CI runs them once, before any build; run them from the root of Naos:
+
+```sh
+cmake -D ROOT=. -P scripts/CheckLinks.cmake    # the links of the documentation
+cmake -D ROOT=. -P scripts/CheckFormat.cmake   # the formatted output of src/
+```
+
+| Script | Checks |
+|---|---|
+| `CheckLinks.cmake` | Every relative link of the Markdown files leads to a file that exists, and every `#anchor` to a heading of that file |
+| `CheckFormat.cmake` | The sources of `src/` call the formatted output functions through `format.h` ([coding style](coding-style.md#formatted-output)) |

@@ -23,8 +23,6 @@ Naos の自己テストについて、何を確かめるか、出力をどう照
 | `discovery/` | テストの列挙に失敗したときの `NaosDiscover.cmake` のメッセージ | 同上 |
 | `no_cmake/` | CMake を使わないビルド（[インストール](../getting-started/installation.md#cmake-を使わない場合)のとおり） | ビルドして実行する |
 | `examples/` | `examples/` のプロジェクトと、文書がそこから引用する出力 | テストが通ること、出力の照合 |
-| `docs/` | すべての Markdown ファイルの相対リンクとアンカー | `CheckLinks.cmake` |
-| `sources/` | `src/` のソース: 書式付きの出力が `format.h` を通ること（[コーディング規約](coding-style.md#書式付きの出力)） | `CheckFormat.cmake` |
 | `misuse/` | コンパイルできてはいけないプログラム（`NAOS_SET_SETUP` に teardown を、`NAOS_ADD_TEST` に setup を指定するなど） | コンパイラが拒否し、誤りの名前を示すこと |
 
 仕組みは `tests/support/` にあります（`NaosSelftest.cmake` の関数と、ケースを 1 つ実行する `CheckOutput.cmake`）。
@@ -78,4 +76,18 @@ SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 
 文書が引用する出力は、`tests/examples/` のゴールデンファイルのケースです（`naos.examples.quickstart` など）。サンプルやその出力が変わったら、それを引用している文書を直します（日本語訳は[文書の書き方](docs-style.md#言語)のとおり後から追いついてもかまいません）。
 
-`naos.docs.links` は、Markdown ファイルのすべての相対リンクが存在するファイルを指し、すべての `#アンカー` がそのファイルの見出しを指していることを確かめます。ほかの自己テストと一緒に実行されます。
+文書のリンクは、自己テストではなく [lint](#lint) のスクリプトで確かめます。
+
+## lint
+
+ソースを読むだけでビルドを必要としない検査は、自己テストではなく `scripts/` のスクリプトです。自己テストにすると、ビルド全体が終わるまで待つことになり、CI のプリセットとコンパイラの数だけ同じ結果のために繰り返されるためです。CI の `lint` ジョブが、ビルドの前に 1 回だけ実行します。手元では Naos のルートで実行します。
+
+```sh
+cmake -D ROOT=. -P scripts/CheckLinks.cmake    # 文書のリンク
+cmake -D ROOT=. -P scripts/CheckFormat.cmake   # src/ の書式付きの出力
+```
+
+| スクリプト | 確かめること |
+|---|---|
+| `CheckLinks.cmake` | Markdown ファイルのすべての相対リンクが存在するファイルを指し、すべての `#アンカー` がそのファイルの見出しを指していること |
+| `CheckFormat.cmake` | `src/` のソースが、書式付きの出力関数を `format.h` を通して呼ぶこと（[コーディング規約](coding-style.md#書式付きの出力)） |
