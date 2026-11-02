@@ -83,7 +83,7 @@ static void format_pointer(char *buffer, size_t size, const void *ptr)
 /* Records a failure with the values left and right, already formatted. */
 static int fail_with_values(const char *left, const char *right, const char *expr, const char *file, int line)
 {
-    naos_diagnostic_begin(NAOS_REPORT_ERROR, file, line, expr);
+    naos_diagnostic_begin(NAOS_DIAGNOSTIC_ERROR, file, line, expr);
     naos_diagnostic_add("left", left);
     naos_diagnostic_add("right", right);
     naos_diagnostic_end();
@@ -167,7 +167,7 @@ static int fail_with_strings(const char *left, const char *right, int show_diffe
     size_t right_size;
     char difference_text[NAOS_VALUE_SIZE];
 
-    naos_diagnostic_begin(NAOS_REPORT_ERROR, file, line, expr);
+    naos_diagnostic_begin(NAOS_DIAGNOSTIC_ERROR, file, line, expr);
     naos_diagnostic_add_string("left", left);
     naos_diagnostic_add_string("right", right);
 
@@ -191,7 +191,7 @@ static int fail_with_pointer(const void *ptr, const char *expr, const char *file
 {
     char value_text[NAOS_VALUE_SIZE];
 
-    naos_diagnostic_begin(NAOS_REPORT_ERROR, file, line, expr);
+    naos_diagnostic_begin(NAOS_DIAGNOSTIC_ERROR, file, line, expr);
 
     if (ptr != NULL)
     {
@@ -211,7 +211,7 @@ int naos_check(int cond, const char *expr, const char *file, int line)
         return passed();
     }
 
-    naos_diagnostic_begin(NAOS_REPORT_ERROR, file, line, expr);
+    naos_diagnostic_begin(NAOS_DIAGNOSTIC_ERROR, file, line, expr);
     naos_diagnostic_end();
 
     return 0;
@@ -265,7 +265,7 @@ int naos_check_double_near(double left, double right, double tol, const char *ex
     naos_value_format_double(right_text, sizeof(right_text), right);
     naos_value_format_double(tol_text, sizeof(tol_text), tol);
 
-    naos_diagnostic_begin(NAOS_REPORT_ERROR, file, line, expr);
+    naos_diagnostic_begin(NAOS_DIAGNOSTIC_ERROR, file, line, expr);
     naos_diagnostic_add("left", left_text);
     naos_diagnostic_add("right", right_text);
     naos_diagnostic_add("tolerance", tol_text);
@@ -324,7 +324,7 @@ int naos_check_mem_eq(const void *left, size_t left_size, const void *right, siz
     naos_snprintf(left_size_text, sizeof(left_size_text), "%zu", left_size);
     naos_snprintf(right_size_text, sizeof(right_size_text), "%zu", right_size);
 
-    naos_diagnostic_begin(NAOS_REPORT_ERROR, file, line, expr);
+    naos_diagnostic_begin(NAOS_DIAGNOSTIC_ERROR, file, line, expr);
     naos_diagnostic_add("left size", left_size_text);
     naos_diagnostic_add("right size", right_size_text);
     naos_diagnostic_add(last_label, last_value);

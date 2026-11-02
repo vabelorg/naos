@@ -24,10 +24,10 @@ naos_outcome_t naos_diagnostic_outcome(void);
 int naos_diagnostic_failure_count(void);
 
 /*
- * Opens a diagnostic: counts the failure of an error or records the skip. kind is NAOS_REPORT_ERROR
- * or NAOS_REPORT_SKIP; text is not NULL. file and text are borrowed until naos_diagnostic_end() returns.
+ * Opens a diagnostic: counts the failure of an error or records the skip. kind is NAOS_DIAGNOSTIC_ERROR
+ * or NAOS_DIAGNOSTIC_SKIP; text is not NULL. file and text are borrowed until naos_diagnostic_end() returns.
  */
-void naos_diagnostic_begin(naos_report_kind_t kind, const char *file, int line, const char *text);
+void naos_diagnostic_begin(naos_diagnostic_kind_t kind, const char *file, int line, const char *text);
 
 /*
  * Adds a value to the open diagnostic; one beyond the eighth is dropped. label is the bare

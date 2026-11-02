@@ -117,9 +117,9 @@ int naos_diagnostic_failure_count(void)
     return g_result.failure_count;
 }
 
-void naos_diagnostic_begin(naos_report_kind_t kind, const char *file, int line, const char *text)
+void naos_diagnostic_begin(naos_diagnostic_kind_t kind, const char *file, int line, const char *text)
 {
-    if (kind == NAOS_REPORT_SKIP)
+    if (kind == NAOS_DIAGNOSTIC_SKIP)
     {
         g_result.skipped = 1;
     }
@@ -157,7 +157,7 @@ void naos_diagnostic_pass(void)
 
 void naos_diagnostic_misuse(const char *file, int line, const char *message)
 {
-    naos_diagnostic_begin(NAOS_REPORT_ERROR, file, line, message);
+    naos_diagnostic_begin(NAOS_DIAGNOSTIC_ERROR, file, line, message);
     end_with(NAOS_CONTEXT_NONE);
 }
 
@@ -174,6 +174,6 @@ void naos_diagnostic_check_traces_popped(void)
 
     innermost = naos_context_trace(naos_context_trace_count() - 1);
     naos_snprintf(message, sizeof(message), "%s%s", prefix, innermost->text);
-    naos_diagnostic_begin(NAOS_REPORT_ERROR, innermost->file, innermost->line, message);
+    naos_diagnostic_begin(NAOS_DIAGNOSTIC_ERROR, innermost->file, innermost->line, message);
     end_with(NAOS_CONTEXT_OUTER);
 }

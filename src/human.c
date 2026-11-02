@@ -65,15 +65,15 @@ static void put_location(naos_human_sink_t sink, void *context, const char *file
 }
 
 /* Word of a diagnostic line, after the location. */
-static const char *report_kind_word(naos_report_kind_t kind)
+static const char *kind_word(naos_diagnostic_kind_t kind)
 {
     switch (kind)
     {
-    case NAOS_REPORT_ERROR:
+    case NAOS_DIAGNOSTIC_ERROR:
         return "error";
-    case NAOS_REPORT_SKIP:
+    case NAOS_DIAGNOSTIC_SKIP:
         return "skip";
-    case NAOS_REPORT_NOTE:
+    case NAOS_DIAGNOSTIC_NOTE:
         return "note";
     }
 
@@ -81,10 +81,10 @@ static const char *report_kind_word(naos_report_kind_t kind)
 }
 
 /* Gives "<location> <kind>: <text>\n"; file and text are given as they are. */
-static void put_diagnostic_line(naos_human_sink_t sink, void *context, naos_report_kind_t kind, const char *file, int line, const char *text)
+static void put_diagnostic_line(naos_human_sink_t sink, void *context, naos_diagnostic_kind_t kind, const char *file, int line, const char *text)
 {
     put_location(sink, context, file, line);
-    sink(context, report_kind_word(kind));
+    sink(context, kind_word(kind));
     sink(context, ": ");
     sink(context, text);
     sink(context, "\n");
@@ -259,7 +259,7 @@ void naos_human_put_diagnostic(const naos_diagnostic_record_t *record, naos_huma
     for (j = 0; j < record->trace_count; j++)
     {
         trace = record->traces[j];
-        put_diagnostic_line(sink, context, NAOS_REPORT_NOTE, trace->file, trace->line, trace->text);
+        put_diagnostic_line(sink, context, NAOS_DIAGNOSTIC_NOTE, trace->file, trace->line, trace->text);
     }
 }
 
@@ -271,7 +271,7 @@ static void diagnostic(const naos_diagnostic_record_t *record)
 {
     size_t held;
 
-    if ((g_in_test != 0) && (g_run_written == 0) && (record->kind == NAOS_REPORT_SKIP))
+    if ((g_in_test != 0) && (g_run_written == 0) && (record->kind == NAOS_DIAGNOSTIC_SKIP))
     {
         held = g_held.length;
         naos_human_put_diagnostic(record, put_text, &g_held);

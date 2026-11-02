@@ -68,7 +68,7 @@ static naos_options_t g_options =
     1,    /* repeat */
     0,    /* fail_fast */
     0,    /* quiet */
-    NAOS_FORMAT_NONE, /* output_format */
+    NAOS_OUTPUT_NONE, /* output_format */
     NULL, /* output_path */
     0,    /* help_requested */
     0     /* usage_error */
@@ -295,7 +295,7 @@ static void take_output(const char *name, const char *value)
 
     if (((size_t)(colon - value) == 3) && (strncmp(value, "xml", 3) == 0))
     {
-        g_options.output_format = NAOS_FORMAT_XML;
+        g_options.output_format = NAOS_OUTPUT_XML;
         g_options.output_path = colon + 1;
         return;
     }

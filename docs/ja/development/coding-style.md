@@ -41,7 +41,7 @@ static size_t add_saturated(size_t a, size_t b)
 |---|---|---|
 | ファイル | 小文字の関心名。公開ヘッダを実装するファイルはヘッダと同名、内部ヘッダは `.c` と同名、同名の公開ヘッダがある内部ヘッダだけ `_internal.h` | `diagnostic.c`、`control.c`、`filter.h`、`suite_internal.h` |
 | 関数 | `naos_<モジュール>_<動詞>`。ファイル内だけの関数は `static` で接頭辞なし | `naos_diagnostic_begin`、`naos_options_get`、`take_filter` |
-| 型 | `naos_<名前>_t` | `naos_cmp_t`、`naos_report_kind_t` |
+| 型 | `naos_<名前>_t` | `naos_cmp_t`、`naos_diagnostic_kind_t` |
 | 公開マクロ | `NAOS_` で始まる大文字 | `NAOS_CHECK_INT_EQ` |
 | 補助マクロ | 公開の名前の末尾に `_` | `NAOS_CHECK_` |
 | ファイル内の状態 | `static` 変数に接頭辞 `g_` | `g_options`、`g_traces` |

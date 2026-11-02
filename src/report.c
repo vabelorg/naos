@@ -39,13 +39,13 @@ static size_t writer_count(void)
 }
 
 /* The human-readable writer, first in g_writers, writes to stdout and never fails; only the one of --naos-output can. */
-int naos_report_begin(const char *program, naos_format_t format, const char *path, int quiet)
+int naos_report_begin(const char *program, naos_output_format_t format, const char *path, int quiet)
 {
     size_t i;
 
     writer_count();
     naos_human_set_quiet(quiet);
-    if (format == NAOS_FORMAT_XML)
+    if (format == NAOS_OUTPUT_XML)
     {
         g_writers[g_writer_count] = naos_xml_writer();
         g_writer_count++;

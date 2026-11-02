@@ -392,7 +392,7 @@ static void diagnostic(const naos_diagnostic_record_t *record)
         naos_text_add_format(&g_location, "\" line=\"%d\"", record->line);
     }
 
-    if (record->kind == NAOS_REPORT_SKIP)
+    if (record->kind == NAOS_DIAGNOSTIC_SKIP)
     {
         if (g_has_skip == 0)
         {

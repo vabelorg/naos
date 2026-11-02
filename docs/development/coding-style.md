@@ -41,7 +41,7 @@ static size_t add_saturated(size_t a, size_t b)
 |---|---|---|
 | Files | The concern, in lowercase. A file implementing a public header has its name; an internal header has the name of its `.c`; only an internal header with a public header of the same name gets `_internal.h` | `diagnostic.c`, `control.c`, `filter.h`, `suite_internal.h` |
 | Functions | `naos_<module>_<verb>`; functions used in one file only are `static`, without prefix | `naos_diagnostic_begin`, `naos_options_get`, `take_filter` |
-| Types | `naos_<name>_t` | `naos_cmp_t`, `naos_report_kind_t` |
+| Types | `naos_<name>_t` | `naos_cmp_t`, `naos_diagnostic_kind_t` |
 | Public macros | `NAOS_` in uppercase | `NAOS_CHECK_INT_EQ` |
 | Helper macros | A public name ending with `_` | `NAOS_CHECK_` |
 | State of a file | `static` variables with the prefix `g_` | `g_options`, `g_traces` |

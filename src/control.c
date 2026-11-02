@@ -48,14 +48,14 @@ void naos_trace_pop(const char *file, int line)
 
 void naos_fail(const char *msg, const char *file, int line)
 {
-    naos_diagnostic_begin(NAOS_REPORT_ERROR, file, line, (msg != NULL) ? msg : "(no message)");
+    naos_diagnostic_begin(NAOS_DIAGNOSTIC_ERROR, file, line, (msg != NULL) ? msg : "(no message)");
     naos_diagnostic_end();
     naos_test_leave();
 }
 
 void naos_skip(const char *msg, const char *file, int line)
 {
-    naos_diagnostic_begin(NAOS_REPORT_SKIP, file, line, (msg != NULL) ? msg : "(no message)");
+    naos_diagnostic_begin(NAOS_DIAGNOSTIC_SKIP, file, line, (msg != NULL) ? msg : "(no message)");
     naos_diagnostic_end();
     naos_test_leave();
 }

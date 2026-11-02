@@ -18,7 +18,7 @@ The file is written by `xml.c`. What [JUnit XML](../reference/xml.md#compatibili
 
 A format is a writer: a table of the functions of `naos_writer_t` (`writer.h`), in a file of its own, such as `xml.c`.
 
-1. Add the format to `naos_format_t` (`report.h`), its name to `take_output()` of `options.c` and to the help of `--naos-output`, and turn its writer on in `naos_report_begin()` (`report.c`).
+1. Add the format to `naos_output_format_t` (`report.h`), its name to `take_output()` of `options.c` and to the help of `--naos-output`, and turn its writer on in `naos_report_begin()` (`report.c`).
 2. The events arrive in the order `writer.h` states. A diagnostic arrives whole, with its values, note and traces; what the event borrows lives only for the call.
 3. Add unit tests of the writer to `tests/unit/`, driven through its events as `tests/unit/xml.c` does, and golden cases of the file to `tests/behavior/` with `OUTPUT_FILE` ([testing](testing.md#cases-compared-with-an-output)). Add a page to the reference, and update [command line](../reference/command-line.md).
 

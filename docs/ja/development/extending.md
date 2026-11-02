@@ -18,7 +18,7 @@
 
 形式は 1 つの書き手です。`naos_writer_t`（`writer.h`）の関数の表を、`xml.c` のように専用のファイルに書きます。
 
-1. 形式を `naos_format_t`（`report.h`）に、名前を `options.c` の `take_output()` と `--naos-output` のヘルプに足し、`naos_report_begin()`（`report.c`）でその書き手を有効にする。
+1. 形式を `naos_output_format_t`（`report.h`）に、名前を `options.c` の `take_output()` と `--naos-output` のヘルプに足し、`naos_report_begin()`（`report.c`）でその書き手を有効にする。
 2. イベントは `writer.h` に書いた順に届く。診断は値、メモ、trace を含めて丸ごと届く。イベントが借りるものは、その呼び出しの間だけ有効。
 3. `tests/unit/xml.c` と同じようにイベントで動かす writer の単体テストを `tests/unit/` に、`OUTPUT_FILE` を使ったファイルの golden のケースを `tests/behavior/` に足す（[テスト](testing.md#出力を照合するケース)）。リファレンスにページを足し、[コマンドライン](../reference/command-line.md)を直す。
 
