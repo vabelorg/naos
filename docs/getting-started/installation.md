@@ -1,6 +1,6 @@
 # Installation
 
-How to bring Naos into a project: with CMake, in one of three ways, or without CMake, by compiling its sources.
+How to bring Naos into a project. Naos is built with CMake: a CMake project adds it in one of three ways, and a project with another build system links the library that CMake built and installed.
 
 ## Requirements
 
@@ -8,7 +8,7 @@ How to bring Naos into a project: with CMake, in one of three ways, or without C
 |---|---|
 | C compiler | C99: GCC, Clang or MSVC |
 | C++ compiler | C++11, only for tests written in C++ |
-| CMake | 3.21 or later; optional ([without CMake](#without-cmake)) |
+| CMake | 3.21 or later, to build Naos, also for a project with [another build system](#other-build-systems) |
 
 Every change is built and tested on Linux (GCC and Clang), macOS (Clang) and Windows (MSVC, and GCC of MinGW-w64 in the UCRT64 and MINGW64 environments of MSYS2), as a static and as a shared library. Other builds with MinGW-w64, such as cross-compiling for Windows from Linux, are expected to work but are not tested.
 
@@ -67,11 +67,22 @@ find_package(Naos 0.2 REQUIRED)
 
 Which versions it accepts is in the [CMake reference](../reference/cmake.md#package).
 
-## Without CMake
+## Other build systems
 
-Add `include/` to the include path and the `.c` files of `src/` to the build.
+Build and install Naos with CMake once, as for an [installed package](#installed-package), then give the compiler the headers and the library under the install prefix:
 
-To run the tests one by one in separate processes without CTest, see [CTest and CI](../guides/ctest-and-ci.md#without-cmake).
+```sh
+cc -std=c99 -I/opt/naos/include -c my_tests.c
+cc -o my_tests my_tests.o -L/opt/naos/lib -lnaos
+```
+
+- A Debug build names the library with the suffix `d`: `-lnaosd`. With MSVC, the library is `naos.lib` (`naosd.lib`).
+- A shared library needs `NAOS_SHARED` defined when compiling the tests (`-DNAOS_SHARED`), and must be found when they run ([shared library](../guides/shared-library.md)).
+- The directories follow `GNUInstallDirs`: the library may be in `lib64/` rather than `lib/`. The files installed are in the [CMake reference](../reference/cmake.md#package).
+
+Building the sources of `src/` into your own project, without the build of Naos, is not supported.
+
+To run the tests one by one in separate processes without CTest, see [CTest and CI](../guides/ctest-and-ci.md#without-ctest).
 
 ## License
 

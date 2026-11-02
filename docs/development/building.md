@@ -71,10 +71,6 @@ cmake --install build/default --prefix /tmp/naos-install
 
 The layout installed is in the [CMake reference](../reference/cmake.md#package). A project can then use it with `find_package(Naos)` and `-DCMAKE_PREFIX_PATH=/tmp/naos-install`. `tests/consumer/` is such a project; `cmake -D PRESET=<preset> -P scripts/TestPackage.cmake` installs a preset built and tests the project against it, as CI does for each build.
 
-## Without CMake
-
-The library must also build with nothing but a compiler; the self test `naos.build.no_cmake.build` checks it as [installation](../getting-started/installation.md#without-cmake) describes, on GCC-compatible compilers.
-
 ## Continuous integration
 
 `.github/workflows/ci.yml` checks every push and pull request. Each of its steps is a command that runs the same locally:

@@ -2,7 +2,7 @@
 
 クラッシュの分離、並列実行、時間制限が必要な場合は、テストを 1 つずつ別のプロセスで起動します。`--naos-list` で名前を列挙し、`--naos-filter` で 1 つずつ実行します。終了コードが `0` なら成功、`77` ならスキップ、それ以外は失敗です。プロセスの管理は呼び出し側（CTest、スクリプト、CI）に任せるのが Naos の方針です。
 
-## CMake を使う場合
+## CTest を使う場合
 
 `naos_add_executable()` で作った実行ファイルのテストは、ビルドのたびに 1 テストずつ CTest に登録されます。CTest はテストごとに別のプロセスを起動するので、CTest で実行するだけで済みます。CTest でのテスト名は `<target>.<suite>.<test>`（例: `my_tests.parser.empty_object`）です。`-C Debug` は、Visual Studio などのマルチコンフィグのジェネレータでビルド構成を選ぶためのものです。
 
@@ -25,7 +25,7 @@ naos_add_executable(io_tests
 
 `ctest -L slow` でラベル `slow` のテストを選び、`ctest -LE slow` で除けます。引数の一覧は [CMake のリファレンス](../reference/cmake.md)にあります。
 
-## CMake を使わない場合
+## CTest を使わない場合
 
 シェルスクリプトで同じことを行います。
 

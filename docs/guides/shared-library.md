@@ -14,7 +14,7 @@ cmake --install naos/build --config Release --prefix /opt/naos
 
 Inside another project (`add_subdirectory` or `FetchContent`), Naos is always a static library, whatever `BUILD_SHARED_LIBS` is.
 
-- Through `find_package(Naos)`, CMake adds the definition that the headers need, `NAOS_SHARED`. Without CMake, define `NAOS_SHARED` yourself when compiling the tests.
+- Through `find_package(Naos)`, CMake adds the definition that the headers need, `NAOS_SHARED`. From [another build system](../getting-started/installation.md#other-build-systems), define `NAOS_SHARED` yourself when compiling the tests.
 - The public functions name no calling convention. Build Naos and the tests with the same default convention (no `/Gz` on 32-bit Windows, for example).
 
 ## Make the DLL findable at build time

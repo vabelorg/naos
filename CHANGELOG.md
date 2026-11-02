@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **BREAKING**: The package is `Naos` and its target `Naos::naos`, as the project is named: `find_package(Naos)`, `FetchContent_Declare(Naos ...)` and `target_link_libraries(... Naos::naos)`. The target `naos::naos` is no longer there, and the variables of `find_package()` are `Naos_VERSION` and `Naos_DIR` rather than `naos_VERSION` and `naos_DIR`. The package is installed as `<libdir>/cmake/Naos/NaosConfig.cmake`, which `find_package(naos)` does not find on a file system that tells the case of letters apart.
 
+### Removed
+
+- **BREAKING**: Building the `.c` files of `src/` directly into a project, without the build of Naos, is no longer supported: the object files of Naos, such as `session.o` and `text.o`, could take the place of those of the project with the same names. A project using CMake adds Naos with `FetchContent`, `add_subdirectory()` or `find_package(Naos)`; a project with another build system builds and installs Naos with CMake, then links the installed library ([installation](docs/getting-started/installation.md#other-build-systems)).
+
 ### Fixed
 
 - Changing the arguments of `naos_add_executable()` or `naos_discover_tests()` (`PREFIX`, `LABELS`, `PROPERTIES`, `DISCOVERY_TIMEOUT`) now registers the tests again at the next build, with the single-config Ninja and Makefile generators. The tests kept their old names, labels and properties until the executable itself was built again.

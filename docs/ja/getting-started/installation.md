@@ -1,6 +1,6 @@
 # インストール
 
-Naos をプロジェクトに取り込む方法です。CMake を使う 3 通りの方法と、CMake を使わずにソースをコンパイルする方法があります。
+Naos をプロジェクトに取り込む方法です。Naos は CMake でビルドします。CMake のプロジェクトは 3 通りの方法で取り込めます。ほかのビルドシステムのプロジェクトは、CMake でビルドしてインストールしたライブラリをリンクします。
 
 ## 必要なもの
 
@@ -8,7 +8,7 @@ Naos をプロジェクトに取り込む方法です。CMake を使う 3 通り
 |---|---|
 | C コンパイラ | C99。GCC、Clang、MSVC |
 | C++ コンパイラ | C++11。C++ でテストを書くときだけ |
-| CMake | 3.21 以上。なくてもよい（[CMake を使わない場合](#cmake-を使わない場合)） |
+| CMake | 3.21 以上。Naos のビルドに使います。[ほかのビルドシステム](#ほかのビルドシステム)のプロジェクトでも必要です |
 
 すべての変更は、Linux（GCC と Clang）、macOS（Clang）、Windows（MSVC と、MSYS2 の UCRT64・MINGW64 環境の MinGW-w64 の GCC）で、静的ライブラリと共有ライブラリの両方でビルドしてテストしています。Linux から Windows 向けにクロスコンパイルするなど、MinGW-w64 でのほかのビルドも動くはずですが、テストはしていません。
 
@@ -67,11 +67,22 @@ find_package(Naos 0.2 REQUIRED)
 
 どのバージョンを受け付けるかは [CMake のリファレンス](../reference/cmake.md#パッケージ)にあります。
 
-## CMake を使わない場合
+## ほかのビルドシステム
 
-`include/` をインクルードパスに加え、`src/` の `.c` ファイルをビルドに加えます。
+[インストール済みのパッケージ](#インストール済みのパッケージ)と同じように、CMake で Naos を一度ビルドしてインストールします。そのうえで、インストール先のヘッダとライブラリをコンパイラに渡します。
 
-CTest を使わずにテストを 1 つずつ別のプロセスで実行する方法は、[CTest と CI](../guides/ctest-and-ci.md#cmake-を使わない場合) にあります。
+```sh
+cc -std=c99 -I/opt/naos/include -c my_tests.c
+cc -o my_tests my_tests.o -L/opt/naos/lib -lnaos
+```
+
+- Debug ビルドでは、ライブラリの名前の末尾に `d` が付きます（`-lnaosd`）。MSVC では、ライブラリは `naos.lib`（`naosd.lib`）です。
+- 共有ライブラリでは、テストをコンパイルするときに `NAOS_SHARED` を定義し（`-DNAOS_SHARED`）、テストの実行時にライブラリが見つかるようにします（[共有ライブラリ](../guides/shared-library.md)）。
+- ディレクトリは `GNUInstallDirs` に従うので、ライブラリが `lib/` ではなく `lib64/` に入ることがあります。インストールされるファイルは [CMake のリファレンス](../reference/cmake.md#パッケージ)にあります。
+
+Naos のビルドを通さずに、`src/` のソースを自分のプロジェクトでビルドする方法はサポートしていません。
+
+CTest を使わずにテストを 1 つずつ別のプロセスで実行する方法は、[CTest と CI](../guides/ctest-and-ci.md#ctest-を使わない場合) にあります。
 
 ## ライセンス
 
