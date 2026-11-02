@@ -14,8 +14,15 @@
 #   NAOS_DISCOVERY_TIMEOUT  limit of the listing, in seconds
 #   NAOS_ARGS               arguments given to each test after its --naos-filter, or empty
 #   NAOS_OUTPUT             the CTest file to write
+#   NAOS_SOURCES            sources whose suites must all be listed, or empty for no check
+#   NAOS_SOURCE_DIR         directory of the relative paths of NAOS_SOURCES
+#   NAOS_IGNORE_SUITES      suites defined in NAOS_SOURCES and left out on purpose, or empty
+#
+# The CTest file is removed first, so that CTest runs no test of an older build when this fails.
 
 cmake_minimum_required(VERSION 3.21)
+
+include("${CMAKE_CURRENT_LIST_DIR}/NaosCheckSuites.cmake")
 
 # Quotes value as a bracket argument for the generated file.
 function(naos_quote out value)
@@ -88,17 +95,22 @@ if(NOT DEFINED NAOS_PARAMS)
 endif()
 include("${NAOS_PARAMS}")
 foreach(name IN ITEMS NAOS_TARGET NAOS_EXECUTABLE NAOS_EMULATOR NAOS_PREFIX NAOS_LABELS
-        NAOS_PROPERTIES NAOS_DISCOVERY_TIMEOUT NAOS_ARGS NAOS_OUTPUT)
+        NAOS_PROPERTIES NAOS_DISCOVERY_TIMEOUT NAOS_ARGS NAOS_OUTPUT NAOS_SOURCES NAOS_SOURCE_DIR
+        NAOS_IGNORE_SUITES)
     if(NOT DEFINED ${name})
         message(FATAL_ERROR "${NAOS_PARAMS} does not set ${name}")
     endif()
 endforeach()
+
+file(REMOVE "${NAOS_OUTPUT}")
 
 if(NOT EXISTS "${NAOS_EXECUTABLE}")
     message(FATAL_ERROR "Test executable not found: ${NAOS_EXECUTABLE}")
 endif()
 
 naos_list_tests(test_names)
+naos_check_suites("${NAOS_TARGET}" "${test_names}" "${NAOS_SOURCES}" "${NAOS_IGNORE_SUITES}" "${NAOS_SOURCE_DIR}"
+    "name it in IGNORE_SUITES of naos_add_executable() or naos_discover_tests()")
 
 naos_quote_list(emulator_args NAOS_EMULATOR)
 naos_quote(executable "${NAOS_EXECUTABLE}")

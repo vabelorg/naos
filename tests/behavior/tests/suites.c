@@ -51,6 +51,14 @@ NAOS_SUITE(teardown_twice,
     NAOS_SET_TEARDOWN(teardown_fixture)
 )
 
+/*
+ * A suite with no test, here one with setup alone: it would never show in --naos-list. A suite whose
+ * tests are all rejected is not reported as one with no test as well.
+ */
+NAOS_SUITE(no_test,
+    NAOS_SET_SETUP(setup_fixture)
+)
+
 /* The macros cannot produce the mistakes below, so these suite functions are written by hand. */
 static void dotted_test(naos_builder_t *builder)
 {
@@ -96,6 +104,12 @@ static void invalid_suite_name(naos_builder_t *builder)
     naos_add_test(builder, "same_name", NAOS_TEST_FUNC_(same_name));
 }
 
+static void only_invalid_tests(naos_builder_t *builder)
+{
+    naos_begin_suite(builder, "only_invalid_tests");
+    naos_add_test(builder, "a-b", NAOS_TEST_FUNC_(same_name));
+}
+
 static void no_begin(naos_builder_t *builder)
 {
     naos_add_test(builder, "same_name", NAOS_TEST_FUNC_(same_name));
@@ -117,6 +131,7 @@ static void add_in_suite(naos_builder_t *builder)
     naos_begin_suite(builder, "add_in_suite");
     NAOS_ADD_SUITE(valid);
     printf("reached-after-add\n");
+    naos_add_test(builder, "same_name", NAOS_TEST_FUNC_(same_name));
 }
 
 static void add_duplicate_test(void)
@@ -170,6 +185,13 @@ static void add_teardown_twice(void)
     NAOS_ADD_SUITE(teardown_twice);
 }
 
+static void add_no_test(void)
+{
+    NAOS_ADD_SUITE(no_test);
+    naos_add_suite(only_invalid_tests);
+    NAOS_ADD_SUITE(valid);
+}
+
 static void add_no_begin(void)
 {
     naos_add_suite(no_begin);
@@ -220,6 +242,7 @@ static const struct case_ cases[] =
     CASE_(xfail_duplicate),
     CASE_(setup_twice),
     CASE_(teardown_twice),
+    CASE_(no_test),
     CASE_(no_begin),
     CASE_(null_suite),
     CASE_(many),

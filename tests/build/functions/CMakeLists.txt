@@ -3,7 +3,8 @@
 #
 # The CMake functions of Naos, naos_add_executable() and naos_discover_tests()
 # (docs/reference/cmake.md#functions), called by project/: the mistakes in their arguments, which
-# the configure reports, and how they register the tests with CTest (Registration.cmake).
+# the configure reports, how they register the tests with CTest (Registration.cmake), and how they
+# report a suite, a test or a fixture defined and never added (Unregistered.cmake).
 
 if(CMAKE_CROSSCOMPILING)
     return()
@@ -28,5 +29,7 @@ functions_error(registered_twice EXPECT "naos_discover_tests: the tests of 't' a
 functions_error(timeout_zero EXPECT "DISCOVERY_TIMEOUT must be a positive integer")
 functions_error(timeout_not_a_number EXPECT "DISCOVERY_TIMEOUT must be a positive integer")
 functions_error(properties_not_pairs EXPECT "PROPERTIES must be pairs of <name> <value>")
+functions_error(ignore_invalid_name EXPECT "IGNORE_SUITES takes suite names" "'a\\.b'")
 
 naos_selftest_add_project_case(registration "${CMAKE_CURRENT_SOURCE_DIR}/Registration.cmake")
+naos_selftest_add_project_case(unregistered "${CMAKE_CURRENT_SOURCE_DIR}/Unregistered.cmake")

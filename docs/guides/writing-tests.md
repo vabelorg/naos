@@ -38,6 +38,23 @@ naos_add_executable(my_tests SOURCES main.c parser_test.c writer_test.c LIBRARIE
 - Suite names must be unique within an executable (a duplicate is a link error).
 - When a suite gets large, split it into suites with a common prefix, such as `parser_object` and `parser_array`: `--naos-filter 'parser_*'` then selects them all.
 
+## Catch a test or a suite never added
+
+A test is written twice: `NAOS_TEST` defines it and `NAOS_ADD_TEST` adds it to its suite. A suite is too: `NAOS_SUITE`, then `NAOS_ADD_SUITE`. When the second half is missing, the test never runs, and the run still passes.
+
+`naos_add_executable()` makes both a build error ([registration check](../reference/cmake.md#registration-check)):
+
+- A test, a setup or a teardown that no suite adds does not compile: its function is `static` on purpose, so that the compiler finds it unused. The error names `naos_gen_test_<name>`.
+- A suite that is defined and not added fails the build after the link, at the line that defines it:
+
+  ```
+  slow_test.c:21: error: suite slow is defined but never added, so its tests never run: add it with NAOS_ADD_SUITE(slow), or name it in IGNORE_SUITES of naos_add_executable() or naos_discover_tests() when it is left out on purpose
+  ```
+
+Add what is missing, or remove what is no longer needed. A suite left out on purpose, such as one that a [custom main()](custom-main.md) adds only on an argument, goes in `IGNORE_SUITES`.
+
+`naos_discover_tests()` checks the suites, but leaves the compile options of its target as they are. There, and with another build system, build the tests with `-Werror=unused-function` (GCC, Clang) or `/we4505` (MSVC); without CMake functions, the suites are checked by [a script](../reference/cmake.md#without-the-cmake-functions).
+
 ## Choose the assertion
 
 Each type of value has its assertions: integers, unsigned integers, doubles, strings, memory and pointers ([assertions](../reference/assertions.md)). Use the one that fits: when it fails, it prints both values in a form that fits the type.

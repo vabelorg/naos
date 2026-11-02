@@ -27,7 +27,15 @@ GCC、Clang、MSVC は `NAOS_FAIL` が戻らないことを知っていますが
 
 **テストが実行されない**
 
-どのスイートにも並べていないか、そのスイートを `main()` で登録していません。`--naos-list` で確かめます。スイートに並べていないテストは、コンパイラの未使用関数の警告でも分かります。
+どのスイートにも並べていないか、そのスイートを `main()` で登録していません。`--naos-list` で確かめます。`naos_add_executable()` は、どちらもビルドのときに報告します。それ以外では、スイートに並べていないテストはコンパイラの未使用関数の警告で分かります（[追加し忘れたテストやスイートに気付く](writing-tests.md#追加し忘れたテストやスイートに気付く)）。
+
+**`unused function 'naos_gen_test_<name>'`、または `'naos_gen_test_<name>' defined but not used`**
+
+テスト `<name>` をどのスイートも並べていません（setup や teardown なら `naos_gen_setup_`、`naos_gen_teardown_`）。`NAOS_ADD_TEST` で追加するか、消します。どこからも呼ばない `static` のヘルパーでも同じエラーになるので、消します（[登録漏れの確認](../reference/cmake.md#登録漏れの確認)）。
+
+**`error: suite <name> is defined but never added`**
+
+リンクの後でビルドが失敗しました。ソースで定義したスイートを `main()` が追加していません。`NAOS_MAIN` に `NAOS_ADD_SUITE(<name>)` を書き足します（スイートが別のファイルにあれば、その上に `NAOS_DECLARE_SUITE(<name>);` も）。わざと外しているなら、`IGNORE_SUITES` に書きます（[登録漏れの確認](../reference/cmake.md#登録漏れの確認)）。
 
 **`naos: error: no assertion ran`**
 
@@ -37,7 +45,7 @@ Naos 0.4 より前に書いたスイートは、直すまでの間、`--naos-all
 
 **終了コードが 2 で、標準エラー出力にメッセージが出る**
 
-使い方エラーです。未知の `--naos-*` オプション、値がない・範囲外の値、どのテストにも一致しないフィルタ、スイートの誤り（同じ名前を 2 回使った、setup を 2 回指定した）のどれかです。誤りは、テストを実行する前にすべて報告されます（[終了コード](../reference/command-line.md#終了コード)）。
+使い方エラーです。未知の `--naos-*` オプション、値がない・範囲外の値、どのテストにも一致しないフィルタ、スイートの誤り（同じ名前を 2 回使った、setup を 2 回指定した、テストのないスイート）のどれかです。誤りは、テストを実行する前にすべて報告されます（[終了コード](../reference/command-line.md#終了コード)）。
 
 **終了コードが 77**
 

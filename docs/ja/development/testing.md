@@ -18,7 +18,7 @@ Naos はテストハーネスなので、自己テストの多くは Naos 自身
 | `api/` | Naos 自身 | 公開 API を、プロジェクトが使うとおりに C と C++ で。公開ヘッダごとに 1 ファイル |
 | `unit/` | Naos 自身 | 内部のモジュール。モジュールごとに 1 ファイル。結果が引数だけで決まるもの（`value`、`filter`、`shuffle`、`text`、各回の種で順序が決まる `plan`）と、イベントで動かす writer（`xml` は JUnit XML のファイル、`human` は診断） |
 | `behavior/` | golden ファイル（[下記](#出力を照合するケース)） | テストの実行について[リファレンス](../reference/README.md)が述べることすべて。ページごとに 1 ディレクトリ: `tests/`、`assertions/`、`control/`、`command-line/`、`output/`、`xml/` |
-| `build/` | コンパイラと CMake | コンパイルできてはいけないプログラム（`misuse/`）、テストの検出のメッセージ（`discovery/`）、[CMake の関数](../reference/cmake.md#関数)（`functions/`）、`add_subdirectory()` で加えた Naos（`subproject/`） |
+| `build/` | コンパイラと CMake | コンパイルできてはいけないプログラム（`misuse/`）、テストの検出のメッセージとスイートの確認（`discovery/`）、[CMake の関数](../reference/cmake.md#関数)（`functions/`）、`add_subdirectory()` で加えた Naos（`subproject/`） |
 | `examples/` | 両方 | `examples/` のプロジェクトと、ドキュメントが引用する出力（[下記](#サンプルとドキュメント)） |
 
 `tests/consumer/` は層ではありません。Naos を使うプロジェクトで、Naos を次の 2 とおりで加えます。
@@ -112,7 +112,7 @@ SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 
 `build/functions/` と `build/subproject/` のケースは、Naos のビルドと同じジェネレータ、コンパイラ、構成で、自分のプロジェクトを configure し、ビルドし、テストします（`naos_selftest_add_project_case()` と `NestedProject.cmake`）。
 
-- `functions/`: CMake の関数の引数の誤りを、1 つずつ configure だけで確かめる。テストの登録のされ方は `Registration.cmake` で確かめる。
+- `functions/`: CMake の関数の引数の誤りを、1 つずつ configure だけで確かめる。テストの登録のされ方は `Registration.cmake` で、追加し忘れたスイート・テスト・前後処理でビルドが失敗することは `Unregistered.cmake` で確かめる。
 - `subproject/`: `add_subdirectory()` で Naos を加えた `tests/consumer/` をビルドする。Naos が自分の外に何かを及ぼすと、その configure が失敗する。
 
 これらのケースは 1 つ数秒かかります。ラベル `slow` が付いているので、`-LE slow` で外せます。

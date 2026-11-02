@@ -17,5 +17,6 @@ if(NOT TARGET Naos::naos)
     FetchContent_MakeAvailable(Naos)
 endif()
 
-# CTest gets the tests listed without arguments: those of the suite quick.
-naos_add_executable(custom_main_tests SOURCES main.c quick_test.c slow_test.c)
+# CTest gets the tests listed without arguments: those of the suite quick. The suite slow is added
+# only on --slow, so IGNORE_SUITES says it is left out of that list on purpose.
+naos_add_executable(custom_main_tests SOURCES main.c quick_test.c slow_test.c IGNORE_SUITES slow)

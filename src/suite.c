@@ -202,9 +202,22 @@ static int build_suites(naos_builder_t *builder, const naos_suite_func_t *suites
 
         suites[i](builder);
 
-        if ((g_out_of_memory == 0) && (builder->current == NULL))
+        if (g_out_of_memory != 0)
+        {
+            break;
+        }
+
+        if (builder->current == NULL)
         {
             builder_error(builder, "suite #%zu does not call naos_begin_suite", i);
+        }
+        else if (builder->test_calls == 0)
+        {
+            /*
+             * A suite with no test would never show in --naos-list, which CTest discovery and its
+             * check of the suites rely on; it is most likely unfinished, too.
+             */
+            builder_error(builder, "suite %s has no test", display_name(builder->current->name));
         }
     }
 

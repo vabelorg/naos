@@ -35,7 +35,7 @@ NAOS_TEST(name)
 `NAOS_TEST(name)` defines a test function. It defines `static void naos_gen_test_<name>(void)`, the name a debugger shows ([generated names](#generated-names)). It runs only when a suite lists it with `NAOS_ADD_TEST`.
 
 - Put no `;` after the closing brace. `NAOS_TEST` defines a function, and `-Wpedantic` warns about the extra `;`.
-- A test that is defined but listed in no suite is not detected. The compiler's unused-function warning points it out.
+- A test that is defined but listed in no suite never runs. Its function is `static` so that the compiler reports it, as an unused function: `naos_add_executable()` makes that an error ([registration check](cmake.md#registration-check)); elsewhere, turn on the warning (`-Wall` for GCC and Clang, `/W4` for MSVC).
 - A test that runs no assertion fails ([a test that runs no assertion](control.md#a-test-that-runs-no-assertion)).
 
 ## Suites
@@ -50,6 +50,8 @@ NAOS_DECLARE_SUITE(name);
 `NAOS_SUITE(name, ...)` defines the suite `name` from entries separated by commas: one `NAOS_ADD_TEST(test)` per test (they run in the order listed), or `NAOS_ADD_TEST_XFAIL(test, reason)` for a test [expected to fail](control.md#a-test-expected-to-fail), and, if needed, [setup and teardown](#setup-and-teardown). Write it after the tests it lists, usually at the end of the file.
 
 `NAOS_DECLARE_SUITE(name);` declares a suite defined in another file, so that this file can register it.
+
+A suite runs only when it is registered with `NAOS_ADD_SUITE` ([main()](#main)). One that is defined and never registered is not reported by the compiler, since its function has external linkage; the CMake functions report it after the build ([registration check](cmake.md#registration-check)).
 
 ```c
 /* parser_test.c */
@@ -76,8 +78,8 @@ NAOS_MAIN(
 - Put no comma after the last entry (it does not compile), and no `;` after `NAOS_SUITE(...)`. `NAOS_DECLARE_SUITE` is a declaration and needs its `;`.
 - A suite is defined within one file. A file may define several. Test functions are `static`, so different files can use the same test names.
 - Two suites of the same name in one executable are a link error.
-- `#ifdef` cannot go between the arguments (undefined behavior in C99). Put the tests that depend on the platform in a suite of their own and wrap the whole suite in `#ifdef`.
-- Naos reports the following mistakes on standard error before running any test, all of them at once, and exits with code 2: a name that is empty or holds a character other than a letter, a digit or `_` (names written through the macros are always valid), a test listed twice in one suite, a test expected to fail with an empty or `NULL` reason, and a suite registered twice.
+- `#ifdef` cannot go between the arguments (undefined behavior in C99). Put the tests that depend on the platform in a suite of their own and wrap the whole suite in `#ifdef`, its `NAOS_ADD_SUITE` too.
+- Naos reports the following mistakes on standard error before running any test, all of them at once, and exits with code 2: a name that is empty or holds a character other than a letter, a digit or `_` (names written through the macros are always valid), a test listed twice in one suite, a test expected to fail with an empty or `NULL` reason, a suite with no test (`suite <name> has no test`), and a suite registered twice.
 
 ## Setup and teardown
 
@@ -110,7 +112,7 @@ NAOS_SUITE(x, ...)   →  void naos_gen_suite_x(naos_builder_t *builder)
 The functions the macros define are named `naos_gen_<role>_<name>`. Write the macros with the plain name `x`, as in the examples; `naos_gen_...` is not written in your code.
 
 - The role is part of the name, so `NAOS_SET_SETUP`, `NAOS_SET_TEARDOWN` and `NAOS_ADD_TEST` accept only a function defined for their own role. Naming a teardown in `NAOS_SET_SETUP`, or a setup in `NAOS_ADD_TEST`, is a compile error ("`naos_gen_setup_x` undeclared"). The same name `x` can therefore be used for a test, a setup and a teardown without a clash.
-- Tests, setup and teardown are `static`, so different files can use the same names. A suite function has external linkage: it is what `NAOS_DECLARE_SUITE` declares.
+- Tests, setup and teardown are `static`, so different files can use the same names, and the compiler reports those that no suite lists ([registration check](cmake.md#registration-check)). A suite function has external linkage: it is what `NAOS_DECLARE_SUITE` declares.
 - Debuggers, stack traces and profilers show these names, so a breakpoint on a test is a breakpoint on `naos_gen_test_<name>`.
 - Names that start with `naos_gen_` are reserved for Naos. Do not define functions of that form yourself, and do not call the generated functions: a test is run by the suite that lists it.
 

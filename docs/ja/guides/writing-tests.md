@@ -38,6 +38,23 @@ naos_add_executable(my_tests SOURCES main.c parser_test.c writer_test.c LIBRARIE
 - スイートの名前は、1 つの実行ファイルの中で重複しないようにします（重複するとリンクエラーになります）。
 - スイートが大きくなったら、`parser_object`、`parser_array` のように名前の先頭をそろえたスイートに分けます。`--naos-filter 'parser_*'` でまとめて指定できます。
 
+## 追加し忘れたテストやスイートに気付く
+
+テストは 2 か所に書きます。`NAOS_TEST` で定義し、`NAOS_ADD_TEST` でスイートに追加します。スイートも同じで、`NAOS_SUITE` の後に `NAOS_ADD_SUITE` です。後半が抜けると、そのテストは一度も実行されず、それでも実行は成功します。
+
+`naos_add_executable()` は、どちらもビルドエラーにします（[登録漏れの確認](../reference/cmake.md#登録漏れの確認)）。
+
+- どのスイートも追加していないテスト・setup・teardown はコンパイルできません。これらの関数は、コンパイラが未使用だと気付けるよう、わざと `static` にしてあります。エラーには `naos_gen_test_<name>` が出ます。
+- 定義したのに追加していないスイートは、リンクの後にビルドを失敗させ、定義した行を示します。
+
+  ```
+  slow_test.c:21: error: suite slow is defined but never added, so its tests never run: add it with NAOS_ADD_SUITE(slow), or name it in IGNORE_SUITES of naos_add_executable() or naos_discover_tests() when it is left out on purpose
+  ```
+
+抜けているほうを書き足すか、要らなくなったものを消します。[独自の main()](custom-main.md) が引数でだけ追加するスイートのように、わざと外しているスイートは `IGNORE_SUITES` に書きます。
+
+`naos_discover_tests()` はスイートを確かめますが、ターゲットのコンパイルオプションには手を付けません。そこや、ほかのビルドシステムでは、テストを `-Werror=unused-function`（GCC、Clang）か `/we4505`（MSVC）を付けてビルドします。CMake の関数を使わないときは、スイートを[スクリプト](../reference/cmake.md#cmake-の関数を使わないとき)で確かめます。
+
 ## アサーションを選ぶ
 
 アサーションは、整数、符号なし整数、double、文字列、メモリ、ポインタと、値の型ごとに用意されています（[アサーション](../reference/assertions.md)）。型に合ったものを使うと、失敗したときに両辺の値が型に合った形で表示されます。

@@ -9,6 +9,11 @@
 #                     executables of a test that runs no assertion, registered with
 #                     ALLOW_NO_ASSERTIONS by each function (PREFIX added. and discovered.) and
 #                     without it (PREFIX strict.)
+#   unregistered      Naos added with add_subdirectory(NAOS_SOURCE_DIR), and executables of a suite
+#                     (left_out_suite.c) or of a test and a setup (left_out_test.c) defined and never
+#                     added: built by default, those registered with IGNORE_SUITES or
+#                     NO_REGISTRATION_CHECK; left out of the default build, those checked, whose build
+#                     fails (checked_suite with IGNORE_SUITES from the variable CHECKED_IGNORE)
 #   any other case    a mistake in the arguments, which the configure must report. No language is
 #                     enabled, since the mistakes are found before anything is built
 #
@@ -32,6 +37,27 @@ if(CASE STREQUAL "registration")
     target_link_libraries(unchecked_discovered PRIVATE Naos::naos)
     naos_discover_tests(unchecked_discovered PREFIX discovered. ALLOW_NO_ASSERTIONS)
     naos_add_executable(unchecked_strict SOURCES unchecked.c PREFIX strict.)
+    return()
+endif()
+
+if(CASE STREQUAL "unregistered")
+    project(naos_functions LANGUAGES C)
+    enable_testing()
+    add_subdirectory("${NAOS_SOURCE_DIR}" naos)
+
+    naos_add_executable(ignored_added SOURCES left_out_suite.c IGNORE_SUITES left_out)
+    add_executable(ignored_discovered left_out_suite.c)
+    target_link_libraries(ignored_discovered PRIVATE Naos::naos)
+    naos_discover_tests(ignored_discovered IGNORE_SUITES left_out)
+    naos_add_executable(unchecked_suite SOURCES left_out_suite.c NO_REGISTRATION_CHECK)
+    naos_add_executable(unchecked_test SOURCES left_out_test.c NO_REGISTRATION_CHECK)
+
+    naos_add_executable(checked_suite SOURCES left_out_suite.c IGNORE_SUITES ${CHECKED_IGNORE})
+    add_executable(checked_discovered left_out_suite.c)
+    target_link_libraries(checked_discovered PRIVATE Naos::naos)
+    naos_discover_tests(checked_discovered)
+    naos_add_executable(checked_test SOURCES left_out_test.c)
+    set_target_properties(checked_suite checked_discovered checked_test PROPERTIES EXCLUDE_FROM_ALL TRUE)
     return()
 endif()
 
@@ -66,6 +92,9 @@ elseif(CASE STREQUAL "timeout_not_a_number")
 elseif(CASE STREQUAL "properties_not_pairs")
     add_executable(t listed.c)
     naos_discover_tests(t PROPERTIES TIMEOUT 7 WILL_FAIL)
+elseif(CASE STREQUAL "ignore_invalid_name")
+    add_executable(t listed.c)
+    naos_discover_tests(t IGNORE_SUITES kept a.b)
 else()
     message(FATAL_ERROR "unknown CASE '${CASE}'")
 endif()
