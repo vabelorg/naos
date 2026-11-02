@@ -46,7 +46,7 @@ Functions whose names start with `_naos_` are internal.
 
 ## Add a source file
 
-Start it with the copyright notice and `SPDX-License-Identifier: MIT`, then a short comment on what the file is responsible for, and add it to its group in `src/CMakeLists.txt`. A new module, or a new dependency between modules, updates [architecture](architecture.md) and the dependency comment of `src/CMakeLists.txt`.
+Start it with the copyright notice and `SPDX-License-Identifier: MIT`, then a short comment on what the file is responsible for, and add it to its layer in `src/CMakeLists.txt` ([architecture](architecture.md#modules)). A new module, or a new dependency between modules, updates [architecture](architecture.md) and the dependency comment of `src/CMakeLists.txt`.
 
 ## Change the version
 

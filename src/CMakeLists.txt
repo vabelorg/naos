@@ -12,45 +12,55 @@ endif()
 
 # One file per concern. The ones implementing a public header are named after it (session.c for
 # naos/session.h); the others declare their functions in an internal header of the same name.
+#
+# The files form four layers, listed below from the top. A file uses only files of its own layer or
+# of a layer below it, never one above, so the layers never form a cycle
+# (docs/development/architecture.md tells what each layer is for):
+#   1. The run:        session, options, runner, filter, order, version
+#   2. The tests:      suite, test, control, check, diagnostic, context
+#   3. The output:     report, writer.h, human, xml, text
+#   4. Shared parts:   clock, value, format.h
+#
 # Dependencies go one way ("a -> b" means a uses b; docs/development/architecture.md draws the main
 # ones). All of them:
 #   session    -> options, suite, runner, report
-#   suite      -> report
-#   check      -> diagnostic, value
-#   control    -> context, diagnostic, test
 #   options    -> order, report, clock
 #   runner     -> options, suite, filter, order, test, report
 #   filter     -> suite
+#   suite      -> report
 #   test       -> suite, context, diagnostic, report, clock
+#   control    -> context, diagnostic, test
+#   check      -> diagnostic, value
 #   diagnostic -> context, report
+#   context    -> writer
 #   report     -> human, xml, writer
 #   human      -> writer, text, value
 #   xml        -> human, writer, text, value
-#   context    -> writer
 #   writer     -> clock
-# version, order, clock, value and text use no other module. writer.h has no .c: it is the
+# version, order, text, clock and value use no other module. writer.h has no .c: it is the
 # events report.c tells and the functions a writer has.
 add_library(naos ${naos_library_type}
-    # Public API
+    # 1. The run
     session.c
-    suite.c
-    check.c
-    control.c
-    version.c
-    # Running the tests
     options.c
     runner.c
     filter.c
     order.c
+    version.c
+    # 2. The tests
+    suite.c
     test.c
-    clock.c
-    # Writing what happened
+    control.c
+    check.c
     diagnostic.c
     context.c
+    # 3. The output
     report.c
     human.c
     xml.c
     text.c
+    # 4. Shared parts
+    clock.c
     value.c
 )
 add_library(Naos::naos ALIAS naos)
