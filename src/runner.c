@@ -2,29 +2,19 @@
  * Copyright (c) 2026 The Naos Authors
  * SPDX-License-Identifier: MIT
  *
- * The whole run of the selected tests (runner.h): the rounds of --naos-repeat, the order of
- * --naos-shuffle, --naos-fail-fast, the events around the rounds and the exit code.
+ * The rounds of the planned tests (runner.h): --naos-repeat and the seed of each round,
+ * --naos-fail-fast, the tally, the events around the rounds and the exit code.
  */
 
 #include "runner.h"
 
 #include <stdint.h>
-#include <stdlib.h>
 
 #include <naos/exit.h>
 
-#include "filter.h"
-#include "message.h"
 #include "report.h"
 #include "shuffle.h"
 #include "test.h"
-
-/* Order of the suites, and of the tests of one suite at a time; malloc as for the builder. */
-typedef struct naos_orders
-{
-    size_t *suites;
-    size_t *tests;
-} naos_orders_t;
 
 /* a + b, or SIZE_MAX when the sum does not fit. */
 static size_t add_saturated(size_t a, size_t b)
@@ -39,53 +29,35 @@ static size_t multiply_saturated(size_t a, size_t b)
 }
 
 /*
- * Runs the selected tests once, adding their results and times to tally. --naos-shuffle
- * shuffles the suites, then the tests of each suite, so that the output stays grouped by suite.
- * Every test takes part in the shuffle, selected or not, so that a seed gives the selected tests the
- * same order whatever the filter. With --naos-fail-fast, the round ends after the first failing test,
- * its teardown included.
+ * Runs the tests of one round of plan, adding their results and times to tally. With
+ * --naos-fail-fast, the round ends after the first failing test, its teardown included.
  */
-static void run_round(const naos_options_t *options, const naos_suite_t *suites, size_t count, const naos_orders_t *orders, naos_tally_t *tally)
+static void run_round(const naos_options_t *options, naos_plan_t *plan, naos_tally_t *tally)
 {
     const naos_suite_t *suite;
     const naos_test_t *test;
     naos_outcome_t outcome;
     naos_nanoseconds_t elapsed;
-    size_t i;
-    size_t j;
 
-    naos_shuffle_make(orders->suites, count, options->shuffle);
-    for (i = 0; i < count; i++)
+    while (naos_plan_next(plan, &suite, &test) != 0)
     {
-        suite = &suites[orders->suites[i]];
-        naos_shuffle_make(orders->tests, suite->count, options->shuffle);
-
-        for (j = 0; j < suite->count; j++)
+        outcome = naos_test_run(suite, test, &elapsed);
+        tally->elapsed += elapsed;
+        switch (outcome)
         {
-            test = &suite->tests[orders->tests[j]];
-            if (naos_filter_matches(suite, test, options->filter) == 0)
+        case NAOS_OUTCOME_FAIL:
+            tally->failed++;
+            if (options->fail_fast != 0)
             {
-                continue;
+                return;
             }
-
-            outcome = naos_test_run(suite, test, &elapsed);
-            tally->elapsed += elapsed;
-            switch (outcome)
-            {
-            case NAOS_OUTCOME_FAIL:
-                tally->failed++;
-                if (options->fail_fast != 0)
-                {
-                    return;
-                }
-                break;
-            case NAOS_OUTCOME_SKIP:
-                tally->skipped++;
-                break;
-            case NAOS_OUTCOME_PASS:
-                tally->passed++;
-                break;
-            }
+            break;
+        case NAOS_OUTCOME_SKIP:
+            tally->skipped++;
+            break;
+        case NAOS_OUTCOME_PASS:
+            tally->passed++;
+            break;
         }
     }
 }
@@ -111,37 +83,6 @@ static int tally_result(const naos_tally_t *tally)
     }
 
     return NAOS_EXIT_PASS;
-}
-
-/* Allocates the orders for suites[0, count). Returns 0, with nothing allocated, when the memory runs out. */
-static int alloc_orders(naos_orders_t *orders, const naos_suite_t *suites, size_t count)
-{
-    size_t most;
-    size_t i;
-
-    most = 1;
-    for (i = 0; i < count; i++)
-    {
-        most = (suites[i].count > most) ? suites[i].count : most;
-    }
-
-    orders->suites = (size_t *)malloc(((count > 0) ? count : 1) * sizeof(size_t));
-    orders->tests = (size_t *)malloc(most * sizeof(size_t));
-    if ((orders->suites == NULL) || (orders->tests == NULL))
-    {
-        free(orders->suites);
-        free(orders->tests);
-
-        return 0;
-    }
-
-    return 1;
-}
-
-static void free_orders(naos_orders_t *orders)
-{
-    free(orders->suites);
-    free(orders->tests);
 }
 
 /* Seed of the first round: the one given, or with --naos-shuffle and none given, one from the time. */
@@ -173,14 +114,8 @@ static int end_round(const naos_options_t *options, const naos_round_t *round, s
     return stopped;
 }
 
-/*
- * Runs the selected tests options->repeat times; the seed of --naos-shuffle goes up by 1 each
- * time, from NAOS_SHUFFLE_SEED_MAX back to 1. --naos-fail-fast stops them all at the first failing
- * test. Returns the result of all the runs together.
- */
-static int run_rounds(const naos_options_t *options, const naos_suite_t *suites, size_t count, size_t selected)
+int naos_runner_run(const naos_options_t *options, naos_plan_t *plan)
 {
-    naos_orders_t orders;
     naos_tally_t total = NAOS_TALLY_EMPTY;
     naos_round_t round;
     unsigned long seed;
@@ -188,16 +123,14 @@ static int run_rounds(const naos_options_t *options, const naos_suite_t *suites,
     int stopped;
     int result;
 
-    if (alloc_orders(&orders, suites, count) == 0)
+    if (naos_plan_prepare(plan) == 0)
     {
-        naos_message("out of memory while ordering the tests");
-
         return NAOS_EXIT_FAIL;
     }
 
     if (naos_report_begin(options->program, options->output_format, options->output_path, options->quiet) == 0)
     {
-        free_orders(&orders);
+        naos_plan_release(plan);
 
         return NAOS_EXIT_USAGE;
     }
@@ -213,21 +146,17 @@ static int run_rounds(const naos_options_t *options, const naos_suite_t *suites,
 
         round.seed = seed;
         naos_report_round_begin(&round);
-        if (options->shuffle != 0)
-        {
-            /* --naos-shuffle --naos-random-seed <seed> runs the same order again. */
-            naos_shuffle_start(seed);
-        }
+        naos_plan_start_round(plan, seed);
 
-        run_round(options, suites, count, &orders, &tally);
-        stopped = end_round(options, &round, selected, &tally);
+        run_round(options, plan, &tally);
+        stopped = end_round(options, &round, plan->selected, &tally);
 
         failed_rounds += (tally.failed > 0) ? 1 : 0;
         tally_add(&total, &tally);
         seed = naos_shuffle_next_seed(seed);
     }
 
-    free_orders(&orders);
+    naos_plan_release(plan);
     result = tally_result(&total);
 
     /* round.index is one past the last round run. */
@@ -237,69 +166,4 @@ static int run_rounds(const naos_options_t *options, const naos_suite_t *suites,
     }
 
     return result;
-}
-
-/* Number of tests the filter selects. */
-static size_t count_selected(const naos_options_t *options, const naos_suite_t *suites, size_t count)
-{
-    size_t selected;
-    size_t i;
-    size_t j;
-
-    selected = 0;
-    for (i = 0; i < count; i++)
-    {
-        for (j = 0; j < suites[i].count; j++)
-        {
-            selected += (size_t)naos_filter_matches(&suites[i], &suites[i].tests[j], options->filter);
-        }
-    }
-
-    return selected;
-}
-
-/*
- * Prints the selected tests for --naos-list: always in the order of registration, one name per
- * line, for the tools reading it.
- */
-static void list_tests(const naos_options_t *options, const naos_suite_t *suites, size_t count)
-{
-    size_t i;
-    size_t j;
-
-    for (i = 0; i < count; i++)
-    {
-        for (j = 0; j < suites[i].count; j++)
-        {
-            if (naos_filter_matches(&suites[i], &suites[i].tests[j], options->filter) != 0)
-            {
-                naos_report_test_name(suites[i].name, suites[i].tests[j].name);
-            }
-        }
-    }
-
-    naos_report_flush();
-}
-
-int naos_runner_run(const naos_options_t *options, const naos_suite_t *suites, size_t count)
-{
-    size_t selected;
-
-    selected = count_selected(options, suites, count);
-    if ((options->filter != NULL) && (selected == 0))
-    {
-        naos_message("no test matches: %s", options->filter);
-        naos_options_print_usage(stderr, options->program);
-
-        return NAOS_EXIT_USAGE;
-    }
-
-    if (options->list_only == 0)
-    {
-        return run_rounds(options, suites, count, selected);
-    }
-
-    list_tests(options, suites, count);
-
-    return NAOS_EXIT_PASS;
 }

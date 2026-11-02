@@ -102,7 +102,7 @@ static int match_any_pattern(const char *begin, const char *end, const char *sui
     }
 }
 
-int naos_filter_matches(const naos_suite_t *suite, const naos_test_t *test, const char *filter)
+int naos_filter_matches(const char *filter, const char *suite, const char *test)
 {
     const char *minus;
     const char *end;
@@ -115,12 +115,12 @@ int naos_filter_matches(const naos_suite_t *suite, const naos_test_t *test, cons
     end = filter + strlen(filter);
     minus = strchr(filter, '-');
 
-    if ((minus != filter) && (match_any_pattern(filter, (minus != NULL) ? minus : end, suite->name, test->name) == 0))
+    if ((minus != filter) && (match_any_pattern(filter, (minus != NULL) ? minus : end, suite, test) == 0))
     {
         return 0;
     }
 
-    if ((minus != NULL) && (match_any_pattern(minus + 1, end, suite->name, test->name) != 0))
+    if ((minus != NULL) && (match_any_pattern(minus + 1, end, suite, test) != 0))
     {
         return 0;
     }

@@ -4,8 +4,8 @@
  *
  * The events of a run, told to every writer on (writer.h): the human-readable output on stdout
  * always, and the file of --naos-output when given. The other modules decide what to tell and when;
- * only the writers know how it looks. The names of --naos-list are written here too. The messages of
- * Naos itself are left to message.h, and the help and the usage of the command line to options.c.
+ * only the writers know how it looks. The names of --naos-list are left to plan.h, the messages of
+ * Naos itself to message.h, and the help and the usage of the command line to options.c.
  */
 
 #ifndef NAOS_REPORT_H
@@ -39,9 +39,6 @@ void naos_report_round_end(const naos_round_t *round, const naos_tally_t *tally,
 
 /* Ends the run. Returns 0 when a writer could not write all of it, after reporting why. */
 int naos_report_end(long failed_rounds, long repeat, long rounds_not_run);
-
-/* Writes the name of a test as --naos-list prints it: "<suite>.<test>". */
-void naos_report_test_name(const char *suite, const char *test);
 
 void naos_report_flush(void);
 

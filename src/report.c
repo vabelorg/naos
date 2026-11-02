@@ -2,14 +2,13 @@
  * Copyright (c) 2026 The Naos Authors
  * SPDX-License-Identifier: MIT
  *
- * Telling the events of a run to every writer on, and the names of --naos-list (report.h).
+ * Telling the events of a run to every writer on (report.h).
  */
 
 #include "report.h"
 
 #include <stdio.h>
 
-#include "format.h"
 #include "human.h"
 #include "message.h"
 #include "xml.h"
@@ -132,11 +131,6 @@ int naos_report_end(long failed_rounds, long repeat, long rounds_not_run)
     }
 
     return written;
-}
-
-void naos_report_test_name(const char *suite, const char *test)
-{
-    naos_printf("%s.%s\n", suite, test);
 }
 
 void naos_report_flush(void)

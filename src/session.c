@@ -11,6 +11,7 @@
 
 #include "message.h"
 #include "options.h"
+#include "plan.h"
 #include "runner.h"
 #include "suite_internal.h"
 
@@ -77,6 +78,7 @@ int naos_run(void)
 {
     const naos_options_t *options;
     naos_builder_t builder;
+    naos_plan_t plan;
     int result;
 
     if (check_phase(NAOS_PHASE_ADDING, "naos_run()") == 0)
@@ -101,7 +103,15 @@ int naos_run(void)
         }
         else if (options->help_requested == 0)
         {
-            result = naos_runner_run(options, builder.suites, builder.count);
+            result = naos_plan_make(&plan, options, builder.suites, builder.count);
+            if ((result == NAOS_EXIT_PASS) && (options->list_only != 0))
+            {
+                naos_plan_list(&plan);
+            }
+            else if (result == NAOS_EXIT_PASS)
+            {
+                result = naos_runner_run(options, &plan);
+            }
         }
     }
 
