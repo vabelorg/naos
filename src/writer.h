@@ -12,7 +12,17 @@
 #include <stddef.h>
 
 #include "clock.h"
-#include "context.h"
+
+/* Size of the text of one trace: longer ones are cut short, ending in "...". */
+#define NAOS_TRACE_TEXT_SIZE 256
+
+/* One trace of NAOS_TRACE_PUSH, where it was pushed and its text. context.c keeps them in this form. */
+typedef struct naos_trace
+{
+    const char *file;
+    int line;
+    char text[NAOS_TRACE_TEXT_SIZE];
+} naos_trace_t;
 
 /* Outcome of one test. */
 typedef enum naos_outcome

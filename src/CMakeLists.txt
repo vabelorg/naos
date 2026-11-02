@@ -26,8 +26,9 @@ endif()
 #   report     -> human, xml, writer
 #   human      -> writer, text, value
 #   xml        -> human, writer, text, value
-#   writer     -> context, clock
-# version, order, clock, context, value and text use no other module. writer.h has no .c: it is the
+#   context    -> writer
+#   writer     -> clock
+# version, order, clock, value and text use no other module. writer.h has no .c: it is the
 # events report.c tells and the functions a writer has.
 add_library(naos ${naos_library_type}
     # Public API
