@@ -56,7 +56,7 @@ SUMMARY: 1 passed, 1 failed, 0 skipped (0 ms)
 - **One test at a time**: `--naos-filter clamp.above_range`, under a debugger for instance. Wildcards and exclusions select groups.
 - **One process per test**: `naos_add_executable()` registers each test with CTest, which isolates crashes, runs in parallel and sets time limits.
 - **No test that checks nothing**: a test that runs no assertion fails, so an empty or unfinished test, or a loop over no case, does not read as a pass.
-- **No test left out**: with the CMake functions, a test or a suite defined and never added fails the build, instead of never running while the run passes.
+- **No test left out**: with the CMake functions, a suite defined and never added fails the build, and so does such a test with GCC and Clang, instead of never running while the run passes.
 - **Tests expected to fail**: `NAOS_ADD_TEST_XFAIL` marks a test written before the code, or one for a known bug, so the run passes while it fails and fails as soon as it passes.
 - **Hidden dependencies shaken out**: `--naos-shuffle` (replayable seed), `--naos-repeat`, `--naos-fail-fast`.
 - **Failures your editor understands**: `file:line: error: ...`, in a stable, documented format.

@@ -44,7 +44,7 @@ naos_add_executable(my_tests SOURCES main.c parser_test.c writer_test.c LIBRARIE
 
 `naos_add_executable()` は、どちらもビルドエラーにします（[登録漏れの確認](../reference/cmake.md#登録漏れの確認)）。
 
-- どのスイートも追加していないテスト・setup・teardown はコンパイルできません。これらの関数は、コンパイラが未使用だと気付けるよう、わざと `static` にしてあります。エラーには `naos_gen_test_<name>` が出ます。
+- どのスイートも追加していないテスト・setup・teardown は、GCC と Clang ではコンパイルできません。これらの関数は、コンパイラが未使用だと気付けるよう、わざと `static` にしてあります。エラーには `naos_gen_test_<name>` が出ます。
 - 定義したのに追加していないスイートは、リンクの後にビルドを失敗させ、定義した行を示します。
 
   ```
@@ -53,7 +53,7 @@ naos_add_executable(my_tests SOURCES main.c parser_test.c writer_test.c LIBRARIE
 
 抜けているほうを書き足すか、要らなくなったものを消します。[独自の main()](custom-main.md) が引数でだけ追加するスイートのように、わざと外しているスイートは `IGNORE_SUITES` に書きます。
 
-`naos_discover_tests()` はスイートを確かめますが、ターゲットのコンパイルオプションには手を付けません。そこや、ほかのビルドシステムでは、テストを `-Werror=unused-function`（GCC、Clang）か `/we4505`（MSVC）を付けてビルドします。CMake の関数を使わないときは、スイートを[スクリプト](../reference/cmake.md#cmake-の関数を使わないとき)で確かめます。
+`naos_discover_tests()` はスイートを確かめますが、ターゲットのコンパイルオプションには手を付けません。そこや、ほかのビルドシステムでは、テストを `-Werror=unused-function`（GCC、Clang）を付けてビルドします。CMake の関数を使わないときは、スイートを[スクリプト](../reference/cmake.md#cmake-の関数を使わないとき)で確かめます。
 
 ## アサーションを選ぶ
 

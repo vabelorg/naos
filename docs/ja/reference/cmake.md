@@ -86,17 +86,12 @@ naos_discover_tests(<target>
 
 テストは `NAOS_TEST` と、スイートの中の `NAOS_ADD_TEST` の 2 か所に書きます。スイートも `NAOS_SUITE` と `NAOS_ADD_SUITE` の 2 か所です（[テストとスイート](tests.md)）。後半を書き忘れたテストやスイートは一度も実行されず、それでも実行は成功します。どちらの関数も、`NO_REGISTRATION_CHECK` を付けない限りこれを確かめます。
 
-**テスト・setup・teardown**（`naos_add_executable()` だけ）: これらの関数は `static` なので、どのスイートも使っていないものはコンパイラが見つけます。この関数は、ターゲットの C と C++ のソースで、その警告をエラーにします。
+**テスト・setup・teardown**（`naos_add_executable()` で、GCC か Clang のときだけ）: これらの関数は `static` なので、どのスイートも使っていないものはコンパイラが見つけます。この関数は、ターゲットの C と C++ のソースを `-Werror=unused-function` 付きでコンパイルし、その警告をエラーにします。
 
-| コンパイラ | オプション |
-|---|---|
-| GCC、Clang（独自のコマンドラインのとき） | `-Werror=unused-function` |
-| MSVC | `/we4505` |
-
-- エラーには関数名 `naos_gen_test_<name>`、`naos_gen_setup_<name>`、`naos_gen_teardown_<name>` が出ます（[生成される関数名](tests.md#生成される関数名)）。場所は、GCC では `naos/suite.h` のマクロの位置、Clang と MSVC ではテストの位置です。
+- エラーには関数名 `naos_gen_test_<name>`、`naos_gen_setup_<name>`、`naos_gen_teardown_<name>` が出ます（[生成される関数名](tests.md#生成される関数名)）。場所は、GCC では `naos/suite.h` のマクロの位置、Clang ではテストの位置です。
 - ソースの中で使われていない `static` 関数はすべて対象です。残ったヘルパーなどは消すか、`NO_REGISTRATION_CHECK` を付けます。
-- ほかのコンパイラには、MSVC のコマンドラインの Clang（`clang-cl`）も含め、オプションを付けません。
-- `naos_discover_tests()` はターゲットのコンパイルオプションに手を付けません。オプションを自分で付けるか、警告（`-Wall`、`/W4`）を有効にして読みます。
+- ほかのコンパイラにはオプションを付けません。使われていない `static` 関数をどのビルドでも報告するとは限らない MSVC（警告 C4505）や、MSVC のコマンドラインの Clang（`clang-cl`）がそうです。これらでは、どのスイートも追加していないテストは見つかりません。スイートの確認はします。
+- `naos_discover_tests()` はターゲットのコンパイルオプションに手を付けません。オプションを自分で付けるか、警告（`-Wall`）を有効にして読みます。
 
 **スイート**（両方の関数）: [列挙](#列挙)のときに、実行ファイルが列挙したスイートと、ソースで定義しているスイートを比べます。定義しているのに列挙されないスイートがあるとビルドが失敗し、1 つにつき 1 行、コンパイラの診断の形で出ます。
 
@@ -124,7 +119,7 @@ cmake -D NAOS_EXECUTABLE=build/my_tests -D "NAOS_SOURCES=main.c;parser_test.c" -
 | `NAOS_SOURCES` | そのソース。`;` で区切る。相対パスはカレントディレクトリから |
 | `NAOS_IGNORE_SUITES` | 省略可。わざと追加していないスイート。`;` で区切る |
 
-定義したスイートがすべて列挙されれば 0 で終了し、そうでなければ上の行を出して失敗します。テストのほうは、`-Werror=unused-function`（GCC、Clang）か `/we4505`（MSVC）を付けてビルドします。
+定義したスイートがすべて列挙されれば 0 で終了し、そうでなければ上の行を出して失敗します。テストのほうは、`-Werror=unused-function`（GCC、Clang）を付けてビルドします。
 
 ## オプション
 

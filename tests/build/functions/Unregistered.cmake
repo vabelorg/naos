@@ -8,7 +8,8 @@
 # 1. A suite left out on purpose, named in IGNORE_SUITES of either function, and both kinds of
 #    mistake under NO_REGISTRATION_CHECK: the executables build, and their tests are registered.
 # 2. Without them, the build fails: discovery names the file, the line and the suite left out, for
-#    either function; naos_add_executable() makes the compiler reject the test and the setup.
+#    either function; with GCC and Clang, naos_add_executable() makes the compiler reject the test
+#    and the setup, and other compilers, which get no option, build them.
 # 3. With the single-config Ninja and Makefile generators, a suite named in IGNORE_SUITES, then no
 #    longer: the build that fails removes the tests it had registered, and CTest has
 #    <prefix>NOT_BUILT in their place.
@@ -79,7 +80,13 @@ nested_ctest(output "${binary}" -R "^(ignored|unchecked)_")
 expect_build_failure(checked_suite "${suite_error}" "IGNORE_SUITES")
 expect_tests("checked_suite." "checked_suite.NOT_BUILT")
 expect_build_failure(checked_discovered "${suite_error}")
-expect_build_failure(checked_test "naos_gen_test_left_out" "naos_gen_setup_left_out")
+file(READ "${binary}/compiler.txt" compiler)
+if(compiler STREQUAL "flagged")
+    expect_build_failure(checked_test "naos_gen_test_left_out" "naos_gen_setup_left_out")
+else()
+    nested_run("build" "${CMAKE_COMMAND}" --build "${binary}" --config "${CONFIG}" --target checked_test)
+    expect_tests("checked_test." "checked_test.kept.passes")
+endif()
 
 # 3. Ignored, then no longer.
 if(GENERATOR MATCHES "Ninja|Makefiles" AND NOT MULTI_CONFIG)

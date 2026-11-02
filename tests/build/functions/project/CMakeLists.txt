@@ -13,7 +13,8 @@
 #                     (left_out_suite.c) or of a test and a setup (left_out_test.c) defined and never
 #                     added: built by default, those registered with IGNORE_SUITES or
 #                     NO_REGISTRATION_CHECK; left out of the default build, those checked, whose build
-#                     fails (checked_suite with IGNORE_SUITES from the variable CHECKED_IGNORE)
+#                     fails (checked_suite with IGNORE_SUITES from the variable CHECKED_IGNORE).
+#                     compiler.txt says whether the compiler gets -Werror=unused-function
 #   any other case    a mistake in the arguments, which the configure must report. No language is
 #                     enabled, since the mistakes are found before anything is built
 #
@@ -58,6 +59,11 @@ if(CASE STREQUAL "unregistered")
     naos_discover_tests(checked_discovered)
     naos_add_executable(checked_test SOURCES left_out_test.c)
     set_target_properties(checked_suite checked_discovered checked_test PROPERTIES EXCLUDE_FROM_ALL TRUE)
+    if((CMAKE_C_COMPILER_ID MATCHES "^(GNU|Clang|AppleClang)$") AND (NOT CMAKE_C_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC"))
+        file(WRITE "${CMAKE_BINARY_DIR}/compiler.txt" "flagged")
+    else()
+        file(WRITE "${CMAKE_BINARY_DIR}/compiler.txt" "not flagged")
+    endif()
     return()
 endif()
 

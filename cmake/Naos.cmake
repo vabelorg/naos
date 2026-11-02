@@ -13,9 +13,9 @@
 #     [ALLOW_NO_ASSERTIONS]           # run each test with --naos-allow-no-assertions
 #     [IGNORE_SUITES <name>...]       # suites defined in the sources but not added, on purpose
 #     [NO_REGISTRATION_CHECK])        # check neither the tests nor the suites added
-#   Creates a test executable linked to Naos::naos and registers each of its tests with CTest. A
-#   test or a fixture defined and never added fails to compile: its static function is unused,
-#   which -Werror=unused-function (GCC, Clang) or /we4505 (MSVC) makes an error.
+#   Creates a test executable linked to Naos::naos and registers each of its tests with CTest. With
+#   GCC and Clang, a test or a fixture defined and never added fails to compile: its static
+#   function is unused, which -Werror=unused-function makes an error.
 #
 # naos_discover_tests(<target> [PREFIX ...] [LABELS ...] [PROPERTIES ...] [DISCOVERY_TIMEOUT ...]
 #     [ALLOW_NO_ASSERTIONS] [IGNORE_SUITES ...] [NO_REGISTRATION_CHECK])
@@ -98,18 +98,15 @@ endfunction()
 
 # Makes a test or a fixture that no suite adds an error for the compiler, in the C and C++ sources
 # of target: their functions are static (NAOS_TEST), so the compiler finds those never used. Only
-# GCC, Clang with its own command line, and MSVC are known; other compilers are left as they are.
+# GCC and Clang with its own command line get the option. MSVC is left as it is: /we4505 did not
+# report an unused static function in a Debug build of C, so it would promise a check it does not
+# make.
 function(_naos_registration_check_flags target)
     foreach(lang IN ITEMS C CXX)
         set(id "${CMAKE_${lang}_COMPILER_ID}")
-        if(id STREQUAL "MSVC")
-            set(flag "/we4505")
-        elseif((id MATCHES "^(GNU|Clang|AppleClang)$") AND (NOT CMAKE_${lang}_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC"))
-            set(flag "-Werror=unused-function")
-        else()
-            continue()
+        if((id MATCHES "^(GNU|Clang|AppleClang)$") AND (NOT CMAKE_${lang}_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC"))
+            target_compile_options(${target} PRIVATE "$<$<COMPILE_LANGUAGE:${lang}>:-Werror=unused-function>")
         endif()
-        target_compile_options(${target} PRIVATE "$<$<COMPILE_LANGUAGE:${lang}>:${flag}>")
     endforeach()
 endfunction()
 

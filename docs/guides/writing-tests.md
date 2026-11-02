@@ -44,7 +44,7 @@ A test is written twice: `NAOS_TEST` defines it and `NAOS_ADD_TEST` adds it to i
 
 `naos_add_executable()` makes both a build error ([registration check](../reference/cmake.md#registration-check)):
 
-- A test, a setup or a teardown that no suite adds does not compile: its function is `static` on purpose, so that the compiler finds it unused. The error names `naos_gen_test_<name>`.
+- A test, a setup or a teardown that no suite adds does not compile, with GCC and Clang: its function is `static` on purpose, so that the compiler finds it unused. The error names `naos_gen_test_<name>`.
 - A suite that is defined and not added fails the build after the link, at the line that defines it:
 
   ```
@@ -53,7 +53,7 @@ A test is written twice: `NAOS_TEST` defines it and `NAOS_ADD_TEST` adds it to i
 
 Add what is missing, or remove what is no longer needed. A suite left out on purpose, such as one that a [custom main()](custom-main.md) adds only on an argument, goes in `IGNORE_SUITES`.
 
-`naos_discover_tests()` checks the suites, but leaves the compile options of its target as they are. There, and with another build system, build the tests with `-Werror=unused-function` (GCC, Clang) or `/we4505` (MSVC); without CMake functions, the suites are checked by [a script](../reference/cmake.md#without-the-cmake-functions).
+`naos_discover_tests()` checks the suites, but leaves the compile options of its target as they are. There, and with another build system, build the tests with `-Werror=unused-function` (GCC, Clang); without CMake functions, the suites are checked by [a script](../reference/cmake.md#without-the-cmake-functions).
 
 ## Choose the assertion
 

@@ -35,7 +35,7 @@ NAOS_TEST(name)
 `NAOS_TEST(name)` defines a test function. It defines `static void naos_gen_test_<name>(void)`, the name a debugger shows ([generated names](#generated-names)). It runs only when a suite lists it with `NAOS_ADD_TEST`.
 
 - Put no `;` after the closing brace. `NAOS_TEST` defines a function, and `-Wpedantic` warns about the extra `;`.
-- A test that is defined but listed in no suite never runs. Its function is `static` so that the compiler reports it, as an unused function: `naos_add_executable()` makes that an error ([registration check](cmake.md#registration-check)); elsewhere, turn on the warning (`-Wall` for GCC and Clang, `/W4` for MSVC).
+- A test that is defined but listed in no suite never runs. Its function is `static` so that the compiler reports it, as an unused function: with GCC and Clang, `naos_add_executable()` makes that an error ([registration check](cmake.md#registration-check)); elsewhere, turn on the warning (`-Wall`).
 - A test that runs no assertion fails ([a test that runs no assertion](control.md#a-test-that-runs-no-assertion)).
 
 ## Suites

@@ -108,7 +108,7 @@ flowchart TB
 - **書式付きの出力**: `src/` の書式付きの出力はすべて `format.h` を通ります。`format.h` は C ライブラリのうち C99 に従う関数を選びます（MinGW では `__mingw_` の関数）。`naos/export.h` の `NAOS_PRINTF_FORMAT` は Naos の printf 形式の関数を同じ書式で宣言するので、コンパイラのチェックと Naos の出力が一致します。
 - **状態**: 共有する可変状態は各モジュールの `static` 変数（`g_` 接頭辞）に閉じ、`extern` 変数にはしません。例外は `naos_init` 以後読むだけのオプションで、`naos_options_get()` で読みます。
 - **列挙**: `naos_add_executable()` は、ビルド後に `NaosDiscover.cmake` を実行する `POST_BUILD` のコマンドを足します。このスクリプトは `<exe> --naos-list` を実行し、出力の 1 行を 1 件のテストとして登録する CTest のファイルを書きます。パラメータはファイル経由で渡すので、リストをエスケープする必要はありません。
-- **登録漏れの確認**: テストは `static` なので、どのスイートも追加していないものはコンパイラが見つけます。`naos_add_executable()` はその警告をエラーにします。スイートの関数は外部リンケージで、使われなくても何も報告されないので、`NaosDiscover.cmake` が CTest のファイルを書く前に、列挙したスイートとターゲットのソースにある `NAOS_SUITE` の定義を比べます（`NaosCheckSuites.cmake`）。追加したスイートが必ず列挙に出るよう、テストのないスイートはスイートの誤りにしています。
+- **登録漏れの確認**: テストは `static` なので、どのスイートも追加していないものはコンパイラが見つけます。`naos_add_executable()` は GCC と Clang でその警告をエラーにします（MSVC はどのビルドでも報告するとは限りません）。スイートの関数は外部リンケージで、使われなくても何も報告されないので、`NaosDiscover.cmake` が CTest のファイルを書く前に、列挙したスイートとターゲットのソースにある `NAOS_SUITE` の定義を比べます（`NaosCheckSuites.cmake`）。追加したスイートが必ず列挙に出るよう、テストのないスイートはスイートの誤りにしています。
 - **列挙の失敗**: 列挙に失敗したときは、テストが 0 件のまま黙って進めず、ビルドを失敗させて原因と対処をメッセージに出します（[トラブルシューティング](../guides/troubleshooting.md#cmake-と-ctest)）。
 - **バージョン**: バージョンの源は `include/naos/version.h` だけです。`NaosVersion.cmake` がそれを読み、`project(VERSION)`、パッケージの互換性、`SOVERSION` を決めます。
 

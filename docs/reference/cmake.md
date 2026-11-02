@@ -86,17 +86,12 @@ The tests are listed after each build of the executable, by running it with `--n
 
 A test is written twice, with `NAOS_TEST` and with `NAOS_ADD_TEST` in its suite; a suite too, with `NAOS_SUITE` and with `NAOS_ADD_SUITE` ([tests and suites](tests.md)). A test or a suite whose second half is missing never runs, and the run still passes. Both functions check for it, unless given `NO_REGISTRATION_CHECK`.
 
-**Tests, setup and teardown**, with `naos_add_executable()` only: their functions are `static`, so the compiler finds those that no suite uses. The function makes that warning an error for the C and C++ sources of the target:
+**Tests, setup and teardown**, with `naos_add_executable()` and GCC or Clang only: their functions are `static`, so the compiler finds those that no suite uses. The function compiles the C and C++ sources of the target with `-Werror=unused-function`, which makes that warning an error.
 
-| Compiler | Option |
-|---|---|
-| GCC, and Clang with its own command line | `-Werror=unused-function` |
-| MSVC | `/we4505` |
-
-- The error names the function, `naos_gen_test_<name>`, `naos_gen_setup_<name>` or `naos_gen_teardown_<name>` ([generated names](tests.md#generated-names)). GCC gives the location of the macro in `naos/suite.h`, Clang and MSVC that of the test.
+- The error names the function, `naos_gen_test_<name>`, `naos_gen_setup_<name>` or `naos_gen_teardown_<name>` ([generated names](tests.md#generated-names)). GCC gives the location of the macro in `naos/suite.h`, Clang that of the test.
 - It applies to every `static` function of the sources that nothing uses, such as a helper left over: remove it, or give `NO_REGISTRATION_CHECK`.
-- Other compilers, Clang with the command line of MSVC (`clang-cl`) among them, get no option.
-- `naos_discover_tests()` leaves the compile options of its target as they are. Give it the option yourself, or turn on the warning (`-Wall`, `/W4`) and read it.
+- Other compilers get no option: MSVC, which does not report an unused `static` function in every build (its warning C4505), and Clang with the command line of MSVC (`clang-cl`) among them. There, a test that no suite adds is not found; the suites are still checked.
+- `naos_discover_tests()` leaves the compile options of its target as they are. Give it the option yourself, or turn on the warning (`-Wall`) and read it.
 
 **Suites**, with both functions: at [discovery](#discovery), the suites the executable lists are compared with those its sources define. A suite defined and not listed fails the build, one line for each, in the form of a compiler diagnostic:
 
@@ -124,7 +119,7 @@ cmake -D NAOS_EXECUTABLE=build/my_tests -D "NAOS_SOURCES=main.c;parser_test.c" -
 | `NAOS_SOURCES` | Its sources, separated by `;`. Relative paths start at the current directory |
 | `NAOS_IGNORE_SUITES` | Optional: the suites left out on purpose, separated by `;` |
 
-It exits with 0 when every suite defined is listed, and fails with the lines above otherwise. For the tests, build with `-Werror=unused-function` (GCC, Clang) or `/we4505` (MSVC).
+It exits with 0 when every suite defined is listed, and fails with the lines above otherwise. For the tests, build with `-Werror=unused-function` (GCC, Clang).
 
 ## Options
 
