@@ -1,0 +1,50 @@
+args: --naos-allow-no-assertions
+exit code: 1
+--- stdout
+RUN: none.empty
+PASS: none.empty (N ms)
+RUN: none.only_prints
+reached-body
+PASS: none.only_prints (N ms)
+RUN: none.only_note
+PASS: none.only_note (N ms)
+RUN: none.only_trace
+PASS: none.only_trace (N ms)
+RUN: none.loop_over_no_case
+PASS: none.loop_over_no_case (N ms)
+RUN: none.returns_early
+PASS: none.returns_early (N ms)
+RUN: counted.check_passes
+PASS: counted.check_passes (N ms)
+RUN: counted.check_fails
+no_assertion.c:LINE: error: 0
+FAIL: counted.check_fails (1 failure, N ms)
+RUN: counted.require_fails
+no_assertion.c:LINE: error: 0
+FAIL: counted.require_fails (1 failure, N ms)
+RUN: counted.in_helper
+PASS: counted.in_helper (N ms)
+RUN: counted.pass
+reached-after-pass
+PASS: counted.pass (N ms)
+RUN: counted.fails
+no_assertion.c:LINE: error: failed on purpose
+FAIL: counted.fails (1 failure, N ms)
+RUN: counted.skips
+no_assertion.c:LINE: skip: skipped on purpose
+SKIP: counted.skips (N ms)
+RUN: in_setup.body
+reached-body
+PASS: in_setup.body (N ms)
+RUN: in_teardown.body
+reached-body
+PASS: in_teardown.body (N ms)
+RUN: skipped_in_setup.body
+no_assertion.c:LINE: skip: skipped in setup
+SKIP: skipped_in_setup.body (N ms)
+RUN: failed_in_teardown.body
+reached-body
+no_assertion.c:LINE: error: 0
+FAIL: failed_in_teardown.body (1 failure, N ms)
+SUMMARY: 11 passed, 4 failed, 2 skipped (N ms)
+--- stderr

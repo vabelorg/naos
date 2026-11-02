@@ -59,7 +59,7 @@ typedef struct naos_detail
 typedef struct naos_diagnostic_record
 {
     naos_diagnostic_kind_t kind; /* NAOS_DIAGNOSTIC_ERROR or NAOS_DIAGNOSTIC_SKIP */
-    const char *file;
+    const char *file; /* NULL for a failure without a location: a test that ran no assertion */
     int line;
     const char *text; /* the expression or the message; not NULL */
     const naos_detail_t *details;

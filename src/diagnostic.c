@@ -88,9 +88,10 @@ typedef struct naos_result
 {
     int failure_count;
     int skipped;
+    int assertion_ran; /* any assertion, NAOS_PASS, NAOS_FAIL or NAOS_SKIP, passed or not */
 } naos_result_t;
 
-static naos_result_t g_result = { 0, 0 };
+static naos_result_t g_result = { 0, 0, 0 };
 
 /* The open diagnostic; its file, text, labels and values are borrowed until it ends. */
 static naos_diagnostic_record_t g_record;
@@ -161,6 +162,7 @@ void naos_diagnostic_start_test(void)
 {
     g_result.failure_count = 0;
     g_result.skipped = 0;
+    g_result.assertion_ran = 0;
 }
 
 naos_outcome_t naos_diagnostic_outcome(void)
@@ -180,6 +182,7 @@ int naos_diagnostic_failure_count(void)
 
 void naos_diagnostic_begin(naos_diagnostic_kind_t kind, const char *file, int line, const char *text)
 {
+    g_result.assertion_ran = 1;
     if (kind == NAOS_DIAGNOSTIC_SKIP)
     {
         g_result.skipped = 1;
@@ -213,7 +216,20 @@ void naos_diagnostic_end(void)
 
 void naos_diagnostic_pass(void)
 {
+    g_result.assertion_ran = 1;
     clear_note();
+}
+
+void naos_diagnostic_check_assertion_ran(void)
+{
+    if ((g_result.assertion_ran != 0) || (naos_diagnostic_outcome() != NAOS_OUTCOME_PASS))
+    {
+        return;
+    }
+
+    naos_diagnostic_begin(NAOS_DIAGNOSTIC_ERROR, NULL, 0, "no assertion ran");
+    naos_diagnostic_add("hint", "check something, or call NAOS_PASS() when the check is that the code runs");
+    end_with(NAOS_CONTEXT_NONE);
 }
 
 void naos_diagnostic_misuse(const char *file, int line, const char *message)

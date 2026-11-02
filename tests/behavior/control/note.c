@@ -101,8 +101,10 @@ NAOS_SUITE(note,
     NAOS_ADD_TEST(with_mem)
 )
 
+/* NAOS_PASS comes first, so that the note is left unused when the test ends. */
 NAOS_TEST(leaves_note)
 {
+    NAOS_PASS();
     NAOS_NOTE("leaked-note");
 }
 

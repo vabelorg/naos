@@ -1,0 +1,9 @@
+args: --naos-quiet --naos-filter none.empty:counted.check_passes
+exit code: 1
+--- stdout
+RUN: none.empty
+naos: error: no assertion ran
+  hint: check something, or call NAOS_PASS() when the check is that the code runs
+FAIL: none.empty (1 failure, N ms)
+SUMMARY: 1 passed, 1 failed, 0 skipped (N ms)
+--- stderr

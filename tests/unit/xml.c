@@ -156,6 +156,21 @@ NAOS_TEST(skipped_test)
         "    </testcase>\n"));
 }
 
+/* A failure without a location, a NULL file, leaves file and line out of the test case. */
+NAOS_TEST(failure_without_location)
+{
+    naos_diagnostic_record_t record;
+    const char *xml;
+
+    record = record_of(NAOS_DIAGNOSTIC_ERROR, NULL, 0, "no assertion ran");
+    xml = one_test("unit_xml_no_location.xml", NAOS_OUTCOME_FAIL, &record, 0);
+
+    NAOS_CHECK_TRUE(has(xml,
+        "    <testcase classname=\"s\" name=\"t\" time=\"0.000\">\n"
+        "      <failure type=\"error\" message=\"no assertion ran\">naos: error: no assertion ran\n</failure>\n"
+        "    </testcase>\n"));
+}
+
 /* Seconds with three decimals, rounded down to the millisecond. */
 NAOS_TEST(times)
 {
@@ -348,6 +363,7 @@ NAOS_TEST(next_file_starts_clean)
 NAOS_SUITE(xml,
     NAOS_ADD_TEST(passed_test),
     NAOS_ADD_TEST(failed_test),
+    NAOS_ADD_TEST(failure_without_location),
     NAOS_ADD_TEST(skipped_test),
     NAOS_ADD_TEST(times),
     NAOS_ADD_TEST(program_name),

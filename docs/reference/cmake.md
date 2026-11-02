@@ -23,6 +23,7 @@ naos_add_executable(<target>
     [LABELS <label>...]
     [PROPERTIES <name> <value>...]
     [DISCOVERY_TIMEOUT <seconds>]
+    [ALLOW_NO_ASSERTIONS]
 )
 ```
 
@@ -40,6 +41,7 @@ naos_discover_tests(<target>
     [LABELS <label>...]
     [PROPERTIES <name> <value>...]
     [DISCOVERY_TIMEOUT <seconds>]
+    [ALLOW_NO_ASSERTIONS]
 )
 ```
 
@@ -51,9 +53,10 @@ Registers each test of an executable made with `add_executable()`, which must ca
 | `LABELS <label>...` | Labels given to the CTest tests |
 | `PROPERTIES <name> <value>...` | Other properties given to the CTest tests. A list value is one argument: `ENVIRONMENT "A=1;B=2"` |
 | `DISCOVERY_TIMEOUT <seconds>` | The time limit of listing the tests (`--naos-list`): a positive integer, 60 by default. Raise it where listing is slow, under an emulator for example |
+| `ALLOW_NO_ASSERTIONS` | Each test also runs with `--naos-allow-no-assertions`, so that a test that runs no assertion passes ([a test that runs no assertion](control.md#a-test-that-runs-no-assertion)) |
 
 - Only an executable target made in the same directory can be registered, and only once. Anything else (a library, a name with no target, a second registration), and `PROPERTIES` that are not name and value pairs, are errors at configure time.
-- Each test becomes the CTest test `<prefix><suite>.<test>`, running `<exe> --naos-filter <suite>.<test>` with `SKIP_RETURN_CODE 77`.
+- Each test becomes the CTest test `<prefix><suite>.<test>`, running `<exe> --naos-filter <suite>.<test>` with `SKIP_RETURN_CODE 77`; with `ALLOW_NO_ASSERTIONS`, `<exe> --naos-filter <suite>.<test> --naos-allow-no-assertions`.
 - A target with the property `CROSSCOMPILING_EMULATOR` is listed and run through the emulator.
 
 ## Discovery
@@ -61,7 +64,7 @@ Registers each test of an executable made with `add_executable()`, which must ca
 The tests are listed after each build of the executable, by running it with `--naos-list`. Adding or removing a test needs no new configure.
 
 - Until the executable is built, CTest has a single failing test in place of its tests, `<prefix>NOT_BUILT`. It carries the `LABELS` too, so that `ctest -L` does not miss it. The same happens with a multi-config generator for a configuration that is not built, chosen with `-C`.
-- What a change to the arguments (`PREFIX`, `LABELS`, `PROPERTIES`, `DISCOVERY_TIMEOUT`) does depends on the generator.
+- What a change to the arguments (`PREFIX`, `LABELS`, `PROPERTIES`, `DISCOVERY_TIMEOUT`, `ALLOW_NO_ASSERTIONS`) does depends on the generator.
   - The single-config Ninja and Makefile generators: the executable is linked again at the next build, which lists its tests again.
   - Other generators, such as Visual Studio, Xcode and Ninja Multi-Config: the tests keep what they had until the executable is built again.
 - When listing fails, the build fails, with the reason and what to do in its message.

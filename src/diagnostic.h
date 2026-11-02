@@ -21,7 +21,7 @@
 #define NAOS_DIAGNOSTIC_TRACE_DEPTH 16
 #define NAOS_DIAGNOSTIC_TRACE_DEPTH_STRING "16"
 
-/* Starts the outcome of a new test: no failure and no skip. */
+/* Starts the outcome of a new test: no failure, no skip and no assertion. */
 void naos_diagnostic_start_test(void);
 
 /* Outcome of the running test so far: FAIL after any failure, else SKIP after a skip, else PASS. */
@@ -31,8 +31,9 @@ naos_outcome_t naos_diagnostic_outcome(void);
 int naos_diagnostic_failure_count(void);
 
 /*
- * Opens a diagnostic: counts the failure of an error or records the skip. kind is NAOS_DIAGNOSTIC_ERROR
- * or NAOS_DIAGNOSTIC_SKIP; text is not NULL. file and text are borrowed until naos_diagnostic_end() returns.
+ * Opens a diagnostic: counts the failure of an error or records the skip, and counts an assertion
+ * run. kind is NAOS_DIAGNOSTIC_ERROR or NAOS_DIAGNOSTIC_SKIP; text is not NULL; file is NULL only
+ * for a failure without a location. file and text are borrowed until naos_diagnostic_end() returns.
  */
 void naos_diagnostic_begin(naos_diagnostic_kind_t kind, const char *file, int line, const char *text);
 
@@ -55,8 +56,15 @@ void naos_diagnostic_add_string(const char *label, const char *value);
  */
 void naos_diagnostic_end(void);
 
-/* Ends an assertion that passed: its note is used up without being written. */
+/* Ends an assertion that passed: counts it, and its note is used up without being written. */
 void naos_diagnostic_pass(void);
+
+/*
+ * Called when the test has ended, teardown included: a test that would pass but ran no assertion
+ * fails, with a diagnostic without a location, note or traces, and with a hint as its one value.
+ * Every diagnostic, and every assertion that passed, counts as an assertion run.
+ */
+void naos_diagnostic_check_assertion_ran(void);
 
 /*
  * Tells a misuse of NAOS_TRACE_PUSH or NAOS_TRACE_POP as a failure without values, the note, which

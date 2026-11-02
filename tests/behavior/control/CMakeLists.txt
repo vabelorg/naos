@@ -47,3 +47,17 @@ naos_expect_tests(${exe}
 naos_expect(note_reset ${exe} ARGS --naos-filter note_reset.*)
 # Every test in one process: a note or trace left by one test must not reach the next.
 naos_expect(context_run_all ${exe})
+
+# no_assertion
+# A test that runs no assertion fails, unless it fails or skips otherwise, or the run is given
+# --naos-allow-no-assertions: what counts, and how the failure reads in each output.
+
+set(exe naos_selftest_no_assertion)
+naos_selftest_program(${exe} no_assertion.c)
+
+naos_expect(no_assertion_run_all ${exe})
+naos_expect(no_assertion_allowed ${exe} ARGS --naos-allow-no-assertions)
+naos_expect(no_assertion_quiet ${exe} ARGS --naos-quiet --naos-filter none.empty:counted.check_passes)
+naos_expect(no_assertion_fail_fast ${exe} ARGS --naos-fail-fast --naos-filter counted.check_passes:none.*)
+naos_expect(no_assertion_xml ${exe} ARGS --naos-output xml:{output} --naos-filter none.empty:counted.check_passes
+    OUTPUT_FILE no_assertion.xml)

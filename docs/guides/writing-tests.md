@@ -82,6 +82,20 @@ geom_test.c:20: error: point_eq(&(expected), &(actual))
   note: left (2, 1), right (1, 1)
 ```
 
+## Check that the code runs
+
+A test that runs no assertion fails: Naos takes it for a test that checks nothing. When the check is only that the code runs, without crashing or stopping on an `assert`, say so with `NAOS_PASS()`, an assertion that always passes.
+
+```c
+NAOS_TEST(free_null_is_harmless)
+{
+    buffer_free(NULL);   /* the check: this returns */
+    NAOS_PASS();
+}
+```
+
+Write a test first and leave its body for later, and it fails until it checks something: the name alone is not a pass ([a test that runs no assertion](../reference/control.md#a-test-that-runs-no-assertion)).
+
 ## Skip a test whose conditions are not met
 
 When running a test makes no sense (a file or an environment variable it needs is missing, for example), skip it with `NAOS_SKIP`. A skipped test is not a failure; its result is `SKIP`.

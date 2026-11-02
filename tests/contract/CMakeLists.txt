@@ -30,6 +30,8 @@ foreach(case IN ITEMS pass fail all_skipped)
 endforeach()
 naos_expect_match(exit_code.skip_among_passes ${exe} EXIT_CODE 0 ARGS --naos-filter outcome.passes:outcome.skips)
 naos_expect_match(exit_code.fail_among_skips ${exe} EXIT_CODE 1 ARGS --naos-filter outcome.fails:skipping.*)
+naos_expect_match(exit_code.no_assertion ${exe} EXIT_CODE 1 ARGS --naos-filter unchecked.runs)
+naos_expect_match(exit_code.no_assertion_allowed ${exe} EXIT_CODE 0 ARGS --naos-filter unchecked.runs --naos-allow-no-assertions)
 naos_expect_match(exit_code.no_test_registered ${exe} EXIT_CODE 0 ARGS no-suites)
 naos_expect_match(exit_code.list ${exe} EXIT_CODE 0 ARGS --naos-list)
 naos_expect_match(exit_code.help ${exe} EXIT_CODE 0 ARGS --help)
@@ -59,6 +61,9 @@ naos_expect_match(diagnostic.path_kept ${exe} EXIT_CODE 1 ARGS --naos-filter out
 naos_expect_match(diagnostic.skip ${exe} EXIT_CODE 77 ARGS --naos-filter diagnostic.skip
     EXPECT "RUN: diagnostic\\.skip.${path}${at}skip: skip message."
     REJECT "${other_form}")
+# A failure without a location, that of a test that ran no assertion, starts with "naos: ".
+naos_expect_match(diagnostic.no_assertion ${exe} EXIT_CODE 1 ARGS --naos-filter unchecked.runs
+    EXPECT "RUN: unchecked\\.runs.naos: error: ")
 
 # --naos-list: the names only, each of which runs its test alone through --naos-filter.
 naos_selftest_add_test(list.round_trip "${CMAKE_COMMAND}"

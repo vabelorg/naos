@@ -24,6 +24,11 @@ static int passed(void)
     return 1;
 }
 
+void naos_pass(void)
+{
+    naos_diagnostic_pass();
+}
+
 /* -1, 0 or 1 as left is below, equal to or above right. */
 static int order_int(intmax_t left, intmax_t right)
 {

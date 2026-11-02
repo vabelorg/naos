@@ -7,6 +7,8 @@ Every assertion comes in two forms:
 
 Both are expressions of type `void`, so they can also go in a comma expression. Each argument is evaluated exactly once.
 
+Every assertion that runs counts, whether it passes or fails: a test that runs none fails ([a test that runs no assertion](control.md#a-test-that-runs-no-assertion)). `NAOS_PASS()` is the assertion that always passes, for a test whose check is that the code runs.
+
 A failed assertion prints an `error` line with its location and its arguments as written, followed by its values as detail lines, then the [note](control.md#notes) and the [traces](control.md#traces). [Output](output.md) has the whole format.
 
 ```

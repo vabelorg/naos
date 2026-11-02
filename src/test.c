@@ -56,7 +56,7 @@ static void run_guarded(naos_func_t first, naos_func_t second)
  * The time is taken here once, between the events that start and end the test, so that every writer
  * shows the same: it covers setup, the body and teardown, and not the writing of RUN and the result.
  */
-naos_outcome_t naos_test_run(const naos_suite_t *suite, const naos_test_t *test, naos_nanoseconds_t *elapsed)
+naos_outcome_t naos_test_run(const naos_suite_t *suite, const naos_test_t *test, int require_assertion, naos_nanoseconds_t *elapsed)
 {
     naos_outcome_t outcome;
     naos_nanoseconds_t start;
@@ -71,6 +71,10 @@ naos_outcome_t naos_test_run(const naos_suite_t *suite, const naos_test_t *test,
 
     end = naos_clock_now();
     *elapsed = (end > start) ? (end - start) : 0;
+    if (require_assertion != 0)
+    {
+        naos_diagnostic_check_assertion_ran();
+    }
     outcome = naos_diagnostic_outcome();
     naos_report_test_result(suite->name, test->name, outcome, naos_diagnostic_failure_count(), *elapsed);
 

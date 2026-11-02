@@ -5,7 +5,10 @@
 #
 #   registration      Naos added with add_subdirectory(NAOS_SOURCE_DIR), and an executable whose
 #                     tests are registered with PREFIX, LABELS and PROPERTIES, from the variables
-#                     LISTED_PREFIX and LISTED_LABELS (labels separated by ',')
+#                     LISTED_PREFIX and LISTED_LABELS (labels separated by ','); and three
+#                     executables of a test that runs no assertion, registered with
+#                     ALLOW_NO_ASSERTIONS by each function (PREFIX added. and discovered.) and
+#                     without it (PREFIX strict.)
 #   any other case    a mistake in the arguments, which the configure must report. No language is
 #                     enabled, since the mistakes are found before anything is built
 #
@@ -24,6 +27,11 @@ if(CASE STREQUAL "registration")
         LABELS ${labels}
         PROPERTIES TIMEOUT 7 ENVIRONMENT "A=1;B=2"
     )
+    naos_add_executable(unchecked_added SOURCES unchecked.c PREFIX added. ALLOW_NO_ASSERTIONS)
+    add_executable(unchecked_discovered unchecked.c)
+    target_link_libraries(unchecked_discovered PRIVATE Naos::naos)
+    naos_discover_tests(unchecked_discovered PREFIX discovered. ALLOW_NO_ASSERTIONS)
+    naos_add_executable(unchecked_strict SOURCES unchecked.c PREFIX strict.)
     return()
 endif()
 

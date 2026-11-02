@@ -164,6 +164,12 @@ NAOS_TEST(passing_helper_returns)
     passing_helper();
 }
 
+/* Passes only because NAOS_PASS counts as an assertion: without one, the test would fail. */
+NAOS_TEST(pass_alone)
+{
+    NAOS_PASS();
+}
+
 NAOS_SUITE(check,
     NAOS_ADD_TEST(condition),
     NAOS_ADD_TEST(int_eq),
@@ -176,5 +182,6 @@ NAOS_SUITE(check,
     NAOS_ADD_TEST(mem_eq),
     NAOS_ADD_TEST(ptr_eq),
     NAOS_ADD_TEST(null),
-    NAOS_ADD_TEST(passing_helper_returns)
+    NAOS_ADD_TEST(passing_helper_returns),
+    NAOS_ADD_TEST(pass_alone)
 )

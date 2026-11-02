@@ -22,7 +22,7 @@ Whatever the tests print themselves comes in between, as it is.
 | Line | When |
 |---|---|
 | `RUN: <suite>.<test>` | As a test starts (before setup). Flushed at once, so it stays even if the process dies |
-| `PASS: <suite>.<test> (<t> ms)` | The test ended with no failure and no skip |
+| `PASS: <suite>.<test> (<t> ms)` | The test ran an assertion and ended with no failure and no skip, or ran none with `--naos-allow-no-assertions` |
 | `FAIL: <suite>.<test> (<N> failure, <t> ms)` | The test recorded failures; `failures` when N is 2 or more |
 | `SKIP: <suite>.<test> (<t> ms)` | The test was skipped and recorded no failure |
 | `SUMMARY: <p> passed, <f> failed, <s> skipped (<t> ms)` | At the end of each iteration, even when it ran a single test or none. After a stop by `--naos-fail-fast`, only the tests run are counted |
@@ -87,12 +87,15 @@ The [JUnit XML](xml.md) file has the same times, in seconds.
 | `error` | A failed assertion | The expression of the assertion, from the macro arguments as written (`count < limit` for `NAOS_CHECK_INT_LT(count, limit)`) |
 | | `NAOS_FAIL(msg)` | `msg`, or `(no message)` when `NULL` |
 | | A mistake with traces | `NAOS_TRACE_PUSH without NAOS_TRACE_POP: <trace>`, `NAOS_TRACE_POP without NAOS_TRACE_PUSH`, `NAOS_TRACE_PUSH beyond 16 levels` |
+| | A test that [ran no assertion](control.md#a-test-that-runs-no-assertion) | `no assertion ran`, without a location |
 | `skip` | `NAOS_SKIP(msg)` | `msg`, or `(no message)` when `NULL` |
 | `note` | A trace that goes with a failure or a skip | The trace; the location is where it was pushed |
 
 The text of a diagnostic line is never empty and holds no value: the values are in the detail lines that follow.
 
 The location is `<file>:<line>: ` (the GCC form). When the library of Naos is built by a compiler that defines `_MSC_VER` (MSVC, clang-cl), it is `<file>(<line>): ` (the MSVC form). The file name is the `__FILE__` the compiler gave.
+
+A failure without a location, that of a test that ran no assertion, has `naos: ` in place of the location, as compilers name themselves in a diagnostic of no file: `naos: error: no assertion ran`.
 
 The form is decided when the library is built, not the tests: tests built with MinGW GCC using a Naos built with MSVC print the MSVC form. No option chooses it at run time.
 
@@ -112,6 +115,7 @@ A detail line is two spaces, a label, a colon, one space and the value. `left` a
 | `*_NULL` | `value` (`%p`) |
 | `*_MEM_EQ` | `left size`, `right size`, then `first difference` or `invalid` |
 | `*_TRUE`, `*_FALSE`, `*_NOT_NULL` | none |
+| A test that ran no assertion | `hint` |
 
 `first difference` is `offset N, left 0xXX, right 0xYY`. When one side is the beginning of the other, it is `offset N, end of left` or `end of right`, N being the shorter length.
 
@@ -152,7 +156,7 @@ A failure or a skip is printed in this order, then standard output is flushed:
 
 Of standard output, only this is kept compatible ([version](version.md)), since tools cannot do without it; the [JUnit XML](xml.md#compatibility) file has its own rules:
 
-- The start of a diagnostic line: the [location](#diagnostic-lines) in its form, then the kind, `error`, `skip` or `note`, and `: `, as editors read them ([open failures in your editor](../guides/ctest-and-ci.md#open-failures-in-your-editor)). The text after it may change.
+- The start of a diagnostic line: the [location](#diagnostic-lines) in its form, or `naos: ` for a failure without a location, then the kind, `error`, `skip` or `note`, and `: `, as editors read them ([open failures in your editor](../guides/ctest-and-ci.md#open-failures-in-your-editor)). The text after it may change.
 - The names printed by `--naos-list`, one per line ([command line](command-line.md#options)), which the CMake functions of Naos read to register the tests with CTest.
 - The [exit codes](command-line.md#exit-codes).
 
