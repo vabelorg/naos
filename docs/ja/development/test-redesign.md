@@ -51,7 +51,9 @@ scripts/
   fixtures/author-warning/  ← tests/package/author-warning/
 ```
 
-ケースの CTest の名前は `naos.<層>.<ページ>.<ケース>` です(`naos.behavior.assertions.integer.eq` など)。`tests/` の下のディレクトリのパスの `/` を `.` にしたものです。どのケースにもラベル `naos` と層のラベル(`contract`、`unit`、`api`、`behavior`、`build`、`examples`)が付きます。
+ケースの CTest の名前は `naos.<層>.<ページ>.<ケース>` です(`naos.behavior.assertions.integer.eq` など)。`tests/` の下のディレクトリのパスの `/` を `.` にしたものです。どのケースにもラベル `naos` と層のラベル(`contract`、`unit`、`api`、`behavior`、`build`、`examples`)が付きます。例外は `examples/` のプロジェクトのテストです。その `CMakeLists.txt` は利用者が写すものなので、CTest の名前は実行ファイルの名前のまま(`clamp_tests.clamp.inside_range`)で、ラベルも付きません。
+
+1 つのディレクトリにまとめるケースは名前が重なってはいけません。今は `control/run_all` と `context/run_all` が重なります([behavior](#behavior) を参照)。
 
 ## 層
 
@@ -61,19 +63,20 @@ scripts/
 
 | 契約 | ケース |
 |---|---|
-| exit code | 成功は 0、失敗は 1、引数の誤りは 2、スイートの誤りは 2、順序の誤った呼び出しは 2、全テストのスキップは 77、成功に混じったスキップは 0、選ばれたテストなしは 0、`--naos-list` と `--help` は 0、開けない `--naos-output` のファイルは 2 |
+| exit code | [終了コード](../reference/command-line.md#終了コード)のとおり: 成功は 0、失敗は 1、引数の誤りは 2、どのテストにも合わないフィルタは 2、スイートの誤りは 2、順序の誤った呼び出しは 2、全テストのスキップは 77、成功に混じったスキップは 0、テストが 1 つも登録されていない実行は 0、`--naos-list` と `--help` は 0、開けない `--naos-output` のファイルは 2 |
 | 診断の行の先頭 | `error`、`skip`、`note` のそれぞれで、位置がコンパイラの形式(`f.c:12:` または `f.c(12):`)であること。`assertions/location_form` をここへ移す |
 | `--naos-list` | 標準出力には名前だけが 1 行に 1 つあること。どの名前も `--naos-filter` に渡すとそのテストだけを実行すること(`ListRoundTrip.cmake`)。CTest の discovery はこれに頼っている |
-| XML ファイルの構造 | [互換性](../reference/xml.md#互換性)が保つものを `junit.xsd` に書き、すべての結果、shuffle 付きの repeat、fail fast のファイルを `xmllint --schema` で確かめる。xmllint があるときだけ(CI では Linux) |
+| XML ファイルの構造 | [互換性](../reference/xml.md#互換性)が保つものを `junit.xsd` に書き、すべての結果、shuffle 付きの repeat、fail fast のファイルを `xmllint --schema` で確かめる。xmllint があるときだけ(CI では Linux と macOS) |
 | XML ファイルを書くとき | クラッシュでは空のまま、`--naos-list` と `--help` では書かない、開けないファイルは 2。`report/list`、`help`、`crash`、`cannot_open` をここへ移す |
 
-**ブートストラップ**: exit code のケースを `FIXTURES_SETUP naos_trust` にし、`unit/` と `api/` のテストを `PROPERTIES FIXTURES_REQUIRED naos_trust` で登録します。失敗が失敗と判定されることが示されるまで、CTest は Naos が自分で判定するテストを実行しません。
+**ブートストラップ**: exit code のケースを `FIXTURES_SETUP naos_trust` にし、`unit/` と `api/` のテストを `PROPERTIES FIXTURES_REQUIRED naos_trust` で登録します。失敗が失敗と判定されることが示されるまで、CTest は `unit/` と `api/` のテストを実行しません。`-R` や `-L` で絞った実行にも CTest はセットアップを加えるので、いつも先に実行されます。`examples/` のテストも Naos が判定しますが、対象にしません。その `CMakeLists.txt` は利用者が写すものなので、自己テストのプロパティを持たせてはいけないためです。
 
 ### unit/
 
 - 残す: `value`、`filter`、`order`。
-- **足す: `text.c`、`xml.c`、`human.c`。** `writer.h` のイベントを writer に直接呼び、作られたテキストを比べます。XML のエスケープの境界(不正な UTF-8、XML が許さない制御文字、属性の改行とタブ、`]]>`)は、テストプログラムを通すよりこの方が網羅しやすいためです。golden のケース `xml/text` は代表するテスト 1 つだけにします。
-- 先に確かめること: writer がグローバルな状態なしに単独で呼べること。呼べなければ、この追加はやめます。
+- **足す: `text.c` と `xml.c` の writer。** `naos_xml_writer()` を通して、ビルドディレクトリのファイルで `begin` し、`writer.h` のイベントを呼び、`end` してから、ファイルを読み戻して比べます。XML のエスケープの境界(不正な UTF-8、XML が許さない制御文字、属性の改行とタブ、`]]>`)は、テストプログラムを通すよりこの方が網羅しやすいためです。golden のケース `xml/text` は代表するテスト 1 つだけにします。
+- `human.c` の writer は入れません。標準出力に書くので同じプロセスのテストからは読み戻せず、書く行はすべて `behavior/` の golden ファイルが確かめているためです。
+- 先に確かめること: `xml.c` の writer は状態を `static` 変数(`g_cases`、`g_suites` など)に持ちます。1 つのプロセスで何度もファイルを書くには、`end` のあとの状態が `begin` の期待どおりである必要があります。そうでなければ、`end` で状態を戻すようにする(ライブラリの変更として別のコミットで)か、この追加をやめます。
 
 ### api/
 
@@ -82,9 +85,8 @@ scripts/
 
 ### behavior/
 
-- **golden ファイルは変えません。** 移すだけにし、ケースの数とすべての成功で、何も失われていないことを示します。
-- テストプログラムはページに 1 つにし、`naos_selftest_program()` で作ります。
-- cli、control、context の `run_all` は、テストを足すたびに大きくなります。それぞれの目的(失敗のあとも続く、テストごとにまっさらから始まる、サマリが数える)を確かめ、`control/run_all` だけにまとめる候補とします。
+- **golden ファイルは変えません。** 移すだけにし、ケースの数とすべての成功で、何も失われていないことを示します。テストプログラムもそのまま移します。まとめると `--naos-list` やプログラム全体の実行の出力が変わり、`session/own_main.c` は自分の `main()` を持つので別のプログラムのままでなければならないためです。
+- cli、control、context の `run_all` は、テストを足すたびに大きくなります。それぞれの目的(失敗のあとも続く、テストごとにまっさらから始まる、サマリが数える)を確かめ、`control/run_all` だけにまとめる候補とします。それまでは、context のものを `control/` に移すときに `context_run_all` と改名します。まとめるディレクトリどうしで重なる名前はこれだけです。
 
 ### build/
 
@@ -111,7 +113,7 @@ scripts/
 |---|---|---|
 | `default` | 静的、Debug | 今と同じ |
 | `shared` | 共有、Debug | 今と同じ |
-| **`release`**(新規) | 静的、Release | `test.c` は `setjmp` / `longjmp` を使う。最適化のときだけ壊れるローカル変数も、GCC の `-Wclobbered`(`-Wextra` に含まれ、最適化のときだけ出る)も、Debug では出ない |
+| **`release`**(新規) | 静的、Release | `test.c` は `longjmp` でテストを止め、どのローカル変数も `volatile` を要らないように書かれている。それが成り立つことを確かめられるのは最適化したビルドだけ。GCC の `-Wclobbered` や `-Wmaybe-uninitialized` のように最適化が要る警告も、そこでエラーになる |
 | **`sanitize`**(新規) | 静的、Debug、`-fsanitize=address,undefined -fno-sanitize-recover=all` | エスケープや伸びるテキストでのメモリの誤り。テストのプリセットで `ASAN_OPTIONS` を設定する。GCC と Clang だけ |
 
 `CMakePresets.json` は version 3 のままにします。workflow プリセットには CMake 3.25 が要り、最低バージョンの 3.21 を確かめられなくなるためです。
@@ -126,14 +128,16 @@ scripts/
 
 - インストールしたパッケージは `cmake -D PRESET=<preset> -P scripts/TestPackage.cmake` の 1 行でテストし、`sanitize` 以外のすべてのジョブで実行します。CMake 3.21 では、利用者の持ちうるいちばん古い CMake で `find_package(Naos)` を確かめることになります。
 - **CMake 3.21 のジョブは新規です。** 今は `cmake_minimum_required(VERSION 3.21)` を一度も確かめていません。
-- ジョブは 12 から 15 になります(`lint` 1、`test` 11、`mingw` 3)。
+- `test` のジョブは `lint` を待ちません。どちらも同時に始まり、プルリクエストにはすべての成功が要ります。
+- CMake 3.21 のジョブで、自己テストや `cmake/` がもっと新しい機能を使っているとわかるかもしれません。その使い方を置き換えるか、別の変更で最低バージョンを上げます。
+- ジョブは 13 から 15 になります(`lint` 1、`test` 11、`mingw` 3。今は `test` 8、`mingw` 4)。
 
 ## 更新するドキュメント
 
 | ファイル | 変更 |
 |---|---|
 | `docs/development/testing.md` | 書き直す: 層とそれぞれが確かめるもの、判定する者、ラベル、ケースの足し方、golden ファイルの更新が触れない契約のケース |
-| `docs/development/building.md` | プリセット、`-R` と `-L` の例、CI の節 |
+| `docs/development/building.md` | プリセット、`-R` と `-L` の例(今は `-R '^naos\.cli\.'`)、CTest の名前 `naos.no_cmake.build`、CI の節 |
 | `docs/development/extending.md` | 変更の種類ごとにテストを足す層(今は `tests/cli/` などの古いパスを挙げている) |
 | `docs/development/architecture.md` | ディレクトリの表の `tests/` と `scripts/` の行 |
 | `docs/development/release.md` | 手順 4(`tests/package/`)と、リリーススクリプトのテスト |
@@ -151,10 +155,11 @@ scripts/
 - [ ] 1. **ハーネス**: `support/` を `harness/` にする。パスから作る名前、ラベル、exit code だけで判定するケース。既存のケースはすべて成功したまま。
 - [ ] 2. **`behavior/` と `build/` へ移す**: `git mv` だけで、golden ファイルは変えない。ケースの数は前後で同じ。
 - [ ] 3. **`contract/`**。`junit.xsd` と `FIXTURES_REQUIRED naos_trust` も。
-- [ ] 4. **`unit/`**: `text`、`xml`、`human`。
+- [ ] 4. **`unit/`**: `text` と `xml` の writer。
 - [ ] 5. **`build/functions` と `build/subproject`**。`package/` を `consumer/` に、`scripts/TestPackage.cmake`。
 - [ ] 6. **プリセット `release` と `sanitize`**。見つかったバグはそれぞれ別のコミットで直す。
 - [ ] 7. **CI**: `Lint.cmake`、`CheckReleaseScripts.cmake`、CMake 3.21 のジョブ。
 - [ ] 8. 変えたページの**日本語訳**。
+- [ ] 9. **このページを消す**(英語と日本語)。
 
-手順 6 では、大きさのわからない `-Wclobbered` やサニタイザの報告が出そうなので、手順 1〜5 とは分けておきます。
+手順 6 で見つかるもの(最適化の警告やサニタイザの報告)は前もって大きさを見積もれないので、手順 1〜5 とは分けておきます。
