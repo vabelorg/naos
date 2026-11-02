@@ -12,6 +12,7 @@
 NAOS_DECLARE_SUITE(value);
 NAOS_DECLARE_SUITE(filter);
 NAOS_DECLARE_SUITE(shuffle);
+NAOS_DECLARE_SUITE(plan);
 NAOS_DECLARE_SUITE(text);
 NAOS_DECLARE_SUITE(xml);
 NAOS_DECLARE_SUITE(human);
@@ -20,6 +21,7 @@ NAOS_MAIN(
     NAOS_ADD_SUITE(value),
     NAOS_ADD_SUITE(filter),
     NAOS_ADD_SUITE(shuffle),
+    NAOS_ADD_SUITE(plan),
     NAOS_ADD_SUITE(text),
     NAOS_ADD_SUITE(xml),
     NAOS_ADD_SUITE(human)

@@ -65,7 +65,8 @@ naos_expect(output_without_value ${exe} ARGS --naos-output)
 # runs
 # Running the tests more than once or in another order: --naos-shuffle, --naos-random-seed,
 # --naos-repeat and --naos-fail-fast. The order of a seed is fixed by the PRNG of Naos, the same on
-# every platform, so the expected orders hold everywhere.
+# every platform, so the expected orders hold everywhere. The rules of the order themselves are
+# covered by unit/plan.c; these cases check that the options reach them.
 
 # shuffle.c: three suites of three passing tests, and a test that passes only after another one.
 set(exe naos_selftest_shuffle)
