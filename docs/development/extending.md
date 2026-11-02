@@ -4,23 +4,35 @@ Where each kind of change goes, and what must change with it. Every change to th
 
 ## Add or change an output line
 
-The form of every line of standard output is written in `human.c`, and only there; which lines a run writes is decided there too. These lines are for people and may change to read better, except what [is kept compatible](../reference/output.md#what-is-kept-compatible): the start of a diagnostic line, the names of `--naos-list` and the exit codes.
+The form of every line of standard output is written in `human.c`, and only there; which lines a run writes is decided there too. These lines are for people and may change to read better. What [is kept compatible](../reference/output.md#what-is-kept-compatible) does not change: the start of a diagnostic line, the names of `--naos-list` and the exit codes.
 
 1. Update [output](../reference/output.md).
-2. Rewrite the expected outputs of the self tests with `NAOS_UPDATE_EXPECTED=1` and check the diff ([testing](testing.md#adding-a-case)). The cases of `tests/contract/` are left as they are, and fail when the change touches what is kept compatible: change them only with such an entry.
+2. Rewrite the expected outputs of the self tests with `NAOS_UPDATE_EXPECTED=1` and check the diff ([testing](testing.md#adding-a-case)).
 3. Add an entry to the changelog under `Changed`. A change to what is kept compatible starts with `**BREAKING**:`.
+
+The cases of `tests/contract/` are not changed by the rewrite. They fail when the change touches what is kept compatible. Change them only to add such an entry.
 
 ## Change the JUnit XML file
 
-The file is written by `xml.c`. What [JUnit XML](../reference/xml.md#compatibility) keeps compatible (the elements, their attributes and when the file is written) may grow, but must not change or go, unless the version allows it ([changelog](changelog.md)). The text of a `<failure>` is the diagnostic of `human.c`, and changes with it. Update the reference, the expected outputs of `tests/behavior/xml/` and the unit tests of `tests/unit/xml.c`; a change to what is kept compatible changes the schema `tests/contract/junit.xsd` too.
+The file is written by `xml.c`. What [JUnit XML](../reference/xml.md#compatibility) keeps compatible (the elements, their attributes and when the file is written) may grow, but must not change or go, unless the version allows it ([changelog](changelog.md)). The text of a `<failure>` is the diagnostic of `human.c`, so it changes with it.
+
+Update with it:
+
+- the reference
+- the expected outputs of `tests/behavior/xml/`
+- the unit tests of `tests/unit/xml.c`
+- the schema `tests/contract/junit.xsd`, when what is kept compatible changes
 
 ## Add an output format
 
 A format is a writer: a table of the functions of `naos_writer_t` (`writer.h`), in a file of its own, such as `xml.c`.
 
+The events arrive in the order `writer.h` states. A diagnostic arrives whole, with its values, note and traces; what an event borrows lives only for the call.
+
 1. Add the format to `naos_output_format_t` (`report.h`), its name to `take_output()` of `options.c` and to the help of `--naos-output`, and turn its writer on in `naos_report_begin()` (`report.c`).
-2. The events arrive in the order `writer.h` states. A diagnostic arrives whole, with its values, note and traces; what the event borrows lives only for the call.
-3. Add unit tests of the writer to `tests/unit/`, driven through its events as `tests/unit/xml.c` does, and golden cases of the file to `tests/behavior/` with `OUTPUT_FILE` ([testing](testing.md#cases-compared-with-an-output)). Add a page to the reference, and update [command line](../reference/command-line.md).
+2. Add unit tests of the writer to `tests/unit/`, driven through its events as `tests/unit/xml.c` does.
+3. Add golden cases of the file to `tests/behavior/` with `OUTPUT_FILE` ([testing](testing.md#cases-compared-with-an-output)).
+4. Add a page to the reference, and update [command line](../reference/command-line.md).
 
 ## Add an assertion
 

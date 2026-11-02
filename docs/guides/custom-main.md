@@ -1,6 +1,8 @@
 # Custom main()
 
-To give the test executable arguments of its own (to run slow tests only when asked, for example), write `main()` yourself instead of `NAOS_MAIN`. `naos_init()` removes the options of Naos, so what is left in `argv` belongs to the program. The complete example is [examples/custom-main](../../examples/custom-main/).
+To give the test executable arguments of its own (to run slow tests only when asked, for example), write `main()` yourself instead of `NAOS_MAIN`.
+
+`naos_init()` removes the options of Naos, so what is left in `argv` belongs to the program. The complete example is [examples/custom-main](../../examples/custom-main/).
 
 ```c
 #include <naos/naos.h>

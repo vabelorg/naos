@@ -19,9 +19,15 @@ cmake --install naos/build --config Release --prefix /opt/naos
 
 ## ビルド時に DLL が見つかるようにする
 
-CMake でビルドする場合、テストの実行ファイルは CTest に登録するため、ビルドの直後に一度起動されます。そのため、ビルドの時点で共有ライブラリが見つかる必要があります。実行ファイルと同じディレクトリに置くか、そのディレクトリを `PATH`（Linux なら `LD_LIBRARY_PATH`、macOS なら `DYLD_LIBRARY_PATH`）に通しておきます。rpath でも構いません。
+CMake でビルドする場合、テストの実行ファイルは CTest に登録するため、ビルドの直後に一度起動されます。そのため、ビルドの時点で共有ライブラリが見つかる必要があります。次のどれかにしておきます。
 
-DLL をビルド後にコピーするなら、`add_executable()` の後、`naos_discover_tests()` より前に `POST_BUILD` のコマンドを足します。コマンドは足した順に実行され、`naos_add_executable()` では列挙が常に先になります。
+- 実行ファイルと同じディレクトリに置く。
+- そのディレクトリを `PATH`（Linux なら `LD_LIBRARY_PATH`、macOS なら `DYLD_LIBRARY_PATH`）に通す。
+- rpath を設定する。
+
+DLL をビルド後にコピーするなら、`add_executable()` の後、`naos_discover_tests()` より前に `POST_BUILD` のコマンドを足します。
+
+コマンドは足した順に実行され、`naos_add_executable()` では列挙が常に先になります。
 
 ```cmake
 add_executable(my_tests main.c parser_test.c)

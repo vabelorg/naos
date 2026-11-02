@@ -19,9 +19,15 @@ Inside another project (`add_subdirectory` or `FetchContent`), Naos is always a 
 
 ## Make the DLL findable at build time
 
-With CMake, each test executable is started right after it is built, to list its tests for CTest. The shared library must therefore be found at build time already: put it in the directory of the executable, or add its directory to `PATH` (`LD_LIBRARY_PATH` on Linux, `DYLD_LIBRARY_PATH` on macOS). An rpath works too.
+With CMake, each test executable is started right after it is built, to list its tests for CTest. The shared library must therefore be found at build time already. Do one of these:
 
-To copy the DLL after the build, add the `POST_BUILD` command after `add_executable()` and before `naos_discover_tests()`. Commands run in the order they were added, and with `naos_add_executable()` the listing always comes first.
+- Put it in the directory of the executable.
+- Add its directory to `PATH` (`LD_LIBRARY_PATH` on Linux, `DYLD_LIBRARY_PATH` on macOS).
+- Set an rpath.
+
+To copy the DLL after the build, add the `POST_BUILD` command after `add_executable()` and before `naos_discover_tests()`.
+
+Commands run in the order they were added, and with `naos_add_executable()` the listing always comes first.
 
 ```cmake
 add_executable(my_tests main.c parser_test.c)

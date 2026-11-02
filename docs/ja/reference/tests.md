@@ -84,9 +84,11 @@ NAOS_SET_SETUP(name)
 NAOS_SET_TEARDOWN(name)
 ```
 
-`NAOS_SUITE` の項目に並べると、`NAOS_SET_SETUP(name)` はスイートの各テストの前に `NAOS_SETUP(name)` で定義した関数を、`NAOS_SET_TEARDOWN(name)` は各テストの後に `NAOS_TEARDOWN(name)` で定義した関数を呼びます。どちらも省略でき、どこに書いてもスイート全体に効きます（先頭に書くことを勧めます）。それぞれスイートに 1 回だけ書けます。2 回書くと、テストを実行する前に報告し、終了コード 2 で終了します。
+`NAOS_SUITE` の項目に並べると、`NAOS_SET_SETUP(name)` はスイートの各テストの前に `NAOS_SETUP(name)` で定義した関数を、`NAOS_SET_TEARDOWN(name)` は各テストの後に `NAOS_TEARDOWN(name)` で定義した関数を呼びます。
 
-- `NAOS_SETUP(name)` と `NAOS_TEARDOWN(name)` は、それぞれ `naos_gen_setup_<name>` と `naos_gen_teardown_<name>` を定義します。`NAOS_SET_SETUP` に teardown を、`NAOS_SET_TEARDOWN` に setup を指定すると、コンパイルエラーになります（[生成される関数名](#生成される関数名)）。
+どちらも省略でき、どこに書いてもスイート全体に効きます（先頭に書くことを勧めます）。それぞれスイートに 1 回だけ書けます。2 回書くと、テストを実行する前に報告し、終了コード 2 で終了します。
+
+- `NAOS_SETUP(name)` と `NAOS_TEARDOWN(name)` は、それぞれ `naos_gen_setup_<name>` と `naos_gen_teardown_<name>` を定義します。setup と teardown を取り違えるとコンパイルエラーになります（[生成される関数名](#生成される関数名)）。
 - setup で致命的な失敗かスキップが起きたら、テストの本体は実行しません。
 - teardown は、setup や本体が途中で止まっても必ず実行します。途中までしか準備できていない状態でも片付けられるように書きます。
 - setup と teardown での失敗は、そのテストの失敗として数えます。
@@ -128,11 +130,15 @@ int  naos_run(void);
 
 独自の引数を解析したいときや、実行時にスイートを選びたいときは、`NAOS_MAIN` の代わりにこれらを呼びます。順番は `naos_init()` を 1 回、`NAOS_ADD_SUITE` を何回でも、`naos_run()` を 1 回です。
 
-- `naos_init()` は、Naos のオプション（`--naos-*`）を `argv` のどこにあっても取り除き、残りの引数を順番どおりに詰めて `*argc` を減らします。`--help` は、プログラムが自分のヘルプも出せるように `argv` に残します。ヘルプと使い方エラーはここで出力します。その後の `naos_run()` はテストを実行しません。スイートは集めて誤りを報告し、使い方エラーかスイートの誤りがあれば 2 を、`--help` だけなら 0 を返します。
+- `naos_init()` は、Naos のオプション（`--naos-*`）を `argv` のどこにあっても取り除き、残りの引数を順番どおりに詰めて `*argc` を減らします。
+  - `--help` は、プログラムが自分のヘルプも出せるように `argv` に残します。
+  - ヘルプと使い方エラーはここで出力します。その後の `naos_run()` はテストを実行しません。スイートは集めて誤りを報告し、使い方エラーかスイートの誤りがあれば 2 を、`--help` だけなら 0 を返します。
 - `NAOS_ADD_SUITE(name)` は、それまでに登録したスイートの後に実行するスイートを登録します。
 - `naos_run()` はスイートを集め、その中の誤りをすべて報告してから、選ばれたテストを実行し、終了コードを返します（[終了コード](command-line.md#終了コード)）。スイートを集めるメモリが確保できなかったときは、1 行報告し、何も実行せずに 1 を返します。
 
-例は[独自の main() のガイド](../guides/custom-main.md)にあります。
+次の点にも注意してください。
 
 - 順番を外れた呼び出しはメッセージを出します。`naos_run()` は 2 を返し、`naos_init()` と `NAOS_ADD_SUITE` は終了コード 2 で終了します。テストやスイートの関数の中で `NAOS_ADD_SUITE` を呼ぶのも、順番を外れた呼び出しです。
 - CMake は、引数なしで実行した `--naos-list` の結果から CTest にテストを登録します。特定の引数のときだけ登録するスイートは CTest には登録されないので、実行ファイルを直接実行して使います。
+
+例は[独自の main() のガイド](../guides/custom-main.md)にあります。

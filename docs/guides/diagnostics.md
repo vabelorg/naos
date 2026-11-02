@@ -25,7 +25,9 @@ A note goes with the next assertion only. For several assertions, write a note b
 
 ## Show which call of a helper failed
 
-When assertions are gathered in a helper function, a failure points inside the helper. To know which call failed, put the call between `NAOS_TRACE_PUSH` and `NAOS_TRACE_POP`. A failure in between is followed by the line of the `NAOS_TRACE_PUSH` and its text. Helpers may push traces of their own; all of them are printed, the innermost first.
+When assertions are gathered in a helper function, a failure points inside the helper. To know which call failed, put the call between `NAOS_TRACE_PUSH` and `NAOS_TRACE_POP`.
+
+A failure in between is followed by the line of the `NAOS_TRACE_PUSH` and its text. Helpers may push traces of their own; all of them are printed, the innermost first.
 
 ```c
 static void check_order(const struct order *order)
@@ -63,7 +65,9 @@ order_test.c:22: note: item 3
 order_test.c:34: note: order 1
 ```
 
-Always pair `NAOS_TRACE_PUSH` with `NAOS_TRACE_POP`. When the test stops in between and the `NAOS_TRACE_POP` is never reached, there is nothing to make up for. What happens when they are not paired is in [traces](../reference/control.md#traces).
+Always pair `NAOS_TRACE_PUSH` with `NAOS_TRACE_POP`.
+
+When the test stops in between and the `NAOS_TRACE_POP` is never reached, there is nothing to make up for. What happens when they are not paired is in [traces](../reference/control.md#traces).
 
 ## Stop the test from a helper
 

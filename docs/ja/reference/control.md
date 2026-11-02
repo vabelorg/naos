@@ -2,7 +2,11 @@
 
 ## テストの止まり方
 
-`NAOS_REQUIRE*` の失敗、`NAOS_FAIL`、`NAOS_SKIP` は、`longjmp` でテストを止めます。ヘルパーの奥深くの関数からでも、値を返す関数の中からでも、呼び出し側に何も書かずに止められます。setup と本体の中からは teardown へ、teardown の中からは teardown の終わりへ抜けます。`NAOS_REQUIRE*` の失敗と `NAOS_FAIL` は**致命的な失敗**で、`NAOS_CHECK*` の失敗と `NAOS_SKIP` はそうではありません。
+`NAOS_REQUIRE*` の失敗、`NAOS_FAIL`、`NAOS_SKIP` は、`longjmp` でテストを止めます。ヘルパーの奥深くの関数からでも、値を返す関数の中からでも、呼び出し側に何も書かずに止められます。
+
+setup と本体の中からは teardown へ、teardown の中からは teardown の終わりへ抜けます。
+
+`NAOS_REQUIRE*` の失敗と `NAOS_FAIL` は**致命的な失敗**で、`NAOS_CHECK*` の失敗と `NAOS_SKIP` はそうではありません。
 
 間にある関数をまとめて抜けるので、次の制約があります。
 

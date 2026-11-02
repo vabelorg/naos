@@ -13,8 +13,10 @@ Thank you for your interest in Naos. Bug reports, documentation fixes, translati
 
 You need a C99 compiler (GCC, Clang or MSVC), CMake 3.21 or later and Git; a C++ compiler for the C++ tests.
 
+First [fork](https://github.com/vabelorg/naos/fork) the repository on GitHub, then clone your fork:
+
 ```sh
-git clone https://github.com/vabelorg/naos.git
+git clone https://github.com/<your-account>/naos.git
 cd naos
 cmake --preset default
 cmake --build --preset default
@@ -25,7 +27,7 @@ Every self test should pass before you change anything. [Building](development/b
 
 ## Make the change
 
-1. Create a branch from `main`.
+1. In your fork, create a branch from `main`.
 2. Read the page for your kind of change:
    - code: [architecture](development/architecture.md), [extending](development/extending.md) and [coding style](development/coding-style.md)
    - tests: [testing](development/testing.md)
@@ -38,6 +40,7 @@ Every self test should pass before you change anything. [Building](development/b
 ## Commits and pull requests
 
 - Commit messages, in English: a short summary in the imperative ("Add NAOS_CHECK_MEM_NE"), a blank line, then why, if it is not obvious.
+- Open the pull request from the branch of your fork against `main` of `vabelorg/naos`.
 - One topic per pull request. Fill in the template: what changes, why, and how it was tested.
 - CI must pass on every platform. A maintainer reviews the change and may ask for changes before merging.
 

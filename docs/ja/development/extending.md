@@ -4,23 +4,35 @@
 
 ## 出力の行を足す・変える
 
-標準出力のすべての行の形は `human.c` にだけ書きます。実行でどの行を書くかも、そこで決めます。これらの行は人向けで、読みやすくするために変えてかまいません。ただし[互換を保つもの](../reference/output.md#互換を保つもの)（診断の行の始まり、`--naos-list` の名前、終了コード）は除きます。
+標準出力の行の形は `human.c` にだけ書きます。どの行を書くかもそこで決めます。人向けの行なので、読みやすくするために変えてかまいません。ただし[互換を保つもの](../reference/output.md#互換を保つもの)（診断の行の始まり、`--naos-list` の名前、終了コード）は変えません。
 
 1. [出力](../reference/output.md)を直す。
-2. 自己テストの期待する出力を `NAOS_UPDATE_EXPECTED=1` で書き直し、差分を確かめる（[テスト](testing.md#ケースを足す)）。`tests/contract/` のケースはこの更新では変わらず、互換を保つものに触れる変更なら失敗する。それを変えるのは、そのような項目を足すときだけにする。
+2. 自己テストの期待する出力を `NAOS_UPDATE_EXPECTED=1` で書き直し、差分を確かめる（[テスト](testing.md#ケースを足す)）。
 3. 変更履歴の `Changed` に項目を足す。互換を保つものを変えるときは `**BREAKING**:` で始める。
+
+`tests/contract/` のケースは、書き直しでは変わりません。互換を保つものに触れる変更なら失敗します。変えるのは、そのような項目を足すときだけです。
 
 ## JUnit XML のファイルを変える
 
-ファイルは `xml.c` が書きます。[JUnit XML](../reference/xml.md#互換性) が互換を保つもの（要素、その属性、ファイルを書くとき）は、足してかまいませんが、バージョンが許さない限り変えたり消したりしません（[変更履歴](changelog.md)）。`<failure>` の中身は `human.c` の診断で、それと一緒に変わります。リファレンス、`tests/behavior/xml/` の期待する出力、`tests/unit/xml.c` の単体テストを直します。互換を保つものを変えるなら、スキーマ `tests/contract/junit.xsd` も直します。
+ファイルは `xml.c` が書きます。[JUnit XML](../reference/xml.md#互換性) の互換を保つもの（要素、その属性、ファイルを書くとき）は、足してかまいませんが、バージョンが許さない限り変えたり消したりしません（[変更履歴](changelog.md)）。`<failure>` の中身は `human.c` の診断なので、それと一緒に変わります。
+
+一緒に直すもの:
+
+- リファレンス
+- `tests/behavior/xml/` の期待する出力
+- `tests/unit/xml.c` の単体テスト
+- スキーマ `tests/contract/junit.xsd`（互換を保つものを変えるとき）
 
 ## 出力の形式を足す
 
 形式は 1 つの書き手です。`naos_writer_t`（`writer.h`）の関数の表を、`xml.c` のように専用のファイルに書きます。
 
+イベントは `writer.h` に書いた順に届きます。診断は値、メモ、trace を含めて丸ごと届き、イベントが借りるものはその呼び出しの間だけ有効です。
+
 1. 形式を `naos_output_format_t`（`report.h`）に、名前を `options.c` の `take_output()` と `--naos-output` のヘルプに足し、`naos_report_begin()`（`report.c`）でその書き手を有効にする。
-2. イベントは `writer.h` に書いた順に届く。診断は値、メモ、trace を含めて丸ごと届く。イベントが借りるものは、その呼び出しの間だけ有効。
-3. `tests/unit/xml.c` と同じようにイベントで動かす writer の単体テストを `tests/unit/` に、`OUTPUT_FILE` を使ったファイルの golden のケースを `tests/behavior/` に足す（[テスト](testing.md#出力を照合するケース)）。リファレンスにページを足し、[コマンドライン](../reference/command-line.md)を直す。
+2. `tests/unit/` に書き手の単体テストを足す。`tests/unit/xml.c` と同じように、イベントで動かす。
+3. `tests/behavior/` に、`OUTPUT_FILE` を使ったファイルの golden のケースを足す（[テスト](testing.md#出力を照合するケース)）。
+4. リファレンスにページを足し、[コマンドライン](../reference/command-line.md)を直す。
 
 ## アサーションを足す
 

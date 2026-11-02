@@ -2,7 +2,11 @@
 
 ## How a test stops
 
-A failure of `NAOS_REQUIRE*`, `NAOS_FAIL` and `NAOS_SKIP` stop the test with `longjmp`. They work from a function deep inside helpers, or from a function that returns a value, with nothing to write at the callers. From setup and the body they jump to teardown; from teardown, to the end of teardown. A failure of `NAOS_REQUIRE*` and `NAOS_FAIL` are **fatal failures**; a failure of `NAOS_CHECK*` and `NAOS_SKIP` are not.
+A failure of `NAOS_REQUIRE*`, `NAOS_FAIL` and `NAOS_SKIP` stop the test with `longjmp`. They work from a function deep inside helpers, or from a function that returns a value, with nothing to write at the callers.
+
+From setup and the body they jump to teardown; from teardown, to the end of teardown.
+
+A failure of `NAOS_REQUIRE*` and `NAOS_FAIL` are **fatal failures**; a failure of `NAOS_CHECK*` and `NAOS_SKIP` are not.
 
 Because they leave every function in between at once:
 

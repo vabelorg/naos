@@ -1,10 +1,20 @@
 # CTest と CI
 
-クラッシュの分離、並列実行、時間制限が必要な場合は、テストを 1 つずつ別のプロセスで起動します。`--naos-list` で名前を列挙し、`--naos-filter` で 1 つずつ実行します。終了コードが `0` なら成功、`77` ならスキップ、それ以外は失敗です。プロセスの管理は呼び出し側（CTest、スクリプト、CI）に任せるのが Naos の方針です。
+クラッシュの分離、並列実行、時間制限が必要な場合は、テストを 1 つずつ別のプロセスで起動します。`--naos-list` で名前を列挙し、`--naos-filter` で 1 つずつ実行します。
+
+終了コードの意味は次のとおりです。
+
+- `0`: 成功
+- `77`: スキップ
+- それ以外: 失敗
+
+プロセスの管理は呼び出し側（CTest、スクリプト、CI）に任せるのが Naos の方針です。
 
 ## CTest を使う場合
 
-`naos_add_executable()` で作った実行ファイルのテストは、ビルドのたびに 1 テストずつ CTest に登録されます。CTest はテストごとに別のプロセスを起動するので、CTest で実行するだけで済みます。CTest でのテスト名は `<target>.<suite>.<test>`（例: `my_tests.parser.empty_object`）です。`-C Debug` は、Visual Studio などのマルチコンフィグのジェネレータでビルド構成を選ぶためのものです。
+`naos_add_executable()` で作った実行ファイルのテストは、ビルドのたびに 1 テストずつ CTest に登録されます。CTest はテストごとに別のプロセスを起動するので、CTest で実行するだけで済みます。
+
+CTest でのテスト名は `<target>.<suite>.<test>`（例: `my_tests.parser.empty_object`）です。`-C Debug` は、Visual Studio などのマルチコンフィグのジェネレータでビルド構成を選ぶためのものです。
 
 ```sh
 ctest --test-dir build -C Debug --output-on-failure      # すべて
@@ -47,7 +57,9 @@ done
 
 ## CI で実行する
 
-CI のジョブでは、configure、ビルド、CTest の実行を行います。`--output-junit` を付けると、多くの CI サービスが表示できる JUnit XML のレポートを（ビルドディレクトリからの相対パスで）書き出します。CTest 3.21 から使えます。GitHub Actions なら次のようになります。
+CI のジョブでは、configure、ビルド、CTest の実行を行います。
+
+`--output-junit` を付けると、多くの CI サービスが表示できる JUnit XML のレポートを（ビルドディレクトリからの相対パスで）書き出します。CTest 3.21 から使えます。GitHub Actions なら次のようになります。
 
 ```yaml
 - name: Build
@@ -58,7 +70,9 @@ CI のジョブでは、configure、ビルド、CTest の実行を行います�
   run: ctest --test-dir build -C Debug --output-on-failure --output-junit junit.xml
 ```
 
-CTest のレポートにあるのは、各テストの結果と出力の全体だけです。Naos のテストごとのテストケースと、各失敗のメッセージと場所を得るには、実行ファイルを `--naos-output xml:<path>` で直接実行します。その実行の JUnit XML のファイルを書きます（[JUnit XML](../reference/xml.md)）。実行ファイルの CTest のテストはどれも同じファイルに書くことになるので、実行ファイルごとに別のパスを指定します。
+CTest のレポートにあるのは、各テストの結果と出力の全体だけです。Naos のテストごとのテストケースと、各失敗のメッセージと場所を得るには、実行ファイルを `--naos-output xml:<path>` で直接実行します。その実行の JUnit XML のファイルを書きます（[JUnit XML](../reference/xml.md)）。
+
+実行ファイルの CTest のテストはどれも同じファイルに書くことになるので、実行ファイルごとに別のパスを指定します。
 
 ```yaml
 - name: Test
@@ -69,7 +83,10 @@ CTest のレポートにあるのは、各テストの結果と出力の全体�
 
 ## 失敗した行をエディタで開く
 
-失敗の行はコンパイラの診断と同じ `file:line: error: ...` の形で出力されるため、エディタのエラー一覧に表示できます。VS Code では、次の problem matcher を `.vscode/tasks.json` に書きます。失敗の行と trace の行が問題パネルに並び、クリックするとソースの該当行に移動できます。Naos のライブラリを MSVC でビルドした場合の `file(line): error: ...` の形にも対応しています。
+失敗の行はコンパイラの診断と同じ `file:line: error: ...` の形で出力されるため、エディタのエラー一覧に表示できます。VS Code では、次の problem matcher を `.vscode/tasks.json` に書きます。
+
+- 失敗の行と trace の行が問題パネルに並び、クリックするとソースの該当行に移動できます。
+- Naos のライブラリを MSVC でビルドした場合の `file(line): error: ...` の形にも対応しています。
 
 ```json
 {
@@ -108,4 +125,6 @@ CTest のレポートにあるのは、各テストの結果と出力の全体�
 }
 ```
 
-これらの行の始まり（`file:line: error: ` と `file:line: note: `）は互換を保つので、problem matcher はバージョンが変わっても使えます。標準出力のそのほかの部分は人向けで、変わることがあります（[出力](../reference/output.md#互換を保つもの)）。CI で結果を集計するなど、結果を集めるツールは `--naos-output` の [JUnit XML](../reference/xml.md) のファイルを読んでください。
+これらの行の始まり（`file:line: error: ` と `file:line: note: `）は互換を保つので、problem matcher はバージョンが変わっても使えます。
+
+標準出力のそのほかの部分は人向けで、変わることがあります（[出力](../reference/output.md#互換を保つもの)）。CI で結果を集計するなど、結果を集めるツールは `--naos-output` の [JUnit XML](../reference/xml.md) のファイルを読んでください。

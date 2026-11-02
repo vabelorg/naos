@@ -26,7 +26,7 @@ cmake --build --preset default
 ctest --preset default
 ```
 
-The same with `shared` checks the shared build. Run both before sending a change that touches the library or the CMake files. `release` shows what only the optimizer finds: `test.c` stops a test with `longjmp`, which an optimized build must survive, and some warnings of GCC, such as `-Wclobbered`, need it. `sanitize` finds memory mistakes and undefined behavior in the library and the tests; CI runs both.
+The same with `shared` checks the shared build. Run both before sending a change that touches the library or the CMake files. `release` shows what only the optimizer finds: `test.c` stops a test with `longjmp`, which an optimized build must survive, and some warnings of GCC, such as `-Wclobbered`, need it. `sanitize` finds memory mistakes and undefined behavior in the library and the tests; CI runs all four.
 
 With MinGW-w64 on Windows, run them in the shell of MSYS2 (UCRT64 or MINGW64), with its `gcc`, `cmake` and `ninja` packages and `CMAKE_GENERATOR=Ninja`, as CI does.
 
@@ -54,7 +54,7 @@ Every self test has a CTest name starting with `naos.`, the label `naos` and the
 
 ```sh
 ctest --preset default -L contract                             # one layer
-ctest --preset default -R '^naos\.behavior\.command-line\.'   # one area
+ctest --preset default -R '^naos\.behavior\.command-line\.'    # one area
 ctest --preset default -LE slow                                # all but the cases that build a project
 ctest --preset default -j8                                     # in parallel
 ```
@@ -69,7 +69,7 @@ The checks that need no build, such as the links of the documentation, are not s
 cmake --install build/default --prefix /tmp/naos-install
 ```
 
-The layout installed is in the [CMake reference](../reference/cmake.md#package). A project can then use it with `find_package(Naos)` and `-DCMAKE_PREFIX_PATH=/tmp/naos-install`. `tests/consumer/` is such a project; `cmake -D PRESET=<preset> -P scripts/TestPackage.cmake` installs a preset built and tests the project against it, as CI does for each build.
+The layout installed is in the [CMake reference](../reference/cmake.md#package). A project can then use it with `find_package(Naos)` and `-DCMAKE_PREFIX_PATH=/tmp/naos-install`. `tests/consumer/` is such a project; `cmake -D PRESET=<preset> -P scripts/TestPackage.cmake` installs a preset built and tests the project against it, as CI does for each build but `sanitize`.
 
 ## Continuous integration
 
@@ -80,5 +80,3 @@ The layout installed is in the [CMake reference](../reference/cmake.md#package).
 | `lint` | `cmake -D ROOT=. -P scripts/Lint.cmake` ([lint](testing.md#lint)) |
 | `test` | Configure, build and `ctest` with a preset, then `cmake -D PRESET=<preset> -P scripts/TestPackage.cmake` ([installing](#installing)), but with `sanitize`. GCC on Linux with `default`, `shared`, `release` and `sanitize`, and with `default` and CMake 3.21, the oldest CMake supported; Clang on Linux with `default` and `release`; Clang on macOS with `default` and `shared`; MSVC with `default`, `shared` and `release` |
 | `mingw` | The same with GCC of MinGW-w64 in MSYS2: UCRT64 with `default` and `shared`, MINGW64 with `default`. MINGW64 is there for the old C library of Windows, msvcrt, whose printf does not follow C99 ([coding style](coding-style.md#formatted-output)) |
-
-A change is merged only when every job passes.

@@ -6,16 +6,16 @@ How the sources of Naos are laid out and how the modules depend on each other, f
 
 These decide what goes into Naos, before any feature:
 
-- **Easy to adopt, first**: no dependency besides the standard C library, and no compiler extension. A feature that would cost either of them stays out. A dependency is a library to install or link: a function of the operating system that needs neither, on every supported platform, is not one. Such a function is used only when standard C has nothing that does the job, and only in one file, with a fallback on standard C elsewhere. The one so far is the monotonic clock of `clock.c`, since `clock()` measures processor time on POSIX and wall-clock time on Windows.
-- **One output for people, one for tools**: standard output is written for people, and may change in any version to read better. Tools read the JUnit XML file of `--naos-output`: what the common tools of JUnit XML process in it is a contract, and the rest, such as the text of a failure, is for people as standard output is ([JUnit XML](../reference/xml.md#compatibility)). Of standard output, only what tools cannot do without stays stable: the start of a diagnostic line, which editors read, the names of `--naos-list`, which CTest discovery reads, and the exit codes ([output](../reference/output.md#what-is-kept-compatible)).
-- **A documented public API**: only what the [reference](../reference/README.md) documents is public and kept compatible.
-- **A narrow scope**: process isolation, parallel runs and time limits are left to the caller (CTest, scripts, CI). Naos writes one report format, for the results only it knows (where each failure is and what it says); others are added only when a clear need for them shows.
+- **Easy to adopt, first**: building needs nothing but a C compiler. No library to install or link, and no compiler extension. A feature that would cost either stays out.
+- **One output for people, one for tools**: standard output is for people, and changes between versions. Tools read the JUnit XML file of `--naos-output`. Only what the common tools process is kept compatible ([JUnit XML](../reference/xml.md#compatibility)). In standard output, only the start of a diagnostic line, the names of `--naos-list` and the exit codes are ([output](../reference/output.md#what-is-kept-compatible)).
+- **A documented public API**: only what the [reference](../reference/README.md) documents is kept compatible.
+- **A narrow scope**: process isolation, parallel runs and time limits are left to the caller (CTest, scripts, CI). Naos writes one report format, and adds others when they are needed.
 
 ## Directories
 
 | Path | Content |
 |---|---|
-| `include/naos/` | The public headers. Users are pointed to `naos/naos.h` only |
+| `include/` | The public headers. Users are pointed to `naos/naos.h` only |
 | `src/` | The implementation and the internal headers |
 | `cmake/` | Installed for users: `Naos.cmake` (`naos_add_executable()`, `naos_discover_tests()`), `NaosDiscover.cmake` (the script that lists the tests after a build and registers them with CTest) and the config of `find_package(Naos)`. Used by the build of Naos only, not installed: `NaosVersion.cmake` (the version and what follows from it: compatibility, SOVERSION) and `NaosInstall.cmake` (the install rules) |
 | `tests/` | The self tests, in layers by who judges them (`contract/`, `api/`, `unit/`, `behavior/`, `build/`, `examples/`), each with its programs, the `CMakeLists.txt` registering its cases and the expected outputs (`expected/`); `consumer/`, a project using Naos; and their helpers (`harness/`). See [testing](testing.md) |
@@ -28,7 +28,7 @@ These decide what goes into Naos, before any feature:
 
 `src/` is split into one file per concern. A file that implements a public header has its name (`naos/control.h` ↔ `control.c`); the others declare what they share in an internal header of the same name (`diagnostic.c` ↔ `diagnostic.h`). Only an internal header that has a public header of the same name gets `_internal.h` (`suite_internal.h`).
 
-The files form four layers, from the top: the run, the tests, the output and the shared parts. A file uses only files of its own layer or of a layer below it, never one above, so the layers never form a cycle. `src/CMakeLists.txt` and the table below list the files in this order. A new file goes into the layer of what it does, and a dependency that would go up is a sign that a part of the file belongs to a lower layer.
+The files form four layers, from the top: the run, the tests, the output and the shared parts. A file uses only files of its own layer or of a layer below it, never one above, `src/CMakeLists.txt` and the table below list the files in this order. A new file goes into the layer of what it does, and a dependency that would go up is a sign that a part of the file belongs to a lower layer.
 
 | Layer | Files | What it is for |
 |---|---|---|
@@ -37,7 +37,7 @@ The files form four layers, from the top: the run, the tests, the output and the
 | 3. The output | `report`, `writer.h`, `human`, `xml`, `text` | The events of the run, and how each writer writes them. `writer.h` holds every type the writers are told, such as the outcome and the trace |
 | 4. Shared parts | `message`, `clock`, `value`, `format.h` | What layers above use without depending on any other module: the messages of Naos itself, the time, how values are written, the formatted output |
 
-A file that implements a public header goes into the layer of what it does, not into a layer of its own: `session.c` and `version.c` are in the run, `suite.c`, `control.c` and `check.c` in the tests.
+A file that implements a public header is in the layer of what it does: `session.c` and `version.c` are in the run, `suite.c`, `control.c` and `check.c` in the tests.
 
 | File | Role |
 |---|---|
@@ -61,7 +61,7 @@ A file that implements a public header goes into the layer of what it does, not 
 | `clock.c` | The clock that times the tests: the monotonic clock of the operating system, or `clock()`. The only file that depends on the platform |
 | `value.c` | How values are written (escaped strings, shortest doubles) |
 
-The layers are a single line, each using every layer below it: the tests use the output because a test writes what happens in it at once (`RUN:` before setup, each failure as it happens), so that what a crashed test wrote is not lost. An arrow points at the module used. `message` is used by every module that writes a message of Naos itself (`session`, `suite`, `options`, `plan`, `test` and `report`), `report` by the modules that tell events (`runner`, `test`, `diagnostic`) and by `options` for the formats of `--naos-output`, and the suites as registered (`suite_internal.h`) by every module that reads them (`plan`, `runner`, `test`), so the diagram leaves those arrows out but `session --> suite` and `diagnostic --> report`. The dependency comment of `src/CMakeLists.txt` lists them all.
+The layers are a single line, each using every layer below it: the tests use the output because a test writes what happens in it at once (`RUN:` before setup, each failure as it happens), so that what a crashed test wrote is not lost. An arrow points at the module used. The diagram leaves out the arrows to `message`, to `report` other than `diagnostic --> report`, and to the suites as registered (`suite_internal.h`) other than `session --> suite`. The dependency comment of `src/CMakeLists.txt` lists them all.
 
 ```mermaid
 flowchart TB
@@ -98,14 +98,17 @@ flowchart TB
 
 ## Key mechanisms
 
-- **Registration**: `NAOS_TEST`, `NAOS_SETUP` and `NAOS_TEARDOWN` define a function whose name holds its role, `naos_gen_<role>_<name>`. `NAOS_ADD_TEST`, `NAOS_SET_SETUP` and `NAOS_SET_TEARDOWN` accept only a function of their own role, so mixing them up does not compile. `NAOS_SUITE` defines a function `naos_gen_suite_<name>` that registers the tests on a builder (`naos_begin_suite`, `naos_add_test`, `naos_set_*`). `NAOS_ADD_SUITE` hands that function to `naos_add_suite`; `naos_run()` calls them to collect the suites, then checks them all before running any test.
+- **Registration**: `NAOS_TEST`, `NAOS_SETUP` and `NAOS_TEARDOWN` define a function whose name holds its role, `naos_gen_<role>_<name>`. `NAOS_ADD_TEST`, `NAOS_SET_SETUP` and `NAOS_SET_TEARDOWN` accept only a function of their own role, so mixing them up does not compile.
+- **Suites**: `NAOS_SUITE` defines a function `naos_gen_suite_<name>` that registers the tests on a builder (`naos_begin_suite`, `naos_add_test`, `naos_set_*`). `NAOS_ADD_SUITE` hands that function to `naos_add_suite`. `naos_run()` calls them to collect the suites, then checks them all before running any test.
 - **Stopping**: `test.c` runs setup, body and teardown under `setjmp`. A stop (`naos_stop`) jumps straight back to that `setjmp`, from whichever function the macro was used in.
 - **Diagnostics**: every failure goes through `naos_diagnostic_begin()` → `naos_diagnostic_add*()` → `naos_diagnostic_end()`, which adds the note and the traces it keeps and tells the whole diagnostic to the writers through `report.c` at its end.
 - **Writers**: what the run writes goes through `report.c`, which tells each event to every writer on, in the same order. The modules that run the tests decide what happened and when; only a writer decides how it looks and which of it is written, so each output can change without the others.
-- **Times**: `test.c` reads the clock (`clock.c`) once just before setup and once just after teardown, and tells the time with the result of the test; `runner.c` adds the times of a round to its tally, which ends the round. The writers only write them, so standard output and the JUnit XML file always show the same times ([output](../reference/output.md#times)). `clock.c` holds every `#if` of `src/` on the operating system: `QueryPerformanceCounter` on Windows, `clock_gettime(CLOCK_MONOTONIC)` on POSIX (it defines `_POSIX_C_SOURCE` before any include, for `-std=c99`, except on macOS, whose headers declare everything without it), and `clock()` elsewhere; `--help` says which one measures.
+- **Times**: `test.c` reads the clock (`clock.c`) once just before setup and once just after teardown, and tells the time with the result of the test. `runner.c` adds the times of a round to its tally, which ends the round. The writers only write them, so standard output and the JUnit XML file always show the same times ([output](../reference/output.md#times)).
+- **Clock and OS**: `clock.c` holds every `#if` of `src/` on the operating system. It uses `QueryPerformanceCounter` on Windows, `clock_gettime(CLOCK_MONOTONIC)` on POSIX and `clock()` elsewhere; `--help` says which one measures.
 - **Formatted output**: every formatted output of `src/` goes through `format.h`, which picks C99 conforming functions of the C library (the `__mingw_` ones on MinGW). `NAOS_PRINTF_FORMAT` of `naos/export.h` declares the printf-like functions of Naos with the same formats, so the check of the compiler matches what Naos prints.
 - **State**: shared mutable state lives in `static` variables of each module (`g_` prefix), never in `extern` variables. The one exception is the options, read only after `naos_init`, through `naos_options_get()`.
-- **Discovery**: `naos_add_executable()` adds a `POST_BUILD` command that runs `NaosDiscover.cmake` after each build. The script runs `<exe> --naos-list` and writes a CTest file that registers each line of the output as one test. Parameters go through a file, so nothing needs escaping. When listing fails, the build fails, with the cause and what to do in its message, instead of going on with no test ([troubleshooting](../guides/troubleshooting.md#cmake-and-ctest)).
+- **Discovery**: `naos_add_executable()` adds a `POST_BUILD` command that runs `NaosDiscover.cmake` after each build. The script runs `<exe> --naos-list` and writes a CTest file that registers each line of the output as one test. Parameters go through a file, so nothing needs escaping.
+- **Discovery failure**: when listing fails, the build fails, with the cause and what to do in its message, instead of going on with no test ([troubleshooting](../guides/troubleshooting.md#cmake-and-ctest)).
 - **Version**: `include/naos/version.h` is the only source of the version. `NaosVersion.cmake` reads it and derives `project(VERSION)`, the package compatibility and the `SOVERSION`.
 
 [Extending](extending.md) tells where each kind of change goes.

@@ -1,6 +1,14 @@
 # クイックスタート
 
-空のディレクトリから、CTest でテストを実行するところまでを 5 分で進めます。C コンパイラ、CMake 3.21 以上、Git が必要です。以下で作る `clamp.h`、`clamp.c`、`clamp_test.c`、`CMakeLists.txt` の 4 つのファイルは、同じディレクトリに置きます。完成したプロジェクトは [examples/quickstart](../../../examples/quickstart/) にあります。
+空のディレクトリから、CTest でテストを実行するところまでを 5 分で進めます。
+
+必要なもの:
+
+- C コンパイラ
+- CMake 3.21 以上
+- Git
+
+以下で作る 4 つのファイル（`clamp.h`、`clamp.c`、`clamp_test.c`、`CMakeLists.txt`）は、同じディレクトリに置きます。完成したプロジェクトは [examples/quickstart](../../../examples/quickstart/) にあります。
 
 ## 1. テストするコード
 
@@ -39,7 +47,11 @@ int clamp(int value, int low, int high)
 
 ## 2. テスト
 
-`clamp()` の動きを 3 つの場合に分けて確かめます。範囲の内側の値はそのまま返ること（`inside_range`）、下限を下回る値は `low` になること（`below_range`）、上限を上回る値は `high` になること（`above_range`）です。
+`clamp()` の動きを、3 つの場合に分けて確かめます。
+
+- `inside_range`: 範囲の内側の値は、そのまま返る。
+- `below_range`: 下限を下回る値は、`low` になる。
+- `above_range`: 上限を上回る値は、`high` になる。
 
 ```c
 /* clamp_test.c */
@@ -133,9 +145,9 @@ CTest はテストごとに別のプロセスを起動し、`<target>.<suite>.<t
 100% tests passed, 0 tests failed out of 3
 ```
 
-これにより、テスト用の実行ファイル `clamp_tests` が生成され、3 つのテストがそれぞれ別のテストとして実行され、すべて通りました。このように、Naos なら、テストを書いて CMake に数行足すだけで、C のテストをすぐに実行できます。
+テスト用の実行ファイル `clamp_tests` ができ、3 つのテストがそれぞれ別のテストとして実行され、すべて通りました。Naos なら、テストを書いて CMake に数行足すだけで、C のテストをすぐに実行できます。
 
-実行ファイルは単独でも実行でき、その場合はすべてのテストを 1 つのプロセスで実行します。以下は Makefile や Ninja などのシングルコンフィグのジェネレータでの例です。
+実行ファイルは単独でも実行でき、その場合はすべてのテストを 1 つのプロセスで実行します。次は、Makefile や Ninja などのシングルコンフィグのジェネレータでの例です。
 
 ```
 $ ./build/clamp_tests
@@ -170,7 +182,9 @@ PASS: clamp.above_range (0 ms)
 SUMMARY: 2 passed, 1 failed, 0 skipped (0 ms)
 ```
 
-`inside_range` だけが失敗し、残りの 2 つは通りました。1 つのテストが失敗しても、ほかのテストは実行されます。失敗の表示は次のように読みます。
+`inside_range` だけが失敗し、残りの 2 つは通りました。1 つのテストが失敗しても、ほかのテストは実行されます。
+
+失敗の表示は次のように読みます。
 
 - `error` の行はコンパイラの診断と同じ `file:line: error: ...` の形なので、エディタからその行に移動できます。
 - 式はアサーションの引数を書いたとおりに示し、`left` と `right` はその値です。

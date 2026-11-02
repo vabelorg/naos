@@ -1,6 +1,9 @@
 # Installation
 
-How to bring Naos into a project. Naos is built with CMake: a CMake project adds it in one of three ways, and a project with another build system links the library that CMake built and installed.
+How to bring Naos into a project. Naos is built with CMake.
+
+- A CMake project adds it in one of three ways: [FetchContent](#fetchcontent), a [subdirectory](#subdirectory) or an [installed package](#installed-package).
+- A project with another build system links the library that CMake built and installed ([other build systems](#other-build-systems)).
 
 ## Requirements
 
@@ -10,11 +13,19 @@ How to bring Naos into a project. Naos is built with CMake: a CMake project adds
 | C++ compiler | C++11, only for tests written in C++ |
 | CMake | 3.21 or later, to build Naos, also for a project with [another build system](#other-build-systems) |
 
-Every change is built and tested on Linux (GCC and Clang), macOS (Clang) and Windows (MSVC, and GCC of MinGW-w64 in the UCRT64 and MINGW64 environments of MSYS2), as a static and as a shared library. Other builds with MinGW-w64, such as cross-compiling for Windows from Linux, are expected to work but are not tested.
+Every change is built and tested on the following, as a static and as a shared library:
+
+- Linux: GCC and Clang
+- macOS: Clang
+- Windows: MSVC, and GCC of MinGW-w64 in the UCRT64 and MINGW64 environments of MSYS2
+
+Other builds with MinGW-w64, such as cross-compiling for Windows from Linux, are expected to work but are not tested.
 
 ## With CMake
 
-Each way below gives the target `Naos::naos` and the functions `naos_add_executable()` and `naos_discover_tests()` ([CMake reference](../reference/cmake.md)). Then make the test executable and let CTest run it:
+Each way below gives the target `Naos::naos` and the functions `naos_add_executable()` and `naos_discover_tests()` ([CMake reference](../reference/cmake.md)).
+
+Then make the test executable and let CTest run it:
 
 ```cmake
 enable_testing()   # or include(CTest)
@@ -51,19 +62,19 @@ Inside another project, unless asked, Naos builds as a static library, registers
 
 ### Installed package
 
-Build and install Naos once:
+1. Build and install Naos once:
 
-```sh
-cmake -S naos -B naos/build -DCMAKE_BUILD_TYPE=Release
-cmake --build naos/build --config Release
-cmake --install naos/build --config Release --prefix /opt/naos
-```
+   ```sh
+   cmake -S naos -B naos/build -DCMAKE_BUILD_TYPE=Release
+   cmake --build naos/build --config Release
+   cmake --install naos/build --config Release --prefix /opt/naos
+   ```
 
-Then find it, with the prefix in `CMAKE_PREFIX_PATH` (`-DCMAKE_PREFIX_PATH=/opt/naos`):
+2. Then find it, with the prefix in `CMAKE_PREFIX_PATH` (`-DCMAKE_PREFIX_PATH=/opt/naos`):
 
-```cmake
-find_package(Naos 0.2 REQUIRED)
-```
+   ```cmake
+   find_package(Naos 0.2 REQUIRED)
+   ```
 
 Which versions it accepts is in the [CMake reference](../reference/cmake.md#package).
 
@@ -76,9 +87,9 @@ cc -std=c99 -I/opt/naos/include -c my_tests.c
 cc -o my_tests my_tests.o -L/opt/naos/lib -lnaos
 ```
 
-- A Debug build names the library with the suffix `d`: `-lnaosd`. With MSVC, the library is `naos.lib` (`naosd.lib`).
-- A shared library needs `NAOS_SHARED` defined when compiling the tests (`-DNAOS_SHARED`), and must be found when they run ([shared library](../guides/shared-library.md)).
-- The directories follow `GNUInstallDirs`: the library may be in `lib64/` rather than `lib/`. The files installed are in the [CMake reference](../reference/cmake.md#package).
+- **Debug build**: the library name has the suffix `d`: `-lnaosd`. With MSVC, the library is `naos.lib` (`naosd.lib`).
+- **Shared library**: define `NAOS_SHARED` when compiling the tests (`-DNAOS_SHARED`), and make the library findable when they run ([shared library](../guides/shared-library.md)).
+- **Directories**: they follow `GNUInstallDirs`: the library may be in `lib64/` rather than `lib/`. The files installed are in the [CMake reference](../reference/cmake.md#package).
 
 Building the sources of `src/` into your own project, without the build of Naos, is not supported.
 

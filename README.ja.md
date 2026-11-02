@@ -9,7 +9,7 @@
 > [!NOTE]
 > `main` ブランチの README と文書には、互換が切れるものも含め、まだリリースしていない変更が書かれていることがあります。リリースされたバージョンを使うときは、そのタグで読んでください（たとえば[最新のリリース](https://github.com/vabelorg/naos/releases/latest)）。リリース前の変更は[変更履歴](CHANGELOG.md)の `[Unreleased]` にあります（英語）。
 
-C と C++ 向けのテストハーネスです。標準 C ライブラリ以外に依存せず、コンパイラ拡張も使いません。素の C99 で、CMake でビルドし、どのビルドシステムからも使えます。
+C と C++ 向けのテストハーネスです。必要なのは C99 のコンパイラだけで、インストールするライブラリもコンパイラ拡張も要りません。CMake でビルドし、どのビルドシステムからも使えます。
 
 ```c
 #include <naos/naos.h>
@@ -96,13 +96,11 @@ cmake -S . -B build && cmake --build build && ctest --test-dir build
 
 ## 文書
 
-文書は英語が正で、[日本語訳](docs/ja/README.md)があります。
-
 | | |
 |---|---|
 | **はじめる** | [インストール](docs/ja/getting-started/installation.md) · [クイックスタート](docs/ja/getting-started/quickstart.md) · [チュートリアル](docs/ja/getting-started/tutorial.md) |
-| **使う** | [ガイド](docs/ja/guides/) · [トラブルシューティング](docs/ja/guides/troubleshooting.md) · [サンプル](examples/) |
-| **調べる** | [リファレンス](docs/ja/reference/): テスト、アサーション、コマンドライン、出力、JUnit XML、CMake |
+| **使う** | [ガイド](docs/ja/guides/) · [トラブルシューティング](docs/ja/guides/troubleshooting.md) |
+| **調べる** | [テスト](docs/ja/reference/tests.md) · [アサーション](docs/ja/reference/assertions.md) · [失敗・スキップ・メモ](docs/ja/reference/control.md) · [バージョン](docs/ja/reference/version.md) · [コマンドライン](docs/ja/reference/command-line.md) · [出力](docs/ja/reference/output.md) · [JUnit XML](docs/ja/reference/xml.md) · [CMake](docs/ja/reference/cmake.md) |
 
 全体の案内は [docs/ja/](docs/ja/README.md) にあります。
 

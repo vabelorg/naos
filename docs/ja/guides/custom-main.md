@@ -1,6 +1,8 @@
 # 独自の main()
 
-重いテストを指定した場合だけ実行したいなど、テストの実行ファイルに独自の引数を持たせたい場合は、`NAOS_MAIN` の代わりに `main()` を自分で書きます。`naos_init()` が Naos のオプションを取り除くので、`argv` に残るのはプログラム自身の引数です。完成した例は [examples/custom-main](../../../examples/custom-main/) にあります。
+重いテストを指定した場合だけ実行したいなど、テストの実行ファイルに独自の引数を持たせたい場合は、`NAOS_MAIN` の代わりに `main()` を自分で書きます。
+
+`naos_init()` が Naos のオプションを取り除くので、`argv` に残るのはプログラム自身の引数です。完成した例は [examples/custom-main](../../../examples/custom-main/) にあります。
 
 ```c
 #include <naos/naos.h>

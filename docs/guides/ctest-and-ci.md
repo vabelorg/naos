@@ -1,10 +1,20 @@
 # CTest and CI
 
-To isolate crashes, run in parallel or set time limits, start each test in a process of its own: list the names with `--naos-list` and run them one by one with `--naos-filter`. An exit code of `0` is a pass, `77` a skip, anything else a failure. Naos leaves process management to the caller: CTest, a script or a CI service.
+To isolate crashes, run in parallel or set time limits, start each test in a process of its own: list the names with `--naos-list` and run them one by one with `--naos-filter`.
+
+The exit code means:
+
+- `0`: a pass
+- `77`: a skip
+- anything else: a failure
+
+Naos leaves process management to the caller: CTest, a script or a CI service.
 
 ## With CTest
 
-The tests of an executable made with `naos_add_executable()` are registered with CTest one by one, at each build. CTest starts each test in a process of its own, so running CTest is all there is to do. The CTest name of a test is `<target>.<suite>.<test>`, such as `my_tests.parser.empty_object`. `-C Debug` chooses the configuration with a multi-config generator such as Visual Studio.
+The tests of an executable made with `naos_add_executable()` are registered with CTest one by one, at each build. CTest starts each test in a process of its own, so running CTest is all there is to do.
+
+The CTest name of a test is `<target>.<suite>.<test>`, such as `my_tests.parser.empty_object`. `-C Debug` chooses the configuration with a multi-config generator such as Visual Studio.
 
 ```sh
 ctest --test-dir build -C Debug --output-on-failure      # every test
@@ -47,7 +57,9 @@ done
 
 ## In CI
 
-A CI job configures, builds and runs CTest. `--output-junit` writes a JUnit XML report (relative to the build directory) that most CI services can show; CTest has it since 3.21. For GitHub Actions:
+A CI job configures, builds and runs CTest.
+
+`--output-junit` writes a JUnit XML report (relative to the build directory) that most CI services can show; CTest has it since 3.21. For GitHub Actions:
 
 ```yaml
 - name: Build
@@ -58,7 +70,9 @@ A CI job configures, builds and runs CTest. `--output-junit` writes a JUnit XML 
   run: ctest --test-dir build -C Debug --output-on-failure --output-junit junit.xml
 ```
 
-CTest's report holds only the result and the whole output of each test. For a test case per Naos test, with the message and the location of each failure, run the executable directly with `--naos-output xml:<path>`: it writes a JUnit XML file of its own run ([JUnit XML](../reference/xml.md)). Give each executable its own path, since every CTest test of an executable would write the same file:
+CTest's report holds only the result and the whole output of each test. For a test case per Naos test, with the message and the location of each failure, run the executable directly with `--naos-output xml:<path>`: it writes a JUnit XML file of its own run ([JUnit XML](../reference/xml.md)).
+
+Give each executable its own path, since every CTest test of an executable would write the same file:
 
 ```yaml
 - name: Test
@@ -69,7 +83,10 @@ To shake out hidden dependencies between tests, a job can also run an executable
 
 ## Open failures in your editor
 
-Failures are printed like compiler diagnostics, `file:line: error: ...`, so editors can list them with the compiler errors. For VS Code, put this problem matcher in `.vscode/tasks.json`: failures and their traces appear in the Problems panel, and a click opens the line. It also reads the form `file(line): error: ...` that Naos prints when its library is built with MSVC.
+Failures are printed like compiler diagnostics, `file:line: error: ...`, so editors can list them with the compiler errors. For VS Code, put this problem matcher in `.vscode/tasks.json`:
+
+- Failures and their traces appear in the Problems panel, and a click opens the line.
+- It also reads the form `file(line): error: ...` that Naos prints when its library is built with MSVC.
 
 ```json
 {
@@ -108,4 +125,6 @@ Failures are printed like compiler diagnostics, `file:line: error: ...`, so edit
 }
 ```
 
-The start of these lines, `file:line: error: ` and `file:line: note: `, is kept compatible, so a problem matcher keeps working across versions; the rest of standard output is written for people and may change ([output](../reference/output.md#what-is-kept-compatible)). A tool that collects results, in CI for example, should read the [JUnit XML](../reference/xml.md) file of `--naos-output`.
+The start of these lines, `file:line: error: ` and `file:line: note: `, is kept compatible, so a problem matcher keeps working across versions.
+
+The rest of standard output is written for people and may change ([output](../reference/output.md#what-is-kept-compatible)). A tool that collects results, in CI for example, should read the [JUnit XML](../reference/xml.md) file of `--naos-output`.

@@ -8,13 +8,13 @@ How a version of Naos is released. Releases are tagged `v<major>.<minor>.<patch>
 - **Minor** (0.0.x → 0.1.0): anything else. Before 1.0, a minor version may break compatibility.
 - **Major**: from 1.0 on, for incompatible changes.
 
-The entries under `[Unreleased]` in `CHANGELOG.md` decide it, as [changelog](changelog.md#at-a-release) describes. The release is refused when they do not allow the version.
+The entries under `[Unreleased]` in `CHANGELOG.md` decide which versions are allowed, as [changelog](changelog.md#at-a-release) describes. The release is refused when they do not allow the version.
 
 ## Steps
 
 1. Make sure CI passes on `main`, and that `[Unreleased]` in `CHANGELOG.md` records every change users can see.
-2. In the Actions tab, run **Release PR** with the version. Tick **dry_run** first to see the changes and the notes in the summary of the run, without opening anything.
-3. The workflow opens the pull request `Release <version>`. It:
+2. In the Actions tab, run **Release PR** with the version. Tick **dry_run** for the first run: it opens nothing, and shows the changes and the notes in the summary of the run. Check them.
+3. If they are right, run **Release PR** again with the same version and **dry_run** unticked. The workflow opens the pull request `Release <version>`. It:
    - sets the version in `include/naos/version.h`, its only home: CMake derives the rest from it;
    - for a new minor or major version, updates the tag used by `FetchContent` (`GIT_TAG v…`) and the minor version named in `find_package(Naos 0.0)` in the README files, the documentation and the examples;
    - closes the changelog: renames `[Unreleased]` to the version and its date, and updates the links at the end of `CHANGELOG.md`.
@@ -25,7 +25,13 @@ For 1.0, the workflow warns that the text on compatibility in the README files a
 
 ## Setup
 
-**Release PR** needs a repository secret `RELEASE_TOKEN`: CI does not run on a pull request opened with the `GITHUB_TOKEN` of a workflow. Create a fine-grained personal access token for this repository with the permissions *Contents* and *Pull requests* (read and write), and add it under *Settings → Secrets and variables → Actions*.
+**Release PR** needs a repository secret `RELEASE_TOKEN`: CI does not run on a pull request opened with the `GITHUB_TOKEN` of a workflow. Before the first release, add it as follows:
+
+1. In the *Settings → Developer settings → Personal access tokens → Fine-grained tokens* of your GitHub account, press *Generate new token*.
+2. Under *Repository access*, choose *Only select repositories* and select this repository.
+3. Under *Repository permissions*, set *Contents* and *Pull requests* to *Read and write*.
+4. Generate the token and copy its value.
+5. In *Settings → Secrets and variables → Actions* of this repository, press *New repository secret*. Name it `RELEASE_TOKEN`, and paste the token as its value.
 
 ## By hand
 

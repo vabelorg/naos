@@ -1,12 +1,21 @@
 # Output
 
-While the tests run, Naos writes only three kinds of lines to standard output. They are written for people to read, and this page describes them as the current version writes them: apart from what [is kept compatible](#what-is-kept-compatible), they may change in any version, to read better. A tool that reads the results should read the [JUnit XML](xml.md) file of `--naos-output` instead. The output of `--naos-list` and `--help`, and the `naos: ...` messages on standard error, are not part of this output. Whatever the tests print themselves comes in between, as it is.
+While the tests run, Naos writes only three kinds of lines to standard output:
 
 | Kind | Form | Content |
 |---|---|---|
 | Flow line | `KEY: value` | The start and result of each test, the iterations and the summary |
 | Diagnostic line | `<location> <kind>: <text>` | A failed assertion, a skip, and the traces that go with them |
 | Detail line | `  <label>: <value>` | Two spaces first; belongs to the diagnostic line above it |
+
+They are written for people to read, and this page describes them as the current version writes them: apart from what [is kept compatible](#what-is-kept-compatible), they may change in any version, to read better. A tool that reads the results should read the [JUnit XML](xml.md) file of `--naos-output` instead.
+
+These are not part of this output:
+
+- The output of `--naos-list` and `--help`.
+- The `naos: ...` messages on standard error.
+
+Whatever the tests print themselves comes in between, as it is.
 
 ## Flow lines
 
@@ -62,7 +71,11 @@ The result lines and `SUMMARY:` end with the time the tests took, so that a slow
 - The time of a test covers its setup, body and teardown: from just before setup to just after teardown, as the test starts and ends. Writing its lines is not counted.
 - The time of `SUMMARY:` is the sum of the times of the tests of its iteration, of those run only after a stop by `--naos-fail-fast`. With `--naos-repeat`, each iteration has its own.
 - Both are whole milliseconds, rounded down: a test shorter than a millisecond shows `0 ms`. `SUMMARY:` rounds the sum down once, so it may be a little more than the sum of the times shown.
-- The clock is wall-clock time from the monotonic clock of the system, which does not jump when the time of the system is changed: `QueryPerformanceCounter` on Windows, `clock_gettime(CLOCK_MONOTONIC)` on macOS and other POSIX systems. Elsewhere, Naos falls back on `clock()` of standard C, which is processor time: a test that sleeps or waits shows less than it took. The last line of `--help` says which one is used ([command line](command-line.md)).
+- The clock is wall-clock time from the monotonic clock of the system, which does not jump when the time of the system is changed.
+  - Windows: `QueryPerformanceCounter`
+  - macOS and other POSIX systems: `clock_gettime(CLOCK_MONOTONIC)`
+  - Elsewhere: Naos falls back on `clock()` of standard C, which is processor time: a test that sleeps or waits shows less than it took.
+- The last line of `--help` says which clock is used ([command line](command-line.md)).
 - The times change from run to run, so standard output does too. To compare the results of two runs, compare the [JUnit XML](xml.md) files without their `time`, or the output without the times.
 
 The [JUnit XML](xml.md) file has the same times, in seconds.
@@ -79,7 +92,9 @@ The [JUnit XML](xml.md) file has the same times, in seconds.
 
 The text of a diagnostic line is never empty and holds no value: the values are in the detail lines that follow.
 
-The location is `<file>:<line>: ` (the GCC form). When the library of Naos is built by a compiler that defines `_MSC_VER` (MSVC, clang-cl), it is `<file>(<line>): ` (the MSVC form). The form is decided when the library is built, not the tests: tests built with MinGW GCC using a Naos built with MSVC print the MSVC form. No option chooses it at run time. The file name is the `__FILE__` the compiler gave.
+The location is `<file>:<line>: ` (the GCC form). When the library of Naos is built by a compiler that defines `_MSC_VER` (MSVC, clang-cl), it is `<file>(<line>): ` (the MSVC form). The file name is the `__FILE__` the compiler gave.
+
+The form is decided when the library is built, not the tests: tests built with MinGW GCC using a Naos built with MSVC print the MSVC form. No option chooses it at run time.
 
 `error` lines in the GCC form are picked up as they are by problem matchers that read GCC diagnostics, such as `$gcc` of VS Code. Lines in the MSVC form are not picked up by `$msCompile` of VS Code. A problem matcher that picks up both forms is in [the CTest and CI guide](../guides/ctest-and-ci.md#open-failures-in-your-editor).
 

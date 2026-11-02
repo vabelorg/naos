@@ -13,7 +13,6 @@
 
 - [Guides](guides/): one task per page, from writing and running tests to CTest, CI, stubs and C++
 - [Reference](reference/): every rule of the macros, the command line, the output, the JUnit XML file and CMake
-- [Examples](../examples/): complete projects, built and run by the self tests
 
 ## Contributing to Naos
 

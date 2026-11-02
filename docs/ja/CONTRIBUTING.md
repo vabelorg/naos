@@ -13,8 +13,10 @@ Naos に関心を持っていただきありがとうございます。バグの
 
 C99 コンパイラ（GCC、Clang、MSVC）、CMake 3.21 以上、Git が必要です。C++ のテストには C++ コンパイラも使います。
 
+まず GitHub でリポジトリを[フォーク](https://github.com/vabelorg/naos/fork)し、自分のフォークを clone します。
+
 ```sh
-git clone https://github.com/vabelorg/naos.git
+git clone https://github.com/<あなたのアカウント>/naos.git
 cd naos
 cmake --preset default
 cmake --build --preset default
@@ -25,7 +27,7 @@ ctest --preset default
 
 ## 変更する
 
-1. `main` からブランチを作る。
+1. フォークした自分のリポジトリで、`main` からブランチを作る。
 2. 変更の種類に応じたページを読む。
    - コード: [アーキテクチャ](development/architecture.md)、[拡張](development/extending.md)、[コードの書き方](development/coding-style.md)
    - テスト: [テスト](development/testing.md)
@@ -38,6 +40,7 @@ ctest --preset default
 ## コミットとプルリクエスト
 
 - コミットメッセージは英語で、命令形の短い要約（"Add NAOS_CHECK_MEM_NE"）、空行、必要なら理由の順に書いてください。
+- プルリクエストは、フォークのブランチから、`vabelorg/naos` の `main` に送ってください。
 - 1 つのプルリクエストには 1 つの話題だけを入れてください。テンプレートに、何を変えるか、なぜか、どうテストしたかを書いてください。
 - CI がすべてのプラットフォームで通る必要があります。メンテナがレビューし、マージの前に変更をお願いすることがあります。
 

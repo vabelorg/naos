@@ -8,13 +8,13 @@ Naos のバージョンをリリースする手順です。リリースは `main
 - **マイナー**（0.0.x → 0.1.0）: それ以外。1.0 より前は、マイナーバージョンで互換が切れることがある。
 - **メジャー**: 1.0 以後、互換のない変更のとき。
 
-どれになるかは、[変更履歴](changelog.md#リリースのとき)に書いたとおり、`CHANGELOG.md` の `[Unreleased]` の項目で決まります。項目に合わないバージョンでは、リリースは止まります。
+許されるバージョンは、[変更履歴](changelog.md#リリースのとき)に書いたとおり、`CHANGELOG.md` の `[Unreleased]` の項目で決まります。項目に合わないバージョンでは、リリースは止まります。
 
 ## 手順
 
 1. `main` で CI が通っていること、`CHANGELOG.md` の `[Unreleased]` に利用者から見える変更がすべて書かれていることを確かめる。
-2. Actions タブで、バージョンを入れて **Release PR** を実行する。先に **dry_run** にチェックを入れて実行すると、何も作らずに、変更とリリースノートを実行のサマリで見られる。
-3. ワークフローがプルリクエスト `Release <version>` を作る。中身は次のとおり。
+2. Actions タブで、バージョンを入れて **Release PR** を実行する。最初は **dry_run** にチェックを入れて実行する。何も作らずに、変更とリリースノートが実行のサマリに出るので、確認する。
+3. 問題がなければ、同じバージョンで **dry_run** のチェックを外して、もう一度 **Release PR** を実行すると、ワークフローがプルリクエスト `Release <version>` を作る。中身は次のとおり。
    - `include/naos/version.h` にバージョンを書く。バージョンを書くのはここだけで、残りは CMake がそこから導く。
    - 新しいマイナーかメジャーのバージョンなら、README と文書とサンプルで、`FetchContent` が使うタグ（`GIT_TAG v…`）と、`find_package(Naos 0.0)` に書いたマイナーバージョンを更新する。
    - 変更履歴を閉じる。`[Unreleased]` をバージョンと日付に変え、`CHANGELOG.md` の末尾のリンクを更新する。
@@ -25,7 +25,13 @@ Naos のバージョンをリリースする手順です。リリースは `main
 
 ## 準備
 
-**Release PR** には、リポジトリのシークレット `RELEASE_TOKEN` が要ります。ワークフローの `GITHUB_TOKEN` で作ったプルリクエストでは CI が走らないためです。このリポジトリに対して *Contents* と *Pull requests* の読み書きの権限を持つ fine-grained personal access token を作り、*Settings → Secrets and variables → Actions* に登録します。
+**Release PR** には、リポジトリのシークレット `RELEASE_TOKEN` が要ります。ワークフローの `GITHUB_TOKEN` で作ったプルリクエストでは CI が走らないためです。最初のリリースの前に、次の手順で登録します。
+
+1. GitHub のアカウントの *Settings → Developer settings → Personal access tokens → Fine-grained tokens* で、*Generate new token* を押す。
+2. *Repository access* で *Only select repositories* を選び、このリポジトリを選ぶ。
+3. *Repository permissions* の *Contents* と *Pull requests* を、*Read and write* にする。
+4. トークンを作り、表示された値をコピーする。
+5. このリポジトリの *Settings → Secrets and variables → Actions* で *New repository secret* を押す。名前を `RELEASE_TOKEN`、値をコピーしたトークンにして登録する。
 
 ## 手作業で行う
 

@@ -1,6 +1,9 @@
 # インストール
 
-Naos をプロジェクトに取り込む方法です。Naos は CMake でビルドします。CMake のプロジェクトは 3 通りの方法で取り込めます。ほかのビルドシステムのプロジェクトは、CMake でビルドしてインストールしたライブラリをリンクします。
+Naos をプロジェクトに取り込む方法です。Naos は CMake でビルドします。
+
+- CMake のプロジェクトは、[FetchContent](#fetchcontent)、[サブディレクトリ](#サブディレクトリ)、[インストール済みのパッケージ](#インストール済みのパッケージ)の 3 通りで取り込めます。
+- ほかのビルドシステムのプロジェクトは、CMake でビルドしてインストールしたライブラリをリンクします（[ほかのビルドシステム](#ほかのビルドシステム)）。
 
 ## 必要なもの
 
@@ -8,13 +11,21 @@ Naos をプロジェクトに取り込む方法です。Naos は CMake でビル
 |---|---|
 | C コンパイラ | C99。GCC、Clang、MSVC |
 | C++ コンパイラ | C++11。C++ でテストを書くときだけ |
-| CMake | 3.21 以上。Naos のビルドに使います。[ほかのビルドシステム](#ほかのビルドシステム)のプロジェクトでも必要です |
+| CMake | 3.21 以上。Naos のビルドに使う。[ほかのビルドシステム](#ほかのビルドシステム)のプロジェクトでも必要 |
 
-すべての変更は、Linux（GCC と Clang）、macOS（Clang）、Windows（MSVC と、MSYS2 の UCRT64・MINGW64 環境の MinGW-w64 の GCC）で、静的ライブラリと共有ライブラリの両方でビルドしてテストしています。Linux から Windows 向けにクロスコンパイルするなど、MinGW-w64 でのほかのビルドも動くはずですが、テストはしていません。
+すべての変更は、次の環境で、静的ライブラリと共有ライブラリの両方をビルドしてテストしています。
+
+- Linux: GCC と Clang
+- macOS: Clang
+- Windows: MSVC と、MSYS2 の UCRT64・MINGW64 環境の MinGW-w64 の GCC
+
+Linux から Windows 向けにクロスコンパイルするなど、MinGW-w64 でのほかのビルドも動くはずですが、テストはしていません。
 
 ## CMake を使う場合
 
-次のどの方法でも、ターゲット `Naos::naos` と、関数 `naos_add_executable()`・`naos_discover_tests()` が使えるようになります（[CMake のリファレンス](../reference/cmake.md)）。あとはテストの実行ファイルを作り、CTest から実行します。
+次のどの方法でも、ターゲット `Naos::naos` と、関数 `naos_add_executable()`・`naos_discover_tests()` が使えるようになります（[CMake のリファレンス](../reference/cmake.md)）。
+
+あとはテストの実行ファイルを作り、CTest から実行します。
 
 ```cmake
 enable_testing()   # または include(CTest)
@@ -51,19 +62,19 @@ add_subdirectory(third_party/naos)
 
 ### インストール済みのパッケージ
 
-Naos を一度ビルドしてインストールします。
+1. Naos を一度ビルドしてインストールする。
 
-```sh
-cmake -S naos -B naos/build -DCMAKE_BUILD_TYPE=Release
-cmake --build naos/build --config Release
-cmake --install naos/build --config Release --prefix /opt/naos
-```
+   ```sh
+   cmake -S naos -B naos/build -DCMAKE_BUILD_TYPE=Release
+   cmake --build naos/build --config Release
+   cmake --install naos/build --config Release --prefix /opt/naos
+   ```
 
-インストール先を `CMAKE_PREFIX_PATH` に入れて（`-DCMAKE_PREFIX_PATH=/opt/naos`）、見つけます。
+2. インストール先を `CMAKE_PREFIX_PATH` に入れて（`-DCMAKE_PREFIX_PATH=/opt/naos`）、見つける。
 
-```cmake
-find_package(Naos 0.2 REQUIRED)
-```
+   ```cmake
+   find_package(Naos 0.2 REQUIRED)
+   ```
 
 どのバージョンを受け付けるかは [CMake のリファレンス](../reference/cmake.md#パッケージ)にあります。
 
@@ -76,11 +87,11 @@ cc -std=c99 -I/opt/naos/include -c my_tests.c
 cc -o my_tests my_tests.o -L/opt/naos/lib -lnaos
 ```
 
-- Debug ビルドでは、ライブラリの名前の末尾に `d` が付きます（`-lnaosd`）。MSVC では、ライブラリは `naos.lib`（`naosd.lib`）です。
-- 共有ライブラリでは、テストをコンパイルするときに `NAOS_SHARED` を定義し（`-DNAOS_SHARED`）、テストの実行時にライブラリが見つかるようにします（[共有ライブラリ](../guides/shared-library.md)）。
-- ディレクトリは `GNUInstallDirs` に従うので、ライブラリが `lib/` ではなく `lib64/` に入ることがあります。インストールされるファイルは [CMake のリファレンス](../reference/cmake.md#パッケージ)にあります。
+- **Debug ビルド**: ライブラリの名前の末尾に `d` が付きます（`-lnaosd`）。MSVC では、ライブラリは `naos.lib`（`naosd.lib`）です。
+- **共有ライブラリ**: テストをコンパイルするときに `NAOS_SHARED` を定義し（`-DNAOS_SHARED`）、テストの実行時にライブラリが見つかるようにします（[共有ライブラリ](../guides/shared-library.md)）。
+- **ディレクトリ**: `GNUInstallDirs` に従うので、ライブラリが `lib/` ではなく `lib64/` に入ることがあります。インストールされるファイルは [CMake のリファレンス](../reference/cmake.md#パッケージ)にあります。
 
-Naos のビルドを通さずに、`src/` のソースを自分のプロジェクトでビルドする方法はサポートしていません。
+Naos のビルドを通さずに、`src/` のソースを自分のプロジェクトでビルドする方法は、サポートしていません。
 
 CTest を使わずにテストを 1 つずつ別のプロセスで実行する方法は、[CTest と CI](../guides/ctest-and-ci.md#ctest-を使わない場合) にあります。
 

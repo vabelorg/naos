@@ -45,15 +45,23 @@ The path is relative to the working directory. Under CTest, every test of an exe
 | `<failure>` | For each failure of a failed test, in the order they happened | `type`: always `error`. `message`: the text of the `error` diagnostic line ([output](output.md#diagnostic-lines)): the expression of the assertion, the message of `NAOS_FAIL`, or the mistake with traces |
 | `<skipped>` | In a skipped test | `message`: the message of `NAOS_SKIP` |
 
-A test case holds the `<failure>` elements when the test failed, one `<skipped>` when it was skipped, and nothing when it passed. A test that fails and then skips has its failures only. The tests that `--naos-fail-fast` left out have no test case. Naos writes no `timestamp` and no `<system-out>`, since it does not capture what the tests print.
+A test case holds the `<failure>` elements when the test failed, one `<skipped>` when it was skipped, and nothing when it passed. A test that fails and then skips has its failures only.
 
-A `time` is in seconds, with three decimals and rounded down to the millisecond (`time="3.120"`), as the tools of JUnit XML read it. The time of a test case is the time its result line shows on standard output: setup, body and teardown, with the clock that `--help` names ([times](output.md#times)). The time of a suite or of the whole file is the sum of the exact times of its test cases, rounded down once, so it may be a little more than the sum of the times written. The times change from run to run, so the file does too.
+The tests that `--naos-fail-fast` left out have no test case. Naos writes no `timestamp` and no `<system-out>`, since it does not capture what the tests print.
+
+A `time` is in seconds, with three decimals and rounded down to the millisecond (`time="3.120"`), as the tools of JUnit XML read it.
+
+The time of a test case is the time its result line shows on standard output: setup, body and teardown, with the clock that `--help` names ([times](output.md#times)). The time of a suite or of the whole file is the sum of the exact times of its test cases, rounded down once, so it may be a little more than the sum of the times written. The times change from run to run, so the file does too.
 
 The text of a `<failure>` is the diagnostic as standard output writes it: the `error` line, its detail lines with the values, the note and the traces ([output](output.md)). CI services show it as it is, so that a failure reads the same in CI as in a terminal. It is written for people, as standard output is.
 
 ## Text
 
-The file is UTF-8. Every text is escaped for XML (`&amp;`, `&lt;`, `&gt;`, and `&quot;` and `&apos;` in attributes; line breaks and tabs in attributes as `&#10;` and `&#9;`; carriage returns as `&#13;`). Valid UTF-8 is kept as it is, so that a message written in any language reads as written. A byte that is not part of valid UTF-8, and a control character that XML 1.0 does not allow (below 0x20, except line breaks, tabs and carriage returns), is written as `\xNN`; such a text cannot always be told apart from one that holds `\xNN` itself. The values of strings are written as on standard output ([value formats](output.md#value-formats)), which leaves only printable ASCII.
+The file is UTF-8. Every text is escaped for XML (`&amp;`, `&lt;`, `&gt;`, and `&quot;` and `&apos;` in attributes; line breaks and tabs in attributes as `&#10;` and `&#9;`; carriage returns as `&#13;`).
+
+Valid UTF-8 is kept as it is, so that a message written in any language reads as written. A byte that is not part of valid UTF-8, and a control character that XML 1.0 does not allow (below 0x20, except line breaks, tabs and carriage returns), is written as `\xNN`; such a text cannot always be told apart from one that holds `\xNN` itself.
+
+The values of strings are written as on standard output ([value formats](output.md#value-formats)), which leaves only printable ASCII.
 
 ## Compatibility
 

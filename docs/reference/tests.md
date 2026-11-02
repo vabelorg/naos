@@ -84,9 +84,11 @@ NAOS_SET_SETUP(name)
 NAOS_SET_TEARDOWN(name)
 ```
 
-Listed among the entries of `NAOS_SUITE`, `NAOS_SET_SETUP(name)` calls the function defined by `NAOS_SETUP(name)` before each test of the suite and `NAOS_SET_TEARDOWN(name)` calls the one defined by `NAOS_TEARDOWN(name)` after each. Both are optional and apply to the whole suite wherever they are written (first is recommended). Each may appear once per suite; a second one is reported before any test runs, with exit code 2.
+Listed among the entries of `NAOS_SUITE`, `NAOS_SET_SETUP(name)` calls the function defined by `NAOS_SETUP(name)` before each test of the suite and `NAOS_SET_TEARDOWN(name)` calls the one defined by `NAOS_TEARDOWN(name)` after each.
 
-- `NAOS_SETUP(name)` and `NAOS_TEARDOWN(name)` define `naos_gen_setup_<name>` and `naos_gen_teardown_<name>`. Naming a teardown in `NAOS_SET_SETUP` (or a setup in `NAOS_SET_TEARDOWN`) does not compile ([generated names](#generated-names)).
+Both are optional and apply to the whole suite wherever they are written (first is recommended). Each may appear once per suite; a second one is reported before any test runs, with exit code 2.
+
+- `NAOS_SETUP(name)` and `NAOS_TEARDOWN(name)` define `naos_gen_setup_<name>` and `naos_gen_teardown_<name>`. Mixing up a setup and a teardown does not compile ([generated names](#generated-names)).
 - When setup ends with a fatal failure or a skip, the body of the test does not run.
 - Teardown always runs, even when setup or the body stopped halfway. Write it so that it can clean up what was only partly set up.
 - Failures in setup and teardown count as failures of the test.
@@ -128,11 +130,15 @@ int  naos_run(void);
 
 Call these instead of `NAOS_MAIN` to parse arguments of your own or to choose suites at run time. The order is `naos_init()` once, `NAOS_ADD_SUITE` any number of times, then `naos_run()` once.
 
-- `naos_init()` removes the options of Naos (`--naos-*`) wherever they are in `argv`, moves the remaining arguments up in their order, and decreases `*argc`. `--help` stays in `argv`, so that the program can print its own help too. Help and usage errors are printed here. `naos_run()` then runs no test: it still collects the suites and reports their mistakes, and returns 2 after a usage error or a mistake in the suites, 0 after `--help` otherwise.
+- `naos_init()` removes the options of Naos (`--naos-*`) wherever they are in `argv`, moves the remaining arguments up in their order, and decreases `*argc`.
+  - `--help` stays in `argv`, so that the program can print its own help too.
+  - Help and usage errors are printed here. `naos_run()` then runs no test: it still collects the suites and reports their mistakes, and returns 2 after a usage error or a mistake in the suites, 0 after `--help` otherwise.
 - `NAOS_ADD_SUITE(name)` registers a suite to run after those registered before it.
 - `naos_run()` collects the suites, reports every mistake in them, runs the selected tests and returns the exit code ([exit codes](command-line.md#exit-codes)). When the memory to collect the suites cannot be allocated, it reports it in one line, runs nothing and returns 1.
 
-An example is in the [custom main() guide](../guides/custom-main.md).
+Note also:
 
 - A call out of order prints a message: `naos_run()` returns 2, and `naos_init()` and `NAOS_ADD_SUITE` exit with code 2. Calling `NAOS_ADD_SUITE` from a test or a suite function is a call out of order too.
 - CMake registers the tests with CTest from `--naos-list` run without arguments. Suites that are registered only for some arguments are not in CTest; run the executable directly to use them.
+
+An example is in the [custom main() guide](../guides/custom-main.md).

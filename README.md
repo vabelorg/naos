@@ -9,7 +9,7 @@ English · [日本語](README.ja.md)
 > [!NOTE]
 > On the `main` branch, this README and the documentation may describe changes not released yet, breaking ones included. If you use a released version, read them at its tag, such as the [latest release](https://github.com/vabelorg/naos/releases/latest). The changes not released yet are under `[Unreleased]` in the [changelog](CHANGELOG.md).
 
-A test harness for C and C++. No dependency besides the standard C library, no compiler extension: plain C99, built with CMake and usable from any build system.
+A test harness for C and C++ that needs only a C99 compiler: no library to install, no compiler extension. Built with CMake and usable from any build system.
 
 ```c
 #include <naos/naos.h>
@@ -99,8 +99,8 @@ The [quickstart](docs/getting-started/quickstart.md) walks through it in five mi
 | | |
 |---|---|
 | **Start** | [Installation](docs/getting-started/installation.md) · [Quickstart](docs/getting-started/quickstart.md) · [Tutorial](docs/getting-started/tutorial.md) |
-| **Use** | [Guides](docs/guides/) · [Troubleshooting](docs/guides/troubleshooting.md) · [Examples](examples/) |
-| **Look up** | [Reference](docs/reference/): tests, assertions, command line, output, JUnit XML, CMake |
+| **Use** | [Guides](docs/guides/) · [Troubleshooting](docs/guides/troubleshooting.md) |
+| **Look up** | [Tests](docs/reference/tests.md) · [Assertions](docs/reference/assertions.md) · [Failing, skipping and notes](docs/reference/control.md) · [Version](docs/reference/version.md) · [Command line](docs/reference/command-line.md) · [Output](docs/reference/output.md) · [JUnit XML](docs/reference/xml.md) · [CMake](docs/reference/cmake.md) |
 
 The whole map is in [docs/](docs/README.md).
 

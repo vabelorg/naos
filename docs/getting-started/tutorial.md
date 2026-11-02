@@ -1,6 +1,15 @@
 # Tutorial
 
-This tutorial tests a small string buffer, step by step, with the things most tests need: several files, `CHECK` and `REQUIRE`, setup and teardown, reading failures, notes, and running only some of the tests. It assumes the [quickstart](quickstart.md) is done. The finished project is [examples/tutorial](../../examples/tutorial/).
+This tutorial tests a small string buffer, step by step, with the things most tests need:
+
+- several files
+- `CHECK` and `REQUIRE`
+- setup and teardown
+- reading failures
+- notes
+- running only some of the tests
+
+It assumes the [quickstart](quickstart.md) is done. The finished project is [examples/tutorial](../../examples/tutorial/).
 
 ## The code to test
 
@@ -56,11 +65,16 @@ NAOS_MAIN(
 )
 ```
 
-`NAOS_DECLARE_SUITE(strbuf);` declares the suite defined in another file. Suite names must be unique within an executable; test functions are `static`, so two files may use the same test names.
+`NAOS_DECLARE_SUITE(strbuf);` declares the suite defined in another file.
+
+- Suite names must be unique within an executable.
+- Test functions are `static`, so two files may use the same test names.
 
 ## Setup and teardown
 
-Suppose every test should start with an empty buffer. Creating and freeing it in each test is tedious. Instead, put the creation in a setup and the freeing in a teardown. Setup runs before each test, and teardown after it:
+Suppose every test should start with an empty buffer. Creating and freeing it in each test is tedious.
+
+Instead, put the creation in a setup and the freeing in a teardown. Setup runs before each test, and teardown after it:
 
 ```c
 /* strbuf_test.c */
@@ -140,7 +154,10 @@ strbuf_test.c:33: error: 12 == sb.length
 FAIL: strbuf.append_joins (2 failures, 0 ms)
 ```
 
-Both checks failed and both are reported, because `CHECK` went on after the first. For strings, `first difference` points at the first byte that differs. Every line of this output is described in [output](../reference/output.md).
+- Both checks failed and both are reported, because `CHECK` went on after the first.
+- For strings, `first difference` points at the first byte that differs.
+
+Every line of this output is described in [output](../reference/output.md).
 
 ## Notes in loops
 
@@ -162,7 +179,9 @@ NAOS_TEST(append_grows)
 }
 ```
 
-The note is printed only when the next assertion fails, as `note: append 37` for instance; a passing assertion prints nothing. To show where a helper function was called from, through nested calls, use traces instead ([diagnostics](../guides/diagnostics.md)).
+The note is printed only when the next assertion fails, as `note: append 37` for instance; a passing assertion prints nothing.
+
+To show where a helper function was called from, through nested calls, use traces instead ([diagnostics](../guides/diagnostics.md)).
 
 ## Running only some of the tests
 
@@ -188,7 +207,9 @@ SUMMARY: 2 passed, 0 failed, 0 skipped (0 ms)
 
 ## Hidden dependencies
 
-All the tests run in one process, so `static` variables keep their values from one test to the next. A test can then come to depend on state an earlier test left behind. `--naos-shuffle` runs the tests in a shuffled order and prints the seed it used. Combined with `--naos-repeat`, each repetition uses a different order:
+All the tests run in one process, so `static` variables keep their values from one test to the next. A test can then come to depend on state an earlier test left behind.
+
+`--naos-shuffle` runs the tests in a shuffled order and prints the seed it used. Combined with `--naos-repeat`, each repetition uses a different order:
 
 ```sh
 ./build/strbuf_tests --naos-shuffle --naos-repeat 20

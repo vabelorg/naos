@@ -4,15 +4,13 @@ How the documentation of Naos is organized and written. Read it before adding or
 
 ## Languages
 
-- English is the source. Every page is written in English first, under `docs/` (and `README.md`; `CONTRIBUTING.md`, `SECURITY.md` and `CODE_OF_CONDUCT.md` live in `docs/` too).
-- Japanese is a full translation: `docs/ja/` mirrors `docs/` file by file, with the same names, and `README.ja.md` translates the English file next to it. `docs/ja/CODE_OF_CONDUCT.md` is the official Japanese translation of the Contributor Covenant, not ours.
-- A change to an English page does not wait for its translation. The translation follows in a later pull request, and a change that only fixes the English wording needs none.
-- `CHANGELOG.md` is in English only, with no Japanese translation.
-- The comments of the code are in English only, in the sources and in `examples/`. A translated page translates the comments of its code samples too; the code itself and the file names stay as they are.
+- English is the source. Every page is written in English first, under `docs/` and `README.md`.
+- An English page and its translation need not change in the same pull request.
+- A translated page translates the comments of its code samples too; the code and the file names stay as they are.
 
 ## Where a page goes
 
-The pages are of three kinds, plus a part for contributors. A page belongs to one kind; when it needs another kind, it links to it.
+Pages are divided into the four parts below. A page belongs to one part; when it needs another part, it links to it.
 
 | Directory | Kind | A page |
 |---|---|---|

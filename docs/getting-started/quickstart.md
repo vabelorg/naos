@@ -1,6 +1,14 @@
 # Quickstart
 
-From an empty directory to tests run by CTest, in five minutes. You need a C compiler, CMake 3.21 or later and Git. The four files built below, `clamp.h`, `clamp.c`, `clamp_test.c` and `CMakeLists.txt`, go in the same directory. The finished project is [examples/quickstart](../../examples/quickstart/).
+From an empty directory to tests run by CTest, in five minutes.
+
+You need:
+
+- a C compiler
+- CMake 3.21 or later
+- Git
+
+The four files built below (`clamp.h`, `clamp.c`, `clamp_test.c` and `CMakeLists.txt`) go in the same directory. The finished project is [examples/quickstart](../../examples/quickstart/).
 
 ## 1. The code to test
 
@@ -39,7 +47,11 @@ int clamp(int value, int low, int high)
 
 ## 2. The tests
 
-The tests check `clamp()` in three cases: a value inside the range comes back unchanged (`inside_range`), a value under the lower bound becomes `low` (`below_range`), and a value over the upper bound becomes `high` (`above_range`).
+The tests check `clamp()` in three cases:
+
+- `inside_range`: a value inside the range comes back unchanged.
+- `below_range`: a value under the lower bound becomes `low`.
+- `above_range`: a value over the upper bound becomes `high`.
 
 ```c
 /* clamp_test.c */
@@ -133,9 +145,9 @@ CTest runs each test in a process of its own and names it `<target>.<suite>.<tes
 100% tests passed, 0 tests failed out of 3
 ```
 
-This generated the test executable `clamp_tests`, and its three tests ran as separate CTest tests and all passed. That is how easy testing C is with Naos: write the tests, add a few lines to CMake, and run them.
+The test executable `clamp_tests` was built, and its three tests ran as separate CTest tests and all passed. That is how easy testing C is with Naos: write the tests, add a few lines to CMake, and run them.
 
-The executable also runs on its own, all its tests in one process. The following is an example with a single-config generator such as Makefiles or Ninja:
+The executable also runs on its own, all its tests in one process. Here is an example with a single-config generator such as Makefiles or Ninja:
 
 ```
 $ ./build/clamp_tests
@@ -170,7 +182,9 @@ PASS: clamp.above_range (0 ms)
 SUMMARY: 2 passed, 1 failed, 0 skipped (0 ms)
 ```
 
-Only `inside_range` fails; the other two still pass. A failing test does not stop the rest from running. The failure output reads like this:
+Only `inside_range` fails; the other two still pass. A failing test does not stop the rest from running.
+
+The failure output reads like this:
 
 - The `error` line has the form of a compiler diagnostic, `file:line: error: ...`, so editors can jump to it.
 - The expression is the assertion's arguments as written; `left` and `right` are their values.

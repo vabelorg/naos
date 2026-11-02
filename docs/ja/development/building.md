@@ -26,7 +26,7 @@ cmake --build --preset default
 ctest --preset default
 ```
 
-`shared` で同じことをすると、共有ビルドを確かめられます。ライブラリや CMake のファイルに触れる変更は、送る前に両方で実行してください。`release` は最適化でしか見つからないものを示します。`test.c` は `longjmp` でテストを止めるので、最適化したビルドでも成り立たなければならず、GCC の `-Wclobbered` のように最適化が要る警告もあります。`sanitize` はライブラリとテストのメモリの誤りと未定義動作を見つけます。CI は両方を実行します。
+`shared` で同じことをすると、共有ビルドを確かめられます。ライブラリや CMake のファイルに触れる変更は、送る前に両方で実行してください。`release` は最適化でしか見つからないものを示します。`test.c` は `longjmp` でテストを止めるので、最適化したビルドでも成り立たなければならず、GCC の `-Wclobbered` のように最適化が要る警告もあります。`sanitize` はライブラリとテストのメモリの誤りと未定義動作を見つけます。CI は 4 つすべてを実行します。
 
 Windows の MinGW-w64 では、CI と同じく、MSYS2 のシェル（UCRT64 または MINGW64）で、その `gcc`・`cmake`・`ninja` のパッケージを入れ、`CMAKE_GENERATOR=Ninja` にして実行します。
 
@@ -54,7 +54,7 @@ ctest --test-dir build --output-on-failure
 
 ```sh
 ctest --preset default -L contract                             # 1 つの層
-ctest --preset default -R '^naos\.behavior\.command-line\.'   # 1 つの領域
+ctest --preset default -R '^naos\.behavior\.command-line\.'    # 1 つの領域
 ctest --preset default -LE slow                                # プロジェクトをビルドするケース以外すべて
 ctest --preset default -j8                                     # 並列
 ```
@@ -69,7 +69,7 @@ ctest --preset default -j8                                     # 並列
 cmake --install build/default --prefix /tmp/naos-install
 ```
 
-インストールされる配置は [CMake のリファレンス](../reference/cmake.md#パッケージ)にあります。プロジェクトからは `find_package(Naos)` と `-DCMAKE_PREFIX_PATH=/tmp/naos-install` で使えます。`tests/consumer/` がそのようなプロジェクトです。`cmake -D PRESET=<preset> -P scripts/TestPackage.cmake` が、ビルドしたプリセットをインストールしてこのプロジェクトをテストします。CI もビルドごとにこれを実行します。
+インストールされる配置は [CMake のリファレンス](../reference/cmake.md#パッケージ)にあります。プロジェクトからは `find_package(Naos)` と `-DCMAKE_PREFIX_PATH=/tmp/naos-install` で使えます。`tests/consumer/` がそのようなプロジェクトです。`cmake -D PRESET=<preset> -P scripts/TestPackage.cmake` が、ビルドしたプリセットをインストールしてこのプロジェクトをテストします。CI も `sanitize` 以外のビルドごとにこれを実行します。
 
 ## 継続的インテグレーション
 
@@ -80,5 +80,3 @@ cmake --install build/default --prefix /tmp/naos-install
 | `lint` | `cmake -D ROOT=. -P scripts/Lint.cmake`（[lint](testing.md#lint)） |
 | `test` | プリセットで configure、ビルド、`ctest`。続いて `sanitize` 以外では `cmake -D PRESET=<preset> -P scripts/TestPackage.cmake`（[インストールする](#インストールする)）。Linux の GCC で `default`、`shared`、`release`、`sanitize`、および `default` を対応するいちばん古い CMake 3.21 で。Linux の Clang で `default` と `release`。macOS の Clang で `default` と `shared`。MSVC で `default`、`shared`、`release` |
 | `mingw` | 同じことを MSYS2 の MinGW-w64 の GCC で。UCRT64 で `default` と `shared`、MINGW64 で `default`。MINGW64 は、printf が C99 に従わない Windows の古い C ライブラリ msvcrt のためにある（[コーディングスタイル](coding-style.md#書式付きの出力)） |
-
-すべてのジョブが通った変更だけをマージします。

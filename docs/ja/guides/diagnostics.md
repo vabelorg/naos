@@ -25,7 +25,9 @@ parser_test.c:57: error: expected[i] == actual[i]
 
 ## ヘルパーをどこから呼んだかを表示する
 
-アサーションをヘルパー関数にまとめると、失敗の行はヘルパーの中を指します。どの呼び出しで失敗したかを分かるようにするには、呼び出しを `NAOS_TRACE_PUSH` と `NAOS_TRACE_POP` で挟みます。挟んだ範囲で失敗すると、失敗の行に続けて、`NAOS_TRACE_PUSH` を書いた行とそのメモが表示されます。ヘルパーの中でさらに挟むこともでき、その場合は内側のものから順にすべて表示されます。
+アサーションをヘルパー関数にまとめると、失敗の行はヘルパーの中を指します。どの呼び出しで失敗したかを分かるようにするには、呼び出しを `NAOS_TRACE_PUSH` と `NAOS_TRACE_POP` で挟みます。
+
+挟んだ範囲で失敗すると、失敗の行に続けて、`NAOS_TRACE_PUSH` を書いた行とそのメモが表示されます。ヘルパーの中でさらに挟むこともでき、その場合は内側のものから順にすべて表示されます。
 
 ```c
 static void check_order(const struct order *order)
@@ -63,7 +65,9 @@ order_test.c:22: note: item 3
 order_test.c:34: note: order 1
 ```
 
-`NAOS_TRACE_PUSH` と `NAOS_TRACE_POP` は必ず対にしてください。ただし、挟んだ範囲でテストが止まり、`NAOS_TRACE_POP` まで実行されなかった場合は、それを補う必要はありません。対にし忘れた場合の扱いは [trace](../reference/control.md#trace) にあります。
+`NAOS_TRACE_PUSH` と `NAOS_TRACE_POP` は必ず対にしてください。
+
+ただし、挟んだ範囲でテストが止まり、`NAOS_TRACE_POP` まで実行されなかった場合は、それを補う必要はありません。対にし忘れた場合の扱いは [trace](../reference/control.md#trace) にあります。
 
 ## ヘルパーの中でテストを止める
 

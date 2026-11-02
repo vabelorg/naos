@@ -12,7 +12,11 @@ The options of every test executable, for choosing tests and changing how they r
 
 To stop in a test under a debugger, put a breakpoint on `naos_gen_test_<name>`, the name of the function that `NAOS_TEST` defines. See [generated names](../reference/tests.md#generated-names).
 
-In a pattern, `*` matches any string and `?` any one character. Separate several patterns with `:`, and put the patterns to exclude after a `-`. Quote the patterns, such as `'parser.*'`, so that the shell does not expand `*` and `?`.
+In a pattern, `*` matches any string and `?` any one character.
+
+- Separate several patterns with `:`.
+- Put the patterns to exclude after a `-`.
+- Quote the patterns, such as `'parser.*'`, so that the shell does not expand `*` and `?`.
 
 | Filter | Tests run |
 |---|---|
@@ -38,11 +42,16 @@ FAIL: parser.nested (1 failure, 0 ms)
 SUMMARY: 211 passed, 1 failed, 0 skipped (1834 ms)
 ```
 
-The tests that are skipped are only counted in the summary. A test that ends the process, such as by a crash, leaves no line naming it: run the same command again without `--naos-quiet` to see which one it was. The lines that are left out are listed in [output](../reference/output.md#with---naos-quiet).
+- The tests that are skipped are only counted in the summary.
+- A test that ends the process, such as by a crash, leaves no line naming it: run the same command again without `--naos-quiet` to see which one it was.
+
+The lines that are left out are listed in [output](../reference/output.md#with---naos-quiet).
 
 ## Find hidden dependencies
 
-The tests run in registration order, in one process. A test that unknowingly depends on the state an earlier test left behind may pass only thanks to that order. `--naos-shuffle` shuffles the order of the suites and of the tests within each suite, so that such dependencies show up as failures.
+The tests run in registration order, in one process. A test that unknowingly depends on the state an earlier test left behind may pass only thanks to that order.
+
+`--naos-shuffle` shuffles the order of the suites and of the tests within each suite, so that such dependencies show up as failures.
 
 ```
 $ ./my_tests --naos-shuffle
@@ -55,9 +64,9 @@ After a failure, give the seed of the `RANDOM SEED` line to `--naos-random-seed`
 
 ## Find flaky tests
 
-A test that fails only once in a while is found by running it many times with `--naos-repeat`. With `--naos-shuffle`, each iteration runs in another order, and the `ITERATION FAILED` line of a failed iteration gives its seed. `--naos-fail-fast` stops at the first failure.
+A test that fails only once in a while is found by running it many times with `--naos-repeat`. With `--naos-shuffle`, each iteration runs in another order, and the `ITERATION FAILED` line of a failed iteration gives its seed.
 
-This runs the tests 50 times in random orders and stops at the first failure:
+`--naos-fail-fast` stops at the first failure. This runs the tests 50 times in random orders and stops at the first failure:
 
 ```sh
 ./my_tests --naos-shuffle --naos-repeat 50 --naos-fail-fast
@@ -76,10 +85,15 @@ PASS: storage.rebuild_index (3120 ms)
 SUMMARY: 2 passed, 0 failed, 0 skipped (3120 ms)
 ```
 
-A test that a change made slower shows on its line. To list the slowest tests, sort the result lines by their time, or the test cases of the [JUnit XML](../reference/xml.md) file of `--naos-output` by `time`. Slow tests named after a pattern, such as `slow_*`, can be left out of the edit-and-run loop with `--naos-filter '-*.slow_*'`. The times also help to choose the time limit of CTest (`--timeout`, [CTest and CI](ctest-and-ci.md)).
+A test that a change made slower shows on its line. The times also help to choose the time limit of CTest (`--timeout`, [CTest and CI](ctest-and-ci.md)).
+
+- To list the slowest tests, sort the result lines by their time, or the test cases of the [JUnit XML](../reference/xml.md) file of `--naos-output` by `time`.
+- Slow tests named after a pattern, such as `slow_*`, can be left out of the edit-and-run loop with `--naos-filter '-*.slow_*'`.
 
 The times are wall-clock time. On a system without a monotonic clock, they are processor time, which `--help` says ([times](../reference/output.md#times)).
 
 ## Run each test in its own process
 
-Running every test in one process is fast, but a crash ends the run and a hang never ends it. To isolate tests, run them in parallel, or give them a time limit, see [CTest and CI](ctest-and-ci.md).
+Running every test in one process is fast, but a crash ends the run and a hang never ends it.
+
+To isolate tests, run them in parallel, or give them a time limit, see [CTest and CI](ctest-and-ci.md).

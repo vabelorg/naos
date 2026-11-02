@@ -64,7 +64,9 @@ NAOS_CHECK_STR_EQ("root", node->name);
 
 ## Compare a type that has no assertion
 
-For a type with no assertion of its own, such as a structure, write a small macro that compares with `NAOS_CHECK_TRUE` and prints the values with `NAOS_NOTE`. Make it a macro rather than a function, so that the failure points at the line that uses it. Each argument is evaluated more than once, so do not pass expressions with side effects such as `points[i++]`.
+For a type with no assertion of its own, such as a structure, write a small macro that compares with `NAOS_CHECK_TRUE` and prints the values with `NAOS_NOTE`.
+
+Make it a macro rather than a function, so that the failure points at the line that uses it. Each argument is evaluated more than once, so do not pass expressions with side effects such as `points[i++]`.
 
 ```c
 #define CHECK_POINT_EQ(a, b) \
