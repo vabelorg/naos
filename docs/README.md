@@ -1,5 +1,8 @@
 # Naos documentation
 
+> [!NOTE]
+> On the `main` branch, this documentation may describe changes not released yet, breaking ones included. If you use a released version, read it at its tag, such as the [latest release](https://github.com/vabelorg/naos/releases/latest).
+
 ## New to Naos
 
 1. [Installation](getting-started/installation.md): requirements, and the ways to bring Naos into a project

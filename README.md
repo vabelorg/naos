@@ -6,6 +6,9 @@ English · [日本語](README.ja.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![C99](https://img.shields.io/badge/C-99-blue.svg)
 
+> [!NOTE]
+> On the `main` branch, this README and the documentation may describe changes not released yet, breaking ones included. If you use a released version, read them at its tag, such as the [latest release](https://github.com/vabelorg/naos/releases/latest). The changes not released yet are under `[Unreleased]` in the [changelog](CHANGELOG.md).
+
 A test harness for C and C++. No dependency besides the standard C library, no compiler extension: plain C99, built with CMake and usable from any build system.
 
 ```c
