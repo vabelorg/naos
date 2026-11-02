@@ -83,11 +83,11 @@ The links of the documentation are checked by a [lint](#lint) script, not by a s
 Checks that read the sources and need no build are scripts of `scripts/`, not self tests: they would otherwise wait for the whole build, and run again with every preset and compiler of CI for the same result. The `lint` job of CI runs them once, before any build; run them from the root of Naos:
 
 ```sh
-cmake -D ROOT=. -P scripts/CheckLinks.cmake    # the links of the documentation
-cmake -D ROOT=. -P scripts/CheckFormat.cmake   # the formatted output of src/
+cmake -D ROOT=. -P scripts/CheckMarkdownLinks.cmake   # the links of the Markdown files
+cmake -D ROOT=. -P scripts/CheckPrintfCalls.cmake     # the printf calls of src/
 ```
 
 | Script | Checks |
 |---|---|
-| `CheckLinks.cmake` | Every relative link of the Markdown files leads to a file that exists, and every `#anchor` to a heading of that file |
-| `CheckFormat.cmake` | The sources of `src/` call the formatted output functions through `format.h` ([coding style](coding-style.md#formatted-output)) |
+| `CheckMarkdownLinks.cmake` | Every relative link of the Markdown files leads to a file that exists, and every `#anchor` to a heading of that file |
+| `CheckPrintfCalls.cmake` | The sources of `src/` call the formatted output functions through `format.h` ([coding style](coding-style.md#formatted-output)) |

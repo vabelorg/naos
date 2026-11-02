@@ -83,11 +83,11 @@ SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
 ソースを読むだけでビルドを必要としない検査は、自己テストではなく `scripts/` のスクリプトです。自己テストにすると、ビルド全体が終わるまで待つことになり、CI のプリセットとコンパイラの数だけ同じ結果のために繰り返されるためです。CI の `lint` ジョブが、ビルドの前に 1 回だけ実行します。手元では Naos のルートで実行します。
 
 ```sh
-cmake -D ROOT=. -P scripts/CheckLinks.cmake    # 文書のリンク
-cmake -D ROOT=. -P scripts/CheckFormat.cmake   # src/ の書式付きの出力
+cmake -D ROOT=. -P scripts/CheckMarkdownLinks.cmake   # Markdown ファイルのリンク
+cmake -D ROOT=. -P scripts/CheckPrintfCalls.cmake     # src/ の printf 系の呼び出し
 ```
 
 | スクリプト | 確かめること |
 |---|---|
-| `CheckLinks.cmake` | Markdown ファイルのすべての相対リンクが存在するファイルを指し、すべての `#アンカー` がそのファイルの見出しを指していること |
-| `CheckFormat.cmake` | `src/` のソースが、書式付きの出力関数を `format.h` を通して呼ぶこと（[コーディング規約](coding-style.md#書式付きの出力)） |
+| `CheckMarkdownLinks.cmake` | Markdown ファイルのすべての相対リンクが存在するファイルを指し、すべての `#アンカー` がそのファイルの見出しを指していること |
+| `CheckPrintfCalls.cmake` | `src/` のソースが、書式付きの出力関数を `format.h` を通して呼ぶこと（[コーディング規約](coding-style.md#書式付きの出力)） |

@@ -20,11 +20,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Links of the documentation
-        run: cmake -D ROOT=. -P scripts/CheckLinks.cmake
+      - name: Links of the Markdown files
+        run: cmake -D ROOT=. -P scripts/CheckMarkdownLinks.cmake
 
-      - name: Formatted output of src/
-        run: cmake -D ROOT=. -P scripts/CheckFormat.cmake
+      - name: printf calls of src/
+        run: cmake -D ROOT=. -P scripts/CheckPrintfCalls.cmake
 
   test:
     name: ${{ matrix.toolchain }} (${{ matrix.preset }})

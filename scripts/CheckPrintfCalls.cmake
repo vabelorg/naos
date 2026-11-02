@@ -4,14 +4,14 @@
 # Checks that the sources of src/ call the formatted output functions through src/format.h
 # (naos_printf, naos_snprintf, ...), never printf, snprintf and the others directly: those are not
 # C99 on every platform (src/format.h tells why). Comments are not checked. Needs no build: run by
-# the lint job of CI, and by hand with  cmake -D ROOT=. -P scripts/CheckFormat.cmake
+# the lint job of CI, and by hand with  cmake -D ROOT=. -P scripts/CheckPrintfCalls.cmake
 #
 # -D ROOT=<path>   root of Naos
 
 cmake_minimum_required(VERSION 3.21)
 
 if(NOT DEFINED ROOT)
-    message(FATAL_ERROR "CheckFormat.cmake: -D ROOT=<path> is required")
+    message(FATAL_ERROR "CheckPrintfCalls.cmake: -D ROOT=<path> is required")
 endif()
 # A relative ROOT, such as ".", is taken from the current directory.
 get_filename_component(ROOT "${ROOT}" ABSOLUTE)

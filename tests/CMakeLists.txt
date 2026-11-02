@@ -27,9 +27,9 @@
 # Not a self test, but configured on its own by CI after installing Naos:
 #   package/    a project using the installed package with find_package(Naos <version>)
 #
-# The checks that read the sources and need no build (the links of the documentation, the formatted
-# output of src/) are not here: they are scripts/CheckLinks.cmake and scripts/CheckFormat.cmake,
-# run once by the lint job of CI.
+# The checks that read the sources and need no build (the links of the Markdown files, the printf
+# calls of src/) are not here: they are scripts/CheckMarkdownLinks.cmake and
+# scripts/CheckPrintfCalls.cmake, run once by the lint job of CI.
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/support/NaosSelftest.cmake)
 
