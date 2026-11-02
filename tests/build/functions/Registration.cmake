@@ -125,6 +125,10 @@ endif()
 
 # 3. New arguments, the executable unchanged.
 if(GENERATOR MATCHES "Ninja|Makefiles" AND NOT MULTI_CONFIG)
+    # The make of macOS (GNU make 3.81) compares times to the second: a parameter file rewritten in
+    # the second the executable was linked is not newer than it, and the executable is not linked
+    # again. Waiting a second keeps the test from depending on when within a second the build ended.
+    execute_process(COMMAND "${CMAKE_COMMAND}" -E sleep 1)
     nested_reconfigure("${binary}" -D LISTED_PREFIX=second. -D LISTED_LABELS=l3)
     nested_build("${binary}")
     nested_ctest_json(json "${binary}")
