@@ -52,10 +52,17 @@ static void put_format(naos_human_sink_t sink, void *context, const char *format
 /*
  * Gives where a diagnostic happened, followed by a space, in the form of the diagnostics of the
  * compiler Naos is built with: "<file>(<line>): " for MSVC, "<file>:<line>: " otherwise. This is
- * the only place that depends on the compiler.
+ * the only place that depends on the compiler. A diagnostic without a location, a NULL file, gives
+ * "naos: ", as compilers name themselves.
  */
 static void put_location(naos_human_sink_t sink, void *context, const char *file, int line)
 {
+    if (file == NULL)
+    {
+        sink(context, "naos: ");
+        return;
+    }
+
     sink(context, file);
 #if defined(_MSC_VER)
     put_format(sink, context, "(%d): ", line);

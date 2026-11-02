@@ -1,5 +1,7 @@
 # Failing, skipping and notes
 
+What stops a test, what makes it fail or skip, and the notes and traces that go with its failures.
+
 ## How a test stops
 
 A failure of `NAOS_REQUIRE*`, `NAOS_FAIL` and `NAOS_SKIP` stop the test with `longjmp`. They work from a function deep inside helpers, or from a function that returns a value, with nothing to write at the callers.
@@ -59,6 +61,47 @@ Records the test as skipped and stops it, recording no failure; it does not retu
 - When every test run was skipped, the exit code is 77, which CTest counts as skipped. `--naos-fail-fast` does not stop on a skip.
 
 An example is in [writing tests](../guides/writing-tests.md#skip-a-test-whose-conditions-are-not-met).
+
+## A test that runs no assertion
+
+A test that runs no assertion fails, so that a test that checks nothing does not read as a pass: an empty or unfinished test, a loop over a table with no case, an early `return` before the assertions, or a helper holding them that is never called.
+
+```
+RUN: parser.parses_negative_numbers
+naos: error: no assertion ran
+  hint: check something, or call NAOS_PASS() when the check is that the code runs
+FAIL: parser.parses_negative_numbers (1 failure, 0 ms)
+```
+
+- What counts: every `NAOS_CHECK*` and `NAOS_REQUIRE*` that runs, whether it passes or fails, `NAOS_PASS`, `NAOS_FAIL` and `NAOS_SKIP`. The count is made as the test runs, so an assertion in a helper counts, and one written but never reached does not.
+- What does not count: `NAOS_NOTE`, `NAOS_TRACE_PUSH` and `NAOS_TRACE_POP`, and what the test prints.
+- Setup, the body and teardown count together: a suite whose setup or teardown checks something for every test has no test reported.
+- Only a test that would pass is reported. A test that failed or skipped already says what happened, and is left as it is.
+- The failure has no location, since a test has none: its diagnostic line starts with `naos: ` ([output](output.md#diagnostic-lines)), and in the [JUnit XML](xml.md) file its test case has no `file` and `line`.
+- It is a failure like the others: the exit code is 1, `--naos-fail-fast` stops at it, and `--naos-quiet` writes it.
+
+`--naos-allow-no-assertions` lets such a test pass, as before Naos 0.4 ([command line](command-line.md#options)); `ALLOW_NO_ASSERTIONS` of the [CMake functions](cmake.md#functions) gives it to every test they register.
+
+### Pass
+
+```c
+NAOS_PASS()
+```
+
+An assertion that always passes, for a test whose check is that the code runs: one that only checks that a call returns without crashing, for example. It counts as an assertion and does nothing else; the test goes on.
+
+```c
+NAOS_TEST(close_twice_is_harmless)
+{
+    file_t *file = file_open("data.bin");
+
+    file_close(file);
+    file_close(file);   /* the check: this returns */
+    NAOS_PASS();
+}
+```
+
+Like any assertion that passes, it uses up the [note](#notes).
 
 ## Notes
 

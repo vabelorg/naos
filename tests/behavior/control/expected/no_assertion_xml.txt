@@ -1,0 +1,25 @@
+args: --naos-output xml:{output} --naos-filter none.empty:counted.check_passes
+exit code: 1
+--- stdout
+RUN: none.empty
+naos: error: no assertion ran
+  hint: check something, or call NAOS_PASS() when the check is that the code runs
+FAIL: none.empty (1 failure, N ms)
+RUN: counted.check_passes
+PASS: counted.check_passes (N ms)
+SUMMARY: 1 passed, 1 failed, 0 skipped (N ms)
+--- stderr
+--- output
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="naos_selftest_no_assertion" tests="2" failures="1" errors="0" skipped="0" time="N.NNN">
+  <testsuite name="none" tests="1" failures="1" errors="0" skipped="0" time="N.NNN">
+    <testcase classname="none" name="empty" time="N.NNN">
+      <failure type="error" message="no assertion ran">naos: error: no assertion ran
+  hint: check something, or call NAOS_PASS() when the check is that the code runs
+</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="counted" tests="1" failures="0" errors="0" skipped="0" time="N.NNN">
+    <testcase classname="counted" name="check_passes" time="N.NNN"/>
+  </testsuite>
+</testsuites>

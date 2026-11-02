@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `NAOS_PASS()`, an assertion that always passes, for a test whose check is that the code runs, such as one that only checks that a call returns without crashing ([#26](https://github.com/vabelorg/naos/issues/26)).
+- `--naos-allow-no-assertions` lets a test that runs no assertion pass, as before; `ALLOW_NO_ASSERTIONS` of `naos_add_executable()` and `naos_discover_tests()` gives it to every test they register ([#26](https://github.com/vabelorg/naos/issues/26)).
+
+### Changed
+
+- **BREAKING**: A test that runs no assertion fails, with `naos: error: no assertion ran`, so that a test that checks nothing no longer reads as a pass: an empty or unfinished test, a loop over a table with no case, an early `return` before the assertions. Every `NAOS_CHECK_*` and `NAOS_REQUIRE_*` that runs counts, whether it passes or fails, as do `NAOS_PASS`, `NAOS_FAIL` and `NAOS_SKIP`, in setup, the body, teardown and the helpers they call; notes, traces and printing do not. Add an assertion to such a test, or end it with `NAOS_PASS()` when its check is that the code runs; to keep a suite passing while you do, run it with `--naos-allow-no-assertions`, or register it with `ALLOW_NO_ASSERTIONS` ([#26](https://github.com/vabelorg/naos/issues/26)).
+- A diagnostic line without a location, that of a test that ran no assertion, starts with `naos: ` in place of `<file>:<line>: `, and its test case in the JUnit XML file has no `file` and `line` ([#26](https://github.com/vabelorg/naos/issues/26)).
+
 ## [0.3.0] - 2026-11-02
 
 ### Changed

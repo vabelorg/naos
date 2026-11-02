@@ -89,6 +89,20 @@ NAOS_TEST(file_and_text_as_given)
 #endif
 }
 
+/* A diagnostic without a location, a NULL file, names Naos in its place, in either form. */
+NAOS_TEST(without_location)
+{
+    static const naos_detail_t details[] = {
+        { "hint", NAOS_DETAIL_TEXT, "h" }
+    };
+    naos_diagnostic_record_t record;
+
+    record = record_of(NAOS_DIAGNOSTIC_ERROR, "no assertion ran", details, 1);
+    record.file = NULL;
+    record.line = 0;
+    NAOS_CHECK_STR_EQ("naos: error: no assertion ran\n  hint: h\n", lines_of(&record));
+}
+
 /* "left" lines up with "right", and "left size" with "right size". */
 NAOS_TEST(left_lines_up_with_right)
 {
@@ -195,6 +209,7 @@ NAOS_SUITE(human,
     NAOS_ADD_TEST(error_line),
     NAOS_ADD_TEST(skip_line),
     NAOS_ADD_TEST(file_and_text_as_given),
+    NAOS_ADD_TEST(without_location),
     NAOS_ADD_TEST(left_lines_up_with_right),
     NAOS_ADD_TEST(left_alone_not_aligned),
     NAOS_ADD_TEST(string_values),

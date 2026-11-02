@@ -15,6 +15,10 @@
  *
  * Every argument is evaluated once. The expression of the error line is the arguments as written,
  * before macro expansion.
+ *
+ * A test that runs no assertion fails, unless it fails or skips otherwise: every NAOS_CHECK_* and
+ * NAOS_REQUIRE_* that runs counts, whether it passes or fails, as do NAOS_PASS, NAOS_FAIL and
+ * NAOS_SKIP, in setup, the body and teardown alike. --naos-allow-no-assertions lets it pass.
  */
 
 #ifndef NAOS_CHECK_H
@@ -119,9 +123,17 @@ typedef enum naos_cmp
 #define NAOS_REQUIRE_NOT_NULL(ptr) NAOS_REQUIRE_(naos_check_not_null((ptr), #ptr " != NULL", __FILE__, __LINE__))
 
 /*
+ * An assertion that always passes, for a test whose check is that the code runs, such as one that
+ * only checks that a call returns without crashing: a test that runs no assertion fails. It does not
+ * stop the test.
+ */
+#define NAOS_PASS() naos_pass()
+
+/*
  * Recording functions used by the macros above, one per kind of assertion (NAOS_CHECK_* and
  * NAOS_REQUIRE_* share it). They return 1 when the check passes and 0 when it fails.
  * naos_check_str takes NAOS_CMP_EQ or NAOS_CMP_NE; a comparison outside naos_cmp_t never holds.
+ * naos_pass, of NAOS_PASS, records an assertion that passed.
  */
 NAOS_API int naos_check(int cond, const char *expr, const char *file, int line);
 NAOS_API int naos_check_int(naos_cmp_t cmp, intmax_t left, intmax_t right, const char *expr, const char *file, int line);
@@ -132,6 +144,7 @@ NAOS_API int naos_check_mem_eq(const void *left, size_t left_size, const void *r
 NAOS_API int naos_check_ptr_eq(const void *left, const void *right, const char *expr, const char *file, int line);
 NAOS_API int naos_check_null(const void *ptr, const char *expr, const char *file, int line);
 NAOS_API int naos_check_not_null(const void *ptr, const char *expr, const char *file, int line);
+NAOS_API void naos_pass(void);
 
 NAOS_END_DECLS
 

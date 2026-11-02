@@ -23,6 +23,7 @@ naos_add_executable(<target>
     [LABELS <label>...]
     [PROPERTIES <name> <value>...]
     [DISCOVERY_TIMEOUT <seconds>]
+    [ALLOW_NO_ASSERTIONS]
 )
 ```
 
@@ -40,6 +41,7 @@ naos_discover_tests(<target>
     [LABELS <label>...]
     [PROPERTIES <name> <value>...]
     [DISCOVERY_TIMEOUT <seconds>]
+    [ALLOW_NO_ASSERTIONS]
 )
 ```
 
@@ -51,9 +53,10 @@ naos_discover_tests(<target>
 | `LABELS <label>...` | CTest のテストに付けるラベル |
 | `PROPERTIES <name> <value>...` | CTest のテストに付けるその他のプロパティ。リストの値は 1 つの引数として渡す（`ENVIRONMENT "A=1;B=2"`） |
 | `DISCOVERY_TIMEOUT <seconds>` | テストの列挙（`--naos-list`）の制限時間。正の整数で、既定値は 60。エミュレータなど、列挙が遅い環境で延ばす |
+| `ALLOW_NO_ASSERTIONS` | 各テストを `--naos-allow-no-assertions` も付けて実行する。アサーションを実行しないテストが成功になる（[アサーションを実行しないテスト](control.md#アサーションを実行しないテスト)） |
 
 - 登録できるのは、同じディレクトリで作った実行ファイルターゲットだけで、1 つのターゲットにつき 1 回です。それ以外（ライブラリ、存在しない名前、2 回目の登録）や、`PROPERTIES` が名前と値の組になっていないときは、configure の時点でエラーになります。
-- 各テストは CTest のテスト `<prefix><suite>.<test>` になり、`SKIP_RETURN_CODE 77` を付けて `<exe> --naos-filter <suite>.<test>` を実行します。
+- 各テストは CTest のテスト `<prefix><suite>.<test>` になり、`SKIP_RETURN_CODE 77` を付けて `<exe> --naos-filter <suite>.<test>` を実行します。`ALLOW_NO_ASSERTIONS` があれば `<exe> --naos-filter <suite>.<test> --naos-allow-no-assertions` を実行します。
 - プロパティ `CROSSCOMPILING_EMULATOR` を持つターゲットは、そのエミュレータを通して列挙・実行します。
 
 ## 列挙
@@ -61,7 +64,7 @@ naos_discover_tests(<target>
 テストは、実行ファイルをビルドするたびに、`--naos-list` で起動して列挙します。テストを足したり消したりしても、configure し直す必要はありません。
 
 - 実行ファイルをビルドするまでは、テストの代わりに失敗するテスト `<prefix>NOT_BUILT` が 1 件だけ登録されています。`LABELS` も付くので、`ctest -L` で選んでも見落としません。マルチコンフィグのジェネレータで、ビルドしていない構成を `-C` で選んだときも同じです。
-- 引数（`PREFIX`、`LABELS`、`PROPERTIES`、`DISCOVERY_TIMEOUT`）を変えたときの動きは、ジェネレータで違います。
+- 引数（`PREFIX`、`LABELS`、`PROPERTIES`、`DISCOVERY_TIMEOUT`、`ALLOW_NO_ASSERTIONS`）を変えたときの動きは、ジェネレータで違います。
   - シングルコンフィグの Ninja と Makefile: 次のビルドで実行ファイルをリンクし直し、テストを列挙し直します。
   - Visual Studio、Xcode、Ninja Multi-Config などほかのジェネレータ: 実行ファイルをビルドし直すまで、テストは前のままです。
 - 列挙に失敗するとビルドが失敗し、その理由と対処がメッセージに出ます。

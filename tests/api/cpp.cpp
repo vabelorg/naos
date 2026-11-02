@@ -84,6 +84,12 @@ NAOS_TEST(assertions)
     NAOS_CHECK_UINT_EQ(NAOS_VERSION_NUMBER, naos_version_number());
 }
 
+/* Passes only because NAOS_PASS counts as an assertion. */
+NAOS_TEST(pass_alone)
+{
+    NAOS_PASS();
+}
+
 NAOS_TEST(note_and_helpers)
 {
     for (std::size_t i = 0; i < values.size(); i++)
@@ -112,6 +118,7 @@ NAOS_SUITE(cpp,
     NAOS_SET_SETUP(setup),
     NAOS_SET_TEARDOWN(teardown),
     NAOS_ADD_TEST(assertions),
+    NAOS_ADD_TEST(pass_alone),
     NAOS_ADD_TEST(note_and_helpers),
     NAOS_ADD_TEST(setup_runs_before_each_test)
 )

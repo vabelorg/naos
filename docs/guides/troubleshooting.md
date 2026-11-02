@@ -29,6 +29,12 @@ GCC, Clang and MSVC know that `NAOS_FAIL` does not return; other compilers may w
 
 It is listed in no suite, or its suite is not registered in `main()`. Check with `--naos-list`. The compiler's unused-function warning points at tests that no suite lists.
 
+**`naos: error: no assertion ran`**
+
+The test ran to its end without running any assertion, so it checked nothing: its body is empty or unfinished, a loop over its cases ran zero times, it returned before its assertions, or the helper holding them was not called. Fix the test so that it checks something. When the check is only that the code runs, end the test with `NAOS_PASS()` ([a test that runs no assertion](../reference/control.md#a-test-that-runs-no-assertion)).
+
+For a suite written before Naos 0.4, `--naos-allow-no-assertions`, or `ALLOW_NO_ASSERTIONS` of the CMake functions, lets these tests pass as they did, while you fix them.
+
 **Exit code 2, with a message on standard error**
 
 A usage error: an unknown `--naos-*` option, a value that is missing or out of range, a filter that matches no test, or a mistake in the suites (a name used twice, setup given twice). Every mistake is reported before any test runs ([exit codes](../reference/command-line.md#exit-codes)).

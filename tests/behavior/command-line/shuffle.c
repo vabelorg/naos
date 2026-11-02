@@ -47,6 +47,7 @@ NAOS_SUITE(c,
 NAOS_TEST(first)
 {
     first_ran = 1;
+    NAOS_PASS();
 }
 
 /* Passes only after first in the same process: the kind of dependency the shuffle brings out. */

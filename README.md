@@ -55,6 +55,7 @@ SUMMARY: 1 passed, 1 failed, 0 skipped (0 ms)
 - **One executable runs every test**: a line per test with the time it took, a summary, and the result as the exit code.
 - **One test at a time**: `--naos-filter clamp.above_range`, under a debugger for instance. Wildcards and exclusions select groups.
 - **One process per test**: `naos_add_executable()` registers each test with CTest, which isolates crashes, runs in parallel and sets time limits.
+- **No test that checks nothing**: a test that runs no assertion fails, so an empty or unfinished test, or a loop over no case, does not read as a pass.
 - **Hidden dependencies shaken out**: `--naos-shuffle` (replayable seed), `--naos-repeat`, `--naos-fail-fast`.
 - **Failures your editor understands**: `file:line: error: ...`, in a stable, documented format.
 - **Easy to adopt**: `FetchContent`, `add_subdirectory`, `find_package`, or the installed library from any build system.

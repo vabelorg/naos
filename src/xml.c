@@ -378,13 +378,13 @@ static void test_begin(const char *suite, const char *test)
 }
 
 /*
- * The first diagnostic gives the test case its location. A failure becomes a <failure> element whose
+ * The first diagnostic with a location gives the test case its location. A failure becomes a <failure> element whose
  * text is the diagnostic as stdout shows it, for people to read; a skip keeps its message for
  * <skipped>.
  */
 static void diagnostic(const naos_diagnostic_record_t *record)
 {
-    if (g_has_location == 0)
+    if ((g_has_location == 0) && (record->file != NULL))
     {
         g_has_location = 1;
         naos_text_add(&g_location, " file=\"");

@@ -41,7 +41,7 @@ static void run_round(const naos_options_t *options, naos_plan_t *plan, naos_tal
 
     while (naos_plan_next(plan, &suite, &test) != 0)
     {
-        outcome = naos_test_run(suite, test, &elapsed);
+        outcome = naos_test_run(suite, test, options->allow_no_assertions == 0, &elapsed);
         tally->elapsed += elapsed;
         switch (outcome)
         {

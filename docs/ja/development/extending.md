@@ -39,7 +39,7 @@
 1. 公開マクロ（`CHECK` と `REQUIRE` の 2 つの形）を `naos/check.h` に、結果を記録する関数を `check.c` に足す。
 2. 比較の種類だけが違うものは、`naos_cmp_t` を受け取る 1 つの関数にする。
 3. 引数の文字列化は公開マクロの側で行う。補助マクロに渡してから `#` を使うと、引数のマクロが展開されてしまう。
-4. 失敗は `naos_diagnostic_begin()` → `naos_diagnostic_add*()` → `naos_diagnostic_end()` で書く。
+4. 失敗は `naos_diagnostic_begin()` → `naos_diagnostic_add*()` → `naos_diagnostic_end()` で書き、成功は `naos_diagnostic_pass()` で終える。どちらでもアサーションとして数えるため。アサーションを 1 つも実行しないテストは失敗する。
 5. 失敗の出力のために `tests/behavior/assertions/` にファイルを、`tests/api/check.c` にテストを足す。
 6. [アサーション](../reference/assertions.md)と、[出力](../reference/output.md#詳細の行)の詳細の行の表を直す。
 

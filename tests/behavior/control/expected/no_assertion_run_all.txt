@@ -1,0 +1,62 @@
+args: 
+exit code: 1
+--- stdout
+RUN: none.empty
+naos: error: no assertion ran
+  hint: check something, or call NAOS_PASS() when the check is that the code runs
+FAIL: none.empty (1 failure, N ms)
+RUN: none.only_prints
+reached-body
+naos: error: no assertion ran
+  hint: check something, or call NAOS_PASS() when the check is that the code runs
+FAIL: none.only_prints (1 failure, N ms)
+RUN: none.only_note
+naos: error: no assertion ran
+  hint: check something, or call NAOS_PASS() when the check is that the code runs
+FAIL: none.only_note (1 failure, N ms)
+RUN: none.only_trace
+naos: error: no assertion ran
+  hint: check something, or call NAOS_PASS() when the check is that the code runs
+FAIL: none.only_trace (1 failure, N ms)
+RUN: none.loop_over_no_case
+naos: error: no assertion ran
+  hint: check something, or call NAOS_PASS() when the check is that the code runs
+FAIL: none.loop_over_no_case (1 failure, N ms)
+RUN: none.returns_early
+naos: error: no assertion ran
+  hint: check something, or call NAOS_PASS() when the check is that the code runs
+FAIL: none.returns_early (1 failure, N ms)
+RUN: counted.check_passes
+PASS: counted.check_passes (N ms)
+RUN: counted.check_fails
+no_assertion.c:LINE: error: 0
+FAIL: counted.check_fails (1 failure, N ms)
+RUN: counted.require_fails
+no_assertion.c:LINE: error: 0
+FAIL: counted.require_fails (1 failure, N ms)
+RUN: counted.in_helper
+PASS: counted.in_helper (N ms)
+RUN: counted.pass
+reached-after-pass
+PASS: counted.pass (N ms)
+RUN: counted.fails
+no_assertion.c:LINE: error: failed on purpose
+FAIL: counted.fails (1 failure, N ms)
+RUN: counted.skips
+no_assertion.c:LINE: skip: skipped on purpose
+SKIP: counted.skips (N ms)
+RUN: in_setup.body
+reached-body
+PASS: in_setup.body (N ms)
+RUN: in_teardown.body
+reached-body
+PASS: in_teardown.body (N ms)
+RUN: skipped_in_setup.body
+no_assertion.c:LINE: skip: skipped in setup
+SKIP: skipped_in_setup.body (N ms)
+RUN: failed_in_teardown.body
+reached-body
+no_assertion.c:LINE: error: 0
+FAIL: failed_in_teardown.body (1 failure, N ms)
+SUMMARY: 5 passed, 10 failed, 2 skipped (N ms)
+--- stderr

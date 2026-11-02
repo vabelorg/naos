@@ -36,6 +36,7 @@ NAOS_TEST(name)
 
 - Put no `;` after the closing brace. `NAOS_TEST` defines a function, and `-Wpedantic` warns about the extra `;`.
 - A test that is defined but listed in no suite is not detected. The compiler's unused-function warning points it out.
+- A test that runs no assertion fails ([a test that runs no assertion](control.md#a-test-that-runs-no-assertion)).
 
 ## Suites
 

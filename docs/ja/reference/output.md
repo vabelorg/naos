@@ -22,7 +22,7 @@
 | 行 | 出すとき |
 |---|---|
 | `RUN: <suite>.<test>` | テストを始めるとき（setup の前）。すぐに書き出すので、プロセスが落ちても残る |
-| `PASS: <suite>.<test> (<t> ms)` | 失敗もスキップもなく終わったとき |
+| `PASS: <suite>.<test> (<t> ms)` | アサーションを実行し、失敗もスキップもなく終わったとき。`--naos-allow-no-assertions` があれば、アサーションを実行しなくても |
 | `FAIL: <suite>.<test> (<N> failure, <t> ms)` | 失敗を記録したとき。N が 2 以上なら `failures` |
 | `SKIP: <suite>.<test> (<t> ms)` | スキップし、失敗を記録しなかったとき |
 | `SUMMARY: <p> passed, <f> failed, <s> skipped (<t> ms)` | 各回の最後。実行したテストが 1 つや 0 のときも出る。`--naos-fail-fast` で止めたときは、実行したテストだけを数える |
@@ -87,12 +87,15 @@ SUMMARY: 497 passed, 1 failed, 2 skipped (2318 ms)
 | `error` | アサーションの失敗 | アサーションの式。マクロの引数を書いたとおりに使う（`NAOS_CHECK_INT_LT(count, limit)` なら `count < limit`） |
 | | `NAOS_FAIL(msg)` | `msg`。`NULL` なら `(no message)` |
 | | trace の書き間違い | `NAOS_TRACE_PUSH without NAOS_TRACE_POP: <trace>`、`NAOS_TRACE_POP without NAOS_TRACE_PUSH`、`NAOS_TRACE_PUSH beyond 16 levels` |
+| | [アサーションを実行しなかった](control.md#アサーションを実行しないテスト)テスト | `no assertion ran`。場所はない |
 | `skip` | `NAOS_SKIP(msg)` | `msg`。`NULL` なら `(no message)` |
 | `note` | 失敗とスキップに添える trace | その trace。場所は積んだ場所 |
 
 診断の行の内容が空になることはなく、値も含みません。値は続く詳細の行にあります。
 
 場所は `<file>:<line>: `（GCC 形式）です。`_MSC_VER` を定義するコンパイラ（MSVC、clang-cl）で Naos のライブラリをビルドしたときは `<file>(<line>): `（MSVC 形式）になります。ファイル名はコンパイラが与えた `__FILE__` のままです。
+
+場所のない失敗（アサーションを実行しなかったテストの失敗）では、場所の代わりに `naos: ` が付きます。ファイルのない診断でコンパイラが自分の名前を書くのと同じです: `naos: error: no assertion ran`。
 
 形式が決まるのは、テストではなくライブラリをビルドしたときです。そのため、MSVC でビルドした Naos を MinGW の GCC でビルドしたテストから使うと MSVC 形式になります。実行時に形式を選ぶオプションはありません。
 
@@ -112,6 +115,7 @@ GCC 形式の `error` の行は、VS Code の `$gcc` など GCC の診断を読�
 | `*_NULL` | `value`（`%p`） |
 | `*_MEM_EQ` | `left size`、`right size`、続けて `first difference` か `invalid` |
 | `*_TRUE`、`*_FALSE`、`*_NOT_NULL` | なし |
+| アサーションを実行しなかったテスト | `hint` |
 
 `first difference` は `offset N, left 0xXX, right 0xYY` です。一方がもう一方の先頭部分と一致するときは `offset N, end of left` / `end of right` で、N は短いほうの長さです。
 
@@ -152,7 +156,7 @@ GCC 形式の `error` の行は、VS Code の `$gcc` など GCC の診断を読�
 
 標準出力のうち、互換を保つのは次のものだけです（[バージョン](version.md)）。ツールがこれなしでは動かないためです。[JUnit XML](xml.md#互換性) のファイルには、それ自身の規則があります。
 
-- 診断の行の始まり。その形式の[場所](#診断の行)、続く種類（`error`、`skip`、`note`）と `: ` です。エディタがこれを読みます（[失敗した行をエディタで開く](../guides/ctest-and-ci.md#失敗した行をエディタで開く)）。その後ろの内容は変わることがあります。
+- 診断の行の始まり。その形式の[場所](#診断の行)（場所のない失敗では `naos: `）、続く種類（`error`、`skip`、`note`）と `: ` です。エディタがこれを読みます（[失敗した行をエディタで開く](../guides/ctest-and-ci.md#失敗した行をエディタで開く)）。その後ろの内容は変わることがあります。
 - `--naos-list` が出力する名前（1 行に 1 つ。[コマンドライン](command-line.md#オプション)）。Naos の CMake の関数がこれを読んで、テストを CTest に登録します。
 - [終了コード](command-line.md#終了コード)。
 

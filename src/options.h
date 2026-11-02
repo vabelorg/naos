@@ -23,6 +23,7 @@ typedef struct naos_options
     long repeat;
     int fail_fast;
     int quiet;
+    int allow_no_assertions;
     naos_output_format_t output_format; /* NAOS_OUTPUT_NONE without --naos-output */
     const char *output_path;     /* NULL without --naos-output */
     int help_requested;

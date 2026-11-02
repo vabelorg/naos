@@ -1,5 +1,7 @@
 # 失敗・スキップ・メモ
 
+テストを止めるもの、テストを失敗やスキップにするもの、失敗に添えるメモと trace です。
+
 ## テストの止まり方
 
 `NAOS_REQUIRE*` の失敗、`NAOS_FAIL`、`NAOS_SKIP` は、`longjmp` でテストを止めます。ヘルパーの奥深くの関数からでも、値を返す関数の中からでも、呼び出し側に何も書かずに止められます。
@@ -59,6 +61,47 @@ NAOS_SKIP(message)
 - 実行したテストがすべてスキップなら、終了コード 77 で終了します。CTest はこれをスキップとして数えます。`--naos-fail-fast` はスキップでは止まりません。
 
 例は[テストを書く](../guides/writing-tests.md#条件がそろわないテストをスキップする)にあります。
+
+## アサーションを実行しないテスト
+
+アサーションを 1 つも実行しないテストは失敗します。何も確かめていないテストが成功に見えないようにするためです。たとえば、本体が空や書きかけのテスト、ケースのない表を回すループ、アサーションの前の `return`、アサーションを持つヘルパーを呼んでいないテストです。
+
+```
+RUN: parser.parses_negative_numbers
+naos: error: no assertion ran
+  hint: check something, or call NAOS_PASS() when the check is that the code runs
+FAIL: parser.parses_negative_numbers (1 failure, 0 ms)
+```
+
+- 数えるもの: 実行した `NAOS_CHECK*` と `NAOS_REQUIRE*` のすべて（成功しても失敗しても）、`NAOS_PASS`、`NAOS_FAIL`、`NAOS_SKIP`。テストの実行中に数えるので、ヘルパーの中のアサーションも数え、書いてあっても到達しなかったものは数えません。
+- 数えないもの: `NAOS_NOTE`、`NAOS_TRACE_PUSH`、`NAOS_TRACE_POP`、テストが出力したもの。
+- setup、本体、teardown をまとめて数えます。setup や teardown がテストごとに何かを確かめるスイートでは、どのテストも報告しません。
+- 報告するのは、成功するはずだったテストだけです。失敗したテストやスキップしたテストは、何が起きたかをすでに示しているので、そのままにします。
+- テストには場所がないので、この失敗にも場所がありません。診断の行は `naos: ` で始まり（[出力](output.md#診断の行)）、[JUnit XML](xml.md) のファイルではそのテストケースに `file` と `line` がありません。
+- ほかの失敗と同じ扱いです。終了コードは 1 になり、`--naos-fail-fast` はここで止まり、`--naos-quiet` でも出力します。
+
+`--naos-allow-no-assertions` を付けると、Naos 0.4 より前と同じように、このテストを成功にします（[コマンドライン](command-line.md#オプション)）。[CMake の関数](cmake.md#関数)の `ALLOW_NO_ASSERTIONS` は、登録するすべてのテストにこれを付けます。
+
+### 必ず通るアサーション
+
+```c
+NAOS_PASS()
+```
+
+必ず成功するアサーションです。コードが動くこと自体を確かめるテストに使います。たとえば、呼び出しがクラッシュせずに戻ることだけを確かめるテストです。アサーションとして数えるほかは何もせず、テストは続きます。
+
+```c
+NAOS_TEST(close_twice_is_harmless)
+{
+    file_t *file = file_open("data.bin");
+
+    file_close(file);
+    file_close(file);   /* the check: this returns */
+    NAOS_PASS();
+}
+```
+
+成功したほかのアサーションと同じく、[メモ](#メモ)を使い切ります。
 
 ## メモ
 

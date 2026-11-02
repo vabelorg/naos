@@ -69,6 +69,7 @@ static naos_options_t g_options =
     1,    /* repeat */
     0,    /* fail_fast */
     0,    /* quiet */
+    0,    /* allow_no_assertions */
     NAOS_OUTPUT_NONE, /* output_format */
     NULL, /* output_path */
     0,    /* help_requested */
@@ -112,6 +113,10 @@ static const naos_option_entry_t g_option_table[] =
         "--naos-quiet", NULL, NULL, &g_options.quiet, NULL,
         "print only the tests that fail, and the lines that end the\n"
         "iterations and the run"
+    },
+    {
+        "--naos-allow-no-assertions", NULL, NULL, &g_options.allow_no_assertions, NULL,
+        "let a test that runs no assertion pass, rather than fail"
     },
     {
         "--naos-output", "<format>:<path>", "<format>:<path>", NULL, take_output,

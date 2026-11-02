@@ -41,8 +41,8 @@ The path is relative to the working directory. Under CTest, every test of an exe
 | `<testsuites>` | Once, around everything | `name`: the name of the program, `argv[0]` without its directory and without `.exe`. `tests`, `failures`, `skipped`: the test cases of the whole file. `errors`: always `0`. `time`: the sum of the times of the test cases of the whole file |
 | `<testsuite>` | For each suite, in each iteration, in the order run | `name`: the suite. `tests`, `failures`, `skipped`, `errors`, `time`: as for `<testsuites>`, for its test cases |
 | `<properties>` | In a `<testsuite>`, when `--naos-repeat` is 2 or more, or with `--naos-shuffle` | Holds `<property name="iteration">` (from 1, with `--naos-repeat` 2 or more) and `<property name="random_seed">` (with `--naos-shuffle`) |
-| `<testcase>` | For each test run | `classname`: the suite. `name`: the test. `time`: the time of the test. `file`, `line`: where its first failure or skip happened, left out when there is none |
-| `<failure>` | For each failure of a failed test, in the order they happened | `type`: always `error`. `message`: the text of the `error` diagnostic line ([output](output.md#diagnostic-lines)): the expression of the assertion, the message of `NAOS_FAIL`, or the mistake with traces |
+| `<testcase>` | For each test run | `classname`: the suite. `name`: the test. `time`: the time of the test. `file`, `line`: where its first failure or skip happened, left out when there is none, or when the test failed for [running no assertion](control.md#a-test-that-runs-no-assertion), which has no location |
+| `<failure>` | For each failure of a failed test, in the order they happened | `type`: always `error`. `message`: the text of the `error` diagnostic line ([output](output.md#diagnostic-lines)): the expression of the assertion, the message of `NAOS_FAIL`, the mistake with traces, or `no assertion ran` |
 | `<skipped>` | In a skipped test | `message`: the message of `NAOS_SKIP` |
 
 A test case holds the `<failure>` elements when the test failed, one `<skipped>` when it was skipped, and nothing when it passed. A test that fails and then skips has its failures only.

@@ -39,7 +39,7 @@ The events arrive in the order `writer.h` states. A diagnostic arrives whole, wi
 1. Add the public macros to `naos/check.h`, a `CHECK` and a `REQUIRE` form, and the function that records the result to `check.c`.
 2. Comparisons that differ only by their kind go to one function taking a `naos_cmp_t`.
 3. Stringify the arguments in the public macro itself. Passing them to a helper macro first and stringifying there with `#` would expand the macros in the arguments.
-4. Write the failure with `naos_diagnostic_begin()` → `naos_diagnostic_add*()` → `naos_diagnostic_end()`.
+4. Write the failure with `naos_diagnostic_begin()` → `naos_diagnostic_add*()` → `naos_diagnostic_end()`, and end a pass with `naos_diagnostic_pass()`, so that the assertion counts either way: a test that runs no assertion fails.
 5. Add a file to `tests/behavior/assertions/` for its failure output, and a test to `tests/api/check.c`.
 6. Update [assertions](../reference/assertions.md) and the table of detail lines in [output](../reference/output.md#detail-lines).
 

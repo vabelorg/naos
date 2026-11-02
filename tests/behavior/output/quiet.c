@@ -48,6 +48,7 @@ NAOS_TEST(fails_with_trace)
 NAOS_TEST(prints)
 {
     printf("printed by the test\n");
+    NAOS_PASS();
 }
 
 NAOS_SUITE(results,

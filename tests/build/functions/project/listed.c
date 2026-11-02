@@ -9,6 +9,7 @@
 
 NAOS_TEST(passes)
 {
+    NAOS_PASS();
 }
 
 NAOS_TEST(fails)
