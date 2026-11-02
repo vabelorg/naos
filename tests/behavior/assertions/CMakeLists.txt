@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 #
 # The behavior that docs/reference/assertions.md states, checked against golden
-# files: a program per subject, and the cases that run it.
+# files: the programs of its areas, each with the cases that run it.
 
 # assertions
 # Failure messages: the error line and the detail lines of each kind of assertion. Every label is

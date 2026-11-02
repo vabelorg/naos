@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 #
 # The behavior that docs/reference/xml.md states, checked against golden
-# files: a program per subject, and the cases that run it.
+# files: the programs of its areas, each with the cases that run it.
 
 # report
 # The JUnit XML file of --naos-output xml:<path>: each case compares the file as well as stdout and

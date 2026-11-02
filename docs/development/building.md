@@ -50,11 +50,13 @@ The options are in the [CMake reference](../reference/cmake.md#options).
 
 ## Running some self tests
 
-Every self test has a CTest name starting with `naos.` and the label `naos`; the [tests of the examples](testing.md#examples-and-documentation) are named after their executables.
+Every self test has a CTest name starting with `naos.`, the label `naos` and the label of its layer; the [tests of the examples](testing.md#examples-and-documentation) are named after their executables ([names and labels](testing.md#names-and-labels)).
 
 ```sh
+ctest --preset default -L contract                             # one layer
 ctest --preset default -R '^naos\.behavior\.command-line\.'   # one area
-ctest --preset default -j8                        # in parallel
+ctest --preset default -LE slow                                # all but the cases that build a project
+ctest --preset default -j8                                     # in parallel
 ```
 
 The checks that need no build, such as the links of the documentation, are not self tests: see [lint](testing.md#lint).
@@ -75,4 +77,12 @@ The library must also build with nothing but a compiler; the self test `naos.bui
 
 ## Continuous integration
 
-`.github/workflows/ci.yml` builds and tests every push and pull request with the presets, on Linux (GCC and Clang), macOS (Clang) and Windows (MSVC, and GCC of MinGW-w64 in the UCRT64 and MINGW64 environments of MSYS2), each as a static and a shared library. A change is merged only when every job passes.
+`.github/workflows/ci.yml` checks every push and pull request. Each of its steps is a command that runs the same locally:
+
+| Job | Runs |
+|---|---|
+| `lint` | `cmake -D ROOT=. -P scripts/Lint.cmake` ([lint](testing.md#lint)) |
+| `test` | Configure, build and `ctest` with a preset, then `cmake -D PRESET=<preset> -P scripts/TestPackage.cmake` ([installing](#installing)), but with `sanitize`. GCC on Linux with `default`, `shared`, `release` and `sanitize`, and with `default` and CMake 3.21, the oldest CMake supported; Clang on Linux with `default` and `release`; Clang on macOS with `default` and `shared`; MSVC with `default`, `shared` and `release` |
+| `mingw` | The same with GCC of MinGW-w64 in MSYS2: UCRT64 with `default` and `shared`, MINGW64 with `default`. MINGW64 is there for the old C library of Windows, msvcrt, whose printf does not follow C99 ([coding style](coding-style.md#formatted-output)) |
+
+A change is merged only when every job passes.

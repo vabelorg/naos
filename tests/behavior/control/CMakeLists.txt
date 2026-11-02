@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 #
 # The behavior that docs/reference/control.md states, checked against golden
-# files: a program per subject, and the cases that run it.
+# files: the programs of its areas, each with the cases that run it.
 
 # control
 # Going on and stopping: NAOS_CHECK_* goes on, NAOS_REQUIRE_*, NAOS_FAIL and NAOS_SKIP stop the test

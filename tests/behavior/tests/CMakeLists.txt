@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 #
 # The behavior that docs/reference/tests.md states, checked against golden
-# files: a program per subject, and the cases that run it.
+# files: the programs of its areas, each with the cases that run it.
 
 # session
 # The main() side: the order of naos_init(), NAOS_ADD_SUITE and naos_run(), the arguments

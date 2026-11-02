@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 #
 # The behavior that docs/reference/command-line.md states, checked against golden
-# files: a program per subject, and the cases that run it.
+# files: the programs of its areas, each with the cases that run it.
 
 # cli
 # The command line: options anywhere, with a value after ' ' or '=', their mistakes, the filter

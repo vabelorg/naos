@@ -8,7 +8,8 @@
 
 ## Checklist
 
-- [ ] Self tests pass with the `default` and `shared` presets
+- [ ] Self tests pass with the `default` and `shared` presets (and `release` and `sanitize` for a change to `src/`)
+- [ ] `cmake -D ROOT=. -P scripts/Lint.cmake` passes
 - [ ] Behavior changes come with a self test
 - [ ] `CHANGELOG.md` has an entry under Unreleased for any change users can see
 - [ ] The reference is updated for any change to the API, the output or the CMake functions

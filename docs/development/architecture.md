@@ -18,10 +18,10 @@ These decide what goes into Naos, before any feature:
 | `include/naos/` | The public headers. Users are pointed to `naos/naos.h` only |
 | `src/` | The implementation and the internal headers |
 | `cmake/` | Installed for users: `Naos.cmake` (`naos_add_executable()`, `naos_discover_tests()`), `NaosDiscover.cmake` (the script that lists the tests after a build and registers them with CTest) and the config of `find_package(Naos)`. Used by the build of Naos only, not installed: `NaosVersion.cmake` (the version and what follows from it: compatibility, SOVERSION) and `NaosInstall.cmake` (the install rules) |
-| `tests/` | The self tests: one directory per subject, with its programs, the `CMakeLists.txt` registering its cases and the expected outputs (`expected/`). See [testing](testing.md) |
+| `tests/` | The self tests, in layers by who judges them (`contract/`, `api/`, `unit/`, `behavior/`, `build/`, `examples/`), each with its programs, the `CMakeLists.txt` registering its cases and the expected outputs (`expected/`); `consumer/`, a project using Naos; and their helpers (`harness/`). See [testing](testing.md) |
 | `examples/` | Complete projects quoted by the documentation, built and run by the self tests |
 | `docs/` | The documentation in English, and its Japanese translation in `docs/ja/` |
-| `scripts/` | Scripts for maintaining Naos, not used by its build: `PrepareRelease.cmake` and `ReleaseNotes.cmake` prepare a release and write its notes, see [releasing](release.md); `CheckMarkdownLinks.cmake` and `CheckPrintfCalls.cmake` check the documentation and the sources, see [lint](testing.md#lint) |
+| `scripts/` | Scripts for maintaining Naos, not used by its build: `PrepareRelease.cmake` and `ReleaseNotes.cmake` prepare a release and write its notes, see [releasing](release.md); `Lint.cmake` runs the checks that need no build (`CheckMarkdownLinks.cmake`, `CheckPrintfCalls.cmake`, `CheckReleaseScripts.cmake`), see [lint](testing.md#lint); `TestPackage.cmake` tests the package a build installs, see [building](building.md#installing) |
 | `.github/` | The workflows (CI and the release) and the templates of issues and pull requests |
 
 ## Modules

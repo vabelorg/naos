@@ -50,11 +50,13 @@ ctest --test-dir build --output-on-failure
 
 ## 一部の自己テストを実行する
 
-自己テストの CTest 名はすべて `naos.` で始まり、ラベル `naos` が付いています。[サンプルのテスト](testing.md#サンプルとドキュメント)は、実行ファイルの名前で始まります。
+自己テストの CTest 名はすべて `naos.` で始まり、ラベル `naos` と層のラベルが付いています。[サンプルのテスト](testing.md#サンプルとドキュメント)は、実行ファイルの名前で始まります（[名前とラベル](testing.md#名前とラベル)）。
 
 ```sh
+ctest --preset default -L contract                             # 1 つの層
 ctest --preset default -R '^naos\.behavior\.command-line\.'   # 1 つの領域
-ctest --preset default -j8                        # 並列
+ctest --preset default -LE slow                                # プロジェクトをビルドするケース以外すべて
+ctest --preset default -j8                                     # 並列
 ```
 
 文書のリンクのように、ビルドを必要としない検査は自己テストではありません（[lint](testing.md#lint)）。
@@ -75,4 +77,12 @@ cmake --install build/default --prefix /tmp/naos-install
 
 ## 継続的インテグレーション
 
-`.github/workflows/ci.yml` は、すべての push とプルリクエストを、プリセットを使って Linux（GCC と Clang）、macOS（Clang）、Windows（MSVC と、MSYS2 の UCRT64・MINGW64 環境の MinGW-w64 の GCC）で、それぞれ静的ライブラリと共有ライブラリとしてビルドしてテストします。すべてのジョブが通った変更だけをマージします。
+`.github/workflows/ci.yml` は、すべての push とプルリクエストを確かめます。どのステップも、手元でも同じように実行できるコマンドです。
+
+| ジョブ | 実行するもの |
+|---|---|
+| `lint` | `cmake -D ROOT=. -P scripts/Lint.cmake`（[lint](testing.md#lint)） |
+| `test` | プリセットで configure、ビルド、`ctest`。続いて `sanitize` 以外では `cmake -D PRESET=<preset> -P scripts/TestPackage.cmake`（[インストールする](#インストールする)）。Linux の GCC で `default`、`shared`、`release`、`sanitize`、および `default` を対応するいちばん古い CMake 3.21 で。Linux の Clang で `default` と `release`。macOS の Clang で `default` と `shared`。MSVC で `default`、`shared`、`release` |
+| `mingw` | 同じことを MSYS2 の MinGW-w64 の GCC で。UCRT64 で `default` と `shared`、MINGW64 で `default`。MINGW64 は、printf が C99 に従わない Windows の古い C ライブラリ msvcrt のためにある（[コーディングスタイル](coding-style.md#書式付きの出力)） |
+
+すべてのジョブが通った変更だけをマージします。

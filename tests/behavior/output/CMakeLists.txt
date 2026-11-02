@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 #
 # The behavior that docs/reference/output.md states, checked against golden
-# files: a program per subject, and the cases that run it.
+# files: the programs of its areas, each with the cases that run it.
 
 # quiet
 # --naos-quiet: stdout leaves out the tests that pass or skip, and ITERATION; a failing test is
@@ -27,7 +27,7 @@ naos_expect(xml ${exe} ARGS --naos-quiet --naos-output xml:{output} --naos-filte
 
 # timing
 # The times of the result lines and SUMMARY. They change from run to run, so the golden cases of the
-# other subjects show them as N ms; here regexes check that they are measured: a test that keeps the
+# other areas show them as N ms; here regexes check that they are measured: a test that keeps the
 # processor busy for a known time shows at least half of it. Not all of it: the test counts processor
 # time, which a system counting it by ticks, as a virtual machine may, can count ahead of the clock,
 # and the time shown is rounded down.

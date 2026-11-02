@@ -7,12 +7,12 @@
 標準出力のすべての行の形は `human.c` にだけ書きます。実行でどの行を書くかも、そこで決めます。これらの行は人向けで、読みやすくするために変えてかまいません。ただし[互換を保つもの](../reference/output.md#互換を保つもの)（診断の行の始まり、`--naos-list` の名前、終了コード）は除きます。
 
 1. [出力](../reference/output.md)を直す。
-2. 自己テストの期待する出力を `NAOS_UPDATE_EXPECTED=1` で書き直し、差分を確かめる（[テスト](testing.md#ケースを足す)）。
+2. 自己テストの期待する出力を `NAOS_UPDATE_EXPECTED=1` で書き直し、差分を確かめる（[テスト](testing.md#ケースを足す)）。`tests/contract/` のケースはこの更新では変わらず、互換を保つものに触れる変更なら失敗する。それを変えるのは、そのような項目を足すときだけにする。
 3. 変更履歴の `Changed` に項目を足す。互換を保つものを変えるときは `**BREAKING**:` で始める。
 
 ## JUnit XML のファイルを変える
 
-ファイルは `xml.c` が書きます。[JUnit XML](../reference/xml.md#互換性) が互換を保つもの（要素、その属性、ファイルを書くとき）は、足してかまいませんが、バージョンが許さない限り変えたり消したりしません（[変更履歴](changelog.md)）。`<failure>` の中身は `human.c` の診断で、それと一緒に変わります。リファレンスと `tests/behavior/xml/` の期待する出力を直します。
+ファイルは `xml.c` が書きます。[JUnit XML](../reference/xml.md#互換性) が互換を保つもの（要素、その属性、ファイルを書くとき）は、足してかまいませんが、バージョンが許さない限り変えたり消したりしません（[変更履歴](changelog.md)）。`<failure>` の中身は `human.c` の診断で、それと一緒に変わります。リファレンス、`tests/behavior/xml/` の期待する出力、`tests/unit/xml.c` の単体テストを直します。互換を保つものを変えるなら、スキーマ `tests/contract/junit.xsd` も直します。
 
 ## 出力の形式を足す
 
@@ -20,7 +20,7 @@
 
 1. 形式を `naos_format_t`（`report.h`）に、名前を `options.c` の `take_output()` と `--naos-output` のヘルプに足し、`naos_report_begin()`（`report.c`）でその書き手を有効にする。
 2. イベントは `writer.h` に書いた順に届く。診断は値、メモ、trace を含めて丸ごと届く。イベントが借りるものは、その呼び出しの間だけ有効。
-3. `tests/behavior/xml/` に `OUTPUT_FILE` を使ったケースを足し（[テスト](testing.md#出力を照合するケース)）、リファレンスにページを足し、[コマンドライン](../reference/command-line.md)を直す。
+3. `tests/unit/xml.c` と同じようにイベントで動かす writer の単体テストを `tests/unit/` に、`OUTPUT_FILE` を使ったファイルの golden のケースを `tests/behavior/` に足す（[テスト](testing.md#出力を照合するケース)）。リファレンスにページを足し、[コマンドライン](../reference/command-line.md)を直す。
 
 ## アサーションを足す
 
@@ -39,7 +39,8 @@
 
 1. `Naos.cmake` の 2 つの公開関数の `cmake_parse_arguments` にキーワードを足し、`_naos_discover()` に渡す。
 2. `NaosDiscover.cmake` に値を渡すなら、`_naos_discovery_params()` のキーワードと、`NaosDiscover.cmake` の先頭の一覧と必須チェックに足す。自己テストの `tests/build/discovery/` も同じ関数でパラメータを書くので、ずれない。
-3. [CMake のリファレンス](../reference/cmake.md)を直す。
+3. `tests/build/functions/` で確かめる。誤りは `project/` のケースとして、登録するものは `Registration.cmake` で。
+4. [CMake のリファレンス](../reference/cmake.md)を直す。
 
 `_naos_` で始まる関数は内部用です。
 
