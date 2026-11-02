@@ -7,8 +7,8 @@
 #
 #   cmake/Naos.cmake          naos_add_executable() and naos_discover_tests(), for the users
 #   cmake/NaosDiscover.cmake  the build-time script those run to register the tests with CTest
-#   cmake/NaosCheckSuites.cmake  the check that every suite defined is added, for NaosDiscover.cmake
-#                             or run alone
+#   cmake/NaosCheckRegistration.cmake  the check that every test and suite defined is added, for
+#                             NaosDiscover.cmake or run alone
 #   cmake/NaosConfig.cmake.in, cmake/NaosInstall.cmake  the package for find_package(Naos)
 #   cmake/NaosVersion.cmake   the version and what follows from it
 #   src/                      the library, Naos::naos

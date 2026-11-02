@@ -4,7 +4,7 @@
 # The CMake functions of Naos, naos_add_executable() and naos_discover_tests()
 # (docs/reference/cmake.md#functions), called by project/: the mistakes in their arguments, which
 # the configure reports, how they register the tests with CTest (Registration.cmake), and how they
-# report a suite, a test or a fixture defined and never added (Unregistered.cmake).
+# report a test or a suite defined and never added (Unregistered.cmake).
 
 if(CMAKE_CROSSCOMPILING)
     return()

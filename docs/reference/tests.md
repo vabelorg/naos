@@ -35,7 +35,7 @@ NAOS_TEST(name)
 `NAOS_TEST(name)` defines a test function. It defines `static void naos_gen_test_<name>(void)`, the name a debugger shows ([generated names](#generated-names)). It runs only when a suite lists it with `NAOS_ADD_TEST`.
 
 - Put no `;` after the closing brace. `NAOS_TEST` defines a function, and `-Wpedantic` warns about the extra `;`.
-- A test that is defined but listed in no suite never runs. Its function is `static` so that the compiler reports it, as an unused function: with GCC and Clang, `naos_add_executable()` makes that an error ([registration check](cmake.md#registration-check)); elsewhere, turn on the warning (`-Wall`).
+- A test that is defined but listed in no suite never runs. The CMake functions report it after the build ([registration check](cmake.md#registration-check)); the compiler's unused-function warning points it out too.
 - A test that runs no assertion fails ([a test that runs no assertion](control.md#a-test-that-runs-no-assertion)).
 
 ## Suites
@@ -112,7 +112,7 @@ NAOS_SUITE(x, ...)   →  void naos_gen_suite_x(naos_builder_t *builder)
 The functions the macros define are named `naos_gen_<role>_<name>`. Write the macros with the plain name `x`, as in the examples; `naos_gen_...` is not written in your code.
 
 - The role is part of the name, so `NAOS_SET_SETUP`, `NAOS_SET_TEARDOWN` and `NAOS_ADD_TEST` accept only a function defined for their own role. Naming a teardown in `NAOS_SET_SETUP`, or a setup in `NAOS_ADD_TEST`, is a compile error ("`naos_gen_setup_x` undeclared"). The same name `x` can therefore be used for a test, a setup and a teardown without a clash.
-- Tests, setup and teardown are `static`, so different files can use the same names, and the compiler reports those that no suite lists ([registration check](cmake.md#registration-check)). A suite function has external linkage: it is what `NAOS_DECLARE_SUITE` declares.
+- Tests, setup and teardown are `static`, so different files can use the same names. A suite function has external linkage: it is what `NAOS_DECLARE_SUITE` declares.
 - Debuggers, stack traces and profilers show these names, so a breakpoint on a test is a breakpoint on `naos_gen_test_<name>`.
 - Names that start with `naos_gen_` are reserved for Naos. Do not define functions of that form yourself, and do not call the generated functions: a test is run by the suite that lists it.
 

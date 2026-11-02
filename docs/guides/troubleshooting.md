@@ -27,11 +27,11 @@ GCC, Clang and MSVC know that `NAOS_FAIL` does not return; other compilers may w
 
 **A test never runs**
 
-It is listed in no suite, or its suite is not registered in `main()`. Check with `--naos-list`. `naos_add_executable()` reports both at build time; elsewhere, the compiler's unused-function warning points at tests that no suite lists ([catch a test or a suite never added](writing-tests.md#catch-a-test-or-a-suite-never-added)).
+It is listed in no suite, or its suite is not registered in `main()`. Check with `--naos-list`. The CMake functions report both at build time ([catch a test or a suite never added](writing-tests.md#catch-a-test-or-a-suite-never-added)).
 
-**`unused function 'naos_gen_test_<name>'`, or `'naos_gen_test_<name>' defined but not used`**
+**`error: test <name> is defined but never added`**
 
-No suite lists the test `<name>` (`naos_gen_setup_` and `naos_gen_teardown_` for a setup or a teardown no suite sets). Add it with `NAOS_ADD_TEST`, or remove it. A `static` helper that nothing calls gives the same error: remove it ([registration check](../reference/cmake.md#registration-check)).
+The build failed after the link: no suite of the file lists the test `<name>`. Add it with `NAOS_ADD_TEST(<name>)` to a suite of that file, or remove it ([registration check](../reference/cmake.md#registration-check)).
 
 **`error: suite <name> is defined but never added`**
 

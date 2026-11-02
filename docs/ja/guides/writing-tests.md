@@ -42,18 +42,13 @@ naos_add_executable(my_tests SOURCES main.c parser_test.c writer_test.c LIBRARIE
 
 テストは 2 か所に書きます。`NAOS_TEST` で定義し、`NAOS_ADD_TEST` でスイートに追加します。スイートも同じで、`NAOS_SUITE` の後に `NAOS_ADD_SUITE` です。後半が抜けると、そのテストは一度も実行されず、それでも実行は成功します。
 
-`naos_add_executable()` は、どちらもビルドエラーにします（[登録漏れの確認](../reference/cmake.md#登録漏れの確認)）。
+`naos_add_executable()` と `naos_discover_tests()` は、どのコンパイラでも、どちらもビルドエラーにします（[登録漏れの確認](../reference/cmake.md#登録漏れの確認)）。リンクの後に、実行ファイルが列挙したテストとソースで定義しているテストを比べ、追加していないテストやスイートの行を示します。
 
-- どのスイートも追加していないテスト・setup・teardown は、GCC と Clang ではコンパイルできません。これらの関数は、コンパイラが未使用だと気付けるよう、わざと `static` にしてあります。エラーには `naos_gen_test_<name>` が出ます。
-- 定義したのに追加していないスイートは、リンクの後にビルドを失敗させ、定義した行を示します。
+```
+left_out_test.c:15: error: test left_out is defined but never added, so it never runs: add it with NAOS_ADD_TEST(left_out) to a suite of this file
+```
 
-  ```
-  slow_test.c:21: error: suite slow is defined but never added, so its tests never run: add it with NAOS_ADD_SUITE(slow), or name it in IGNORE_SUITES of naos_add_executable() or naos_discover_tests() when it is left out on purpose
-  ```
-
-抜けているほうを書き足すか、要らなくなったものを消します。[独自の main()](custom-main.md) が引数でだけ追加するスイートのように、わざと外しているスイートは `IGNORE_SUITES` に書きます。
-
-`naos_discover_tests()` はスイートを確かめますが、ターゲットのコンパイルオプションには手を付けません。そこや、ほかのビルドシステムでは、テストを `-Werror=unused-function`（GCC、Clang）を付けてビルドします。CMake の関数を使わないときは、スイートを[スクリプト](../reference/cmake.md#cmake-の関数を使わないとき)で確かめます。
+抜けているほうを書き足すか、要らなくなったものを消します。[独自の main()](custom-main.md) が引数でだけ追加するスイートのように、わざと外しているスイートは `IGNORE_SUITES` に書きます。CMake の関数を使わないときは、[スクリプト](../reference/cmake.md#cmake-の関数を使わないとき)で同じ確認ができます。
 
 ## アサーションを選ぶ
 

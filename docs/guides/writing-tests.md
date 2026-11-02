@@ -42,18 +42,13 @@ naos_add_executable(my_tests SOURCES main.c parser_test.c writer_test.c LIBRARIE
 
 A test is written twice: `NAOS_TEST` defines it and `NAOS_ADD_TEST` adds it to its suite. A suite is too: `NAOS_SUITE`, then `NAOS_ADD_SUITE`. When the second half is missing, the test never runs, and the run still passes.
 
-`naos_add_executable()` makes both a build error ([registration check](../reference/cmake.md#registration-check)):
+`naos_add_executable()` and `naos_discover_tests()` make both a build error, with every compiler ([registration check](../reference/cmake.md#registration-check)). After the link, they compare the tests the executable lists with those its sources define, and name the line of each test or suite not added:
 
-- A test, a setup or a teardown that no suite adds does not compile, with GCC and Clang: its function is `static` on purpose, so that the compiler finds it unused. The error names `naos_gen_test_<name>`.
-- A suite that is defined and not added fails the build after the link, at the line that defines it:
+```
+left_out_test.c:15: error: test left_out is defined but never added, so it never runs: add it with NAOS_ADD_TEST(left_out) to a suite of this file
+```
 
-  ```
-  slow_test.c:21: error: suite slow is defined but never added, so its tests never run: add it with NAOS_ADD_SUITE(slow), or name it in IGNORE_SUITES of naos_add_executable() or naos_discover_tests() when it is left out on purpose
-  ```
-
-Add what is missing, or remove what is no longer needed. A suite left out on purpose, such as one that a [custom main()](custom-main.md) adds only on an argument, goes in `IGNORE_SUITES`.
-
-`naos_discover_tests()` checks the suites, but leaves the compile options of its target as they are. There, and with another build system, build the tests with `-Werror=unused-function` (GCC, Clang); without CMake functions, the suites are checked by [a script](../reference/cmake.md#without-the-cmake-functions).
+Add what is missing, or remove what is no longer needed. A suite left out on purpose, such as one that a [custom main()](custom-main.md) adds only on an argument, goes in `IGNORE_SUITES`. Without the CMake functions, [a script](../reference/cmake.md#without-the-cmake-functions) runs the same check.
 
 ## Choose the assertion
 

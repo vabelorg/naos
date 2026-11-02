@@ -27,11 +27,11 @@ GCC、Clang、MSVC は `NAOS_FAIL` が戻らないことを知っていますが
 
 **テストが実行されない**
 
-どのスイートにも並べていないか、そのスイートを `main()` で登録していません。`--naos-list` で確かめます。`naos_add_executable()` は、どちらもビルドのときに報告します。それ以外では、スイートに並べていないテストはコンパイラの未使用関数の警告で分かります（[追加し忘れたテストやスイートに気付く](writing-tests.md#追加し忘れたテストやスイートに気付く)）。
+どのスイートにも並べていないか、そのスイートを `main()` で登録していません。`--naos-list` で確かめます。CMake の関数は、どちらもビルドのときに報告します（[追加し忘れたテストやスイートに気付く](writing-tests.md#追加し忘れたテストやスイートに気付く)）。
 
-**`unused function 'naos_gen_test_<name>'`、または `'naos_gen_test_<name>' defined but not used`**
+**`error: test <name> is defined but never added`**
 
-テスト `<name>` をどのスイートも並べていません（setup や teardown なら `naos_gen_setup_`、`naos_gen_teardown_`）。`NAOS_ADD_TEST` で追加するか、消します。どこからも呼ばない `static` のヘルパーでも同じエラーになるので、消します（[登録漏れの確認](../reference/cmake.md#登録漏れの確認)）。
+リンクの後でビルドが失敗しました。ファイルのどのスイートもテスト `<name>` を並べていません。そのファイルのスイートに `NAOS_ADD_TEST(<name>)` で追加するか、消します（[登録漏れの確認](../reference/cmake.md#登録漏れの確認)）。
 
 **`error: suite <name> is defined but never added`**
 

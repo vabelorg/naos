@@ -12,16 +12,13 @@
 #     [DISCOVERY_TIMEOUT <seconds>]   # limit for "<exe> --naos-list", default 60
 #     [ALLOW_NO_ASSERTIONS]           # run each test with --naos-allow-no-assertions
 #     [IGNORE_SUITES <name>...]       # suites defined in the sources but not added, on purpose
-#     [NO_REGISTRATION_CHECK])        # check neither the tests nor the suites added
-#   Creates a test executable linked to Naos::naos and registers each of its tests with CTest. With
-#   GCC and Clang, a test or a fixture defined and never added fails to compile: its static
-#   function is unused, which -Werror=unused-function makes an error.
+#     [NO_REGISTRATION_CHECK])        # do not check that the tests and suites defined are added
+#   Creates a test executable linked to Naos::naos and registers each of its tests with CTest.
 #
 # naos_discover_tests(<target> [PREFIX ...] [LABELS ...] [PROPERTIES ...] [DISCOVERY_TIMEOUT ...]
 #     [ALLOW_NO_ASSERTIONS] [IGNORE_SUITES ...] [NO_REGISTRATION_CHECK])
 #   Registers the tests of an existing executable target that calls naos_init() and naos_run().
-#   The target must be made in the same directory, and registered only once. Its compile options
-#   are left as they are.
+#   The target must be made in the same directory, and registered only once.
 #
 # Tests are discovered after each build by running "<exe> --naos-list", so adding or removing a test
 # needs no reconfigure. Every test becomes one CTest test running
@@ -30,9 +27,9 @@
 # or when discovery fails, CTest has one failing test in their place, <prefix>NOT_BUILT, with the
 # same labels.
 #
-# Discovery also fails when a suite defined in the sources of the target (NAOS_SUITE) is not among
-# those listed, unless IGNORE_SUITES names it or NO_REGISTRATION_CHECK is given
-# (NaosCheckSuites.cmake).
+# Discovery also fails when a test or a suite defined in the sources of the target (NAOS_TEST,
+# NAOS_SUITE) is not among those listed, unless NO_REGISTRATION_CHECK is given; IGNORE_SUITES names
+# suites left out on purpose (NaosCheckRegistration.cmake).
 #
 # The functions whose names start with _naos_ are internal.
 
@@ -96,20 +93,6 @@ function(_naos_check_discovery_args caller target timeout properties ignore_suit
     endforeach()
 endfunction()
 
-# Makes a test or a fixture that no suite adds an error for the compiler, in the C and C++ sources
-# of target: their functions are static (NAOS_TEST), so the compiler finds those never used. Only
-# GCC and Clang with its own command line get the option. MSVC is left as it is: /we4505 did not
-# report an unused static function in a Debug build of C, so it would promise a check it does not
-# make.
-function(_naos_registration_check_flags target)
-    foreach(lang IN ITEMS C CXX)
-        set(id "${CMAKE_${lang}_COMPILER_ID}")
-        if((id MATCHES "^(GNU|Clang|AppleClang)$") AND (NOT CMAKE_${lang}_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC"))
-            target_compile_options(${target} PRIVATE "$<$<COMPILE_LANGUAGE:${lang}>:-Werror=unused-function>")
-        endif()
-    endforeach()
-endfunction()
-
 # Registers the tests of target, for caller. The arguments are those of naos_discover_tests(),
 # empty or false when not given.
 function(_naos_discover caller target prefix labels properties timeout allow_no_assertions ignore_suites no_check)
@@ -139,7 +122,7 @@ function(_naos_discover caller target prefix labels properties timeout allow_no_
     set(tests_file "${file_base}_tests${config_suffix}.cmake")
     set(include_file "${file_base}_include.cmake")
 
-    # The sources whose suites are checked, as the build sees them; none without the check.
+    # The sources whose tests and suites are checked, as the build sees them; none without the check.
     if(no_check)
         set(sources "")
     else()
@@ -225,9 +208,6 @@ function(naos_add_executable target)
 
     add_executable(${target} ${arg_SOURCES})
     target_link_libraries(${target} PRIVATE Naos::naos ${arg_LIBRARIES})
-    if(NOT arg_NO_REGISTRATION_CHECK)
-        _naos_registration_check_flags(${target})
-    endif()
 
     _naos_discover(naos_add_executable ${target}
         "${arg_PREFIX}" "${arg_LABELS}" "${arg_PROPERTIES}" "${arg_DISCOVERY_TIMEOUT}" "${arg_ALLOW_NO_ASSERTIONS}"

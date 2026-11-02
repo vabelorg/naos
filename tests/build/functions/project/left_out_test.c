@@ -2,8 +2,7 @@
  * Copyright (c) 2026 The Naos Authors
  * SPDX-License-Identifier: MIT
  *
- * A test and a setup defined and never added: naos_add_executable() makes them errors of the
- * compiler.
+ * A test defined and never added to a suite, left_out: discovery fails.
  */
 
 #include <naos/naos.h>
@@ -16,10 +15,6 @@ NAOS_TEST(passes)
 NAOS_TEST(left_out)
 {
     NAOS_FAIL("never runs");
-}
-
-NAOS_SETUP(left_out)
-{
 }
 
 NAOS_SUITE(kept,

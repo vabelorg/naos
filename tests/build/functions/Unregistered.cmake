@@ -1,15 +1,16 @@
 # Copyright (c) 2026 The Naos Authors
 # SPDX-License-Identifier: MIT
 #
-# How the CMake functions report a suite, a test or a fixture defined and never added
+# How the CMake functions report a test or a suite defined and never added
 # (docs/reference/cmake.md#registration-check), in a project of its own (project/,
 # CASE=unregistered):
 #
 # 1. A suite left out on purpose, named in IGNORE_SUITES of either function, and both kinds of
-#    mistake under NO_REGISTRATION_CHECK: the executables build, and their tests are registered.
-# 2. Without them, the build fails: discovery names the file, the line and the suite left out, for
-#    either function; with GCC and Clang, naos_add_executable() makes the compiler reject the test
-#    and the setup, and other compilers, which get no option, build them.
+#    mistake under NO_REGISTRATION_CHECK: the executables build, and their tests are registered. The
+#    tests of the file of an ignored suite are not checked.
+# 2. Without them, the build fails: discovery names the file, the line and the suite or the test
+#    left out, for either function. A test of the suite left out is not reported as well; a test
+#    added in another file under the same name does not hide one left out.
 # 3. With the single-config Ninja and Makefile generators, a suite named in IGNORE_SUITES, then no
 #    longer: the build that fails removes the tests it had registered, and CTest has
 #    <prefix>NOT_BUILT in their place.
@@ -51,7 +52,8 @@ function(expect_tests prefix expected)
     endif()
 endfunction()
 
-# Fails unless building target fails with an output that every regex given matches.
+# Fails unless building target fails with an output that every regex given matches, and that
+# "only_in_left_out" does not.
 function(expect_build_failure target)
     execute_process(COMMAND "${CMAKE_COMMAND}" --build "${binary}" --config "${CONFIG}" --target ${target}
         RESULT_VARIABLE code OUTPUT_VARIABLE output ERROR_VARIABLE output)
@@ -63,9 +65,12 @@ function(expect_build_failure target)
             message(FATAL_ERROR "the build of ${target} failed without '${regex}':\n${output}")
         endif()
     endforeach()
+    if(output MATCHES "only_in_left_out")
+        message(FATAL_ERROR "the build of ${target} reports only_in_left_out:\n${output}")
+    endif()
 endfunction()
 
-set(suite_error "left_out_suite\\.c:19: error: suite left_out is defined but never added")
+set(suite_error "left_out_suite\\.c:25: error: suite left_out is defined but never added")
 
 # 1. Left out on purpose, or not checked.
 nested_configure("${CMAKE_CURRENT_LIST_DIR}/project" "${binary}"
@@ -80,13 +85,9 @@ nested_ctest(output "${binary}" -R "^(ignored|unchecked)_")
 expect_build_failure(checked_suite "${suite_error}" "IGNORE_SUITES")
 expect_tests("checked_suite." "checked_suite.NOT_BUILT")
 expect_build_failure(checked_discovered "${suite_error}")
-file(READ "${binary}/compiler.txt" compiler)
-if(compiler STREQUAL "flagged")
-    expect_build_failure(checked_test "naos_gen_test_left_out" "naos_gen_setup_left_out")
-else()
-    nested_run("build" "${CMAKE_COMMAND}" --build "${binary}" --config "${CONFIG}" --target checked_test)
-    expect_tests("checked_test." "checked_test.kept.passes")
-endif()
+expect_build_failure(checked_test "left_out_test\\.c:15: error: test left_out is defined but never added"
+    "NAOS_ADD_TEST\\(left_out\\)")
+expect_build_failure(checked_same_name "same_name_left_out\\.c:10: error: test shared is defined but never added")
 
 # 3. Ignored, then no longer.
 if(GENERATOR MATCHES "Ninja|Makefiles" AND NOT MULTI_CONFIG)
@@ -101,4 +102,4 @@ if(GENERATOR MATCHES "Ninja|Makefiles" AND NOT MULTI_CONFIG)
     expect_tests("checked_suite." "checked_suite.NOT_BUILT")
 endif()
 
-message(STATUS "the suites, tests and fixtures never added are reported as docs/reference/cmake.md states")
+message(STATUS "the tests and suites never added are reported as docs/reference/cmake.md states")

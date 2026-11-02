@@ -10,11 +10,10 @@
 #                     ALLOW_NO_ASSERTIONS by each function (PREFIX added. and discovered.) and
 #                     without it (PREFIX strict.)
 #   unregistered      Naos added with add_subdirectory(NAOS_SOURCE_DIR), and executables of a suite
-#                     (left_out_suite.c) or of a test and a setup (left_out_test.c) defined and never
-#                     added: built by default, those registered with IGNORE_SUITES or
+#                     (left_out_suite.c) or a test (left_out_test.c, same_name_*.c) defined and
+#                     never added: built by default, those registered with IGNORE_SUITES or
 #                     NO_REGISTRATION_CHECK; left out of the default build, those checked, whose build
-#                     fails (checked_suite with IGNORE_SUITES from the variable CHECKED_IGNORE).
-#                     compiler.txt says whether the compiler gets -Werror=unused-function
+#                     fails (checked_suite with IGNORE_SUITES from the variable CHECKED_IGNORE)
 #   any other case    a mistake in the arguments, which the configure must report. No language is
 #                     enabled, since the mistakes are found before anything is built
 #
@@ -58,12 +57,9 @@ if(CASE STREQUAL "unregistered")
     target_link_libraries(checked_discovered PRIVATE Naos::naos)
     naos_discover_tests(checked_discovered)
     naos_add_executable(checked_test SOURCES left_out_test.c)
-    set_target_properties(checked_suite checked_discovered checked_test PROPERTIES EXCLUDE_FROM_ALL TRUE)
-    if((CMAKE_C_COMPILER_ID MATCHES "^(GNU|Clang|AppleClang)$") AND (NOT CMAKE_C_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC"))
-        file(WRITE "${CMAKE_BINARY_DIR}/compiler.txt" "flagged")
-    else()
-        file(WRITE "${CMAKE_BINARY_DIR}/compiler.txt" "not flagged")
-    endif()
+    naos_add_executable(checked_same_name SOURCES same_name_added.c same_name_left_out.c)
+    set_target_properties(checked_suite checked_discovered checked_test checked_same_name
+        PROPERTIES EXCLUDE_FROM_ALL TRUE)
     return()
 endif()
 

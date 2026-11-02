@@ -31,8 +31,6 @@ naos_add_executable(<target>
 
 Makes the executable `<target>` from the `SOURCES`, links it to `Naos::naos` and the `LIBRARIES` (privately), and registers each of its tests with CTest. The arguments other than `SOURCES` and `LIBRARIES` are those of [`naos_discover_tests()`](#naos_discover_tests).
 
-It also makes a test, a setup or a teardown that no suite adds an error of the compiler ([registration check](#registration-check)); `NO_REGISTRATION_CHECK` leaves the compile options as they are.
-
 ```cmake
 naos_add_executable(my_tests SOURCES main.c parser_test.c LIBRARIES my_lib)
 ```
@@ -61,10 +59,9 @@ Registers each test of an executable made with `add_executable()`, which must ca
 | `DISCOVERY_TIMEOUT <seconds>` | The time limit of listing the tests (`--naos-list`): a positive integer, 60 by default. Raise it where listing is slow, under an emulator for example |
 | `ALLOW_NO_ASSERTIONS` | Each test also runs with `--naos-allow-no-assertions`, so that a test that runs no assertion passes ([a test that runs no assertion](control.md#a-test-that-runs-no-assertion)) |
 | `IGNORE_SUITES <suite>...` | Suites defined in the sources and not added on purpose, such as those a [custom `main()`](../guides/custom-main.md) adds on an argument: the [registration check](#registration-check) leaves them out. Each is a suite name |
-| `NO_REGISTRATION_CHECK` | No [registration check](#registration-check): neither the suites at discovery, nor, with `naos_add_executable()`, the tests and fixtures at compile time |
+| `NO_REGISTRATION_CHECK` | No [registration check](#registration-check): a test or a suite defined and not added does not fail the build |
 
 - Only an executable target made in the same directory can be registered, and only once. Anything else (a library, a name with no target, a second registration), `PROPERTIES` that are not name and value pairs, and an `IGNORE_SUITES` entry that is not a suite name, are errors at configure time.
-- The compile options of the target are left as they are.
 - Each test becomes the CTest test `<prefix><suite>.<test>`, running `<exe> --naos-filter <suite>.<test>` with `SKIP_RETURN_CODE 77`; with `ALLOW_NO_ASSERTIONS`, `<exe> --naos-filter <suite>.<test> --naos-allow-no-assertions`.
 - A target with the property `CROSSCOMPILING_EMULATOR` is listed and run through the emulator.
 
@@ -79,38 +76,40 @@ The tests are listed after each build of the executable, by running it with `--n
 - When listing fails, the build fails, with the reason and what to do in its message.
   - After the time limit: it says to raise `DISCOVERY_TIMEOUT`.
   - Otherwise: it tells what to do when a shared library (DLL) is not found ([shared library](../guides/shared-library.md)). On Windows, a missing DLL gives no output, only `Exit code 0xc0000135`; in that case the message names the cause outright.
-- When a suite is defined and not added, the build fails too ([registration check](#registration-check)).
+- When a test or a suite is defined and not added, the build fails too ([registration check](#registration-check)).
 - Commands added to the target with `add_custom_command(TARGET ... POST_BUILD)` run in the order added. Add one that must run before the listing (copying a DLL, for example) after `add_executable()` and before `naos_discover_tests()`; with `naos_add_executable()`, the listing always comes first.
 
 ## Registration check
 
-A test is written twice, with `NAOS_TEST` and with `NAOS_ADD_TEST` in its suite; a suite too, with `NAOS_SUITE` and with `NAOS_ADD_SUITE` ([tests and suites](tests.md)). A test or a suite whose second half is missing never runs, and the run still passes. Both functions check for it, unless given `NO_REGISTRATION_CHECK`.
+A test is written twice, with `NAOS_TEST` and with `NAOS_ADD_TEST` in its suite; a suite too, with `NAOS_SUITE` and with `NAOS_ADD_SUITE` ([tests and suites](tests.md)). A test or a suite whose second half is missing never runs, and the run still passes. Both functions check for it at [discovery](#discovery), unless given `NO_REGISTRATION_CHECK`: they compare what the executable lists with what its sources define. The check reads text only, so it is the same with every compiler.
 
-**Tests, setup and teardown**, with `naos_add_executable()` and GCC or Clang only: their functions are `static`, so the compiler finds those that no suite uses. The function compiles the C and C++ sources of the target with `-Werror=unused-function`, which makes that warning an error.
-
-- The error names the function, `naos_gen_test_<name>`, `naos_gen_setup_<name>` or `naos_gen_teardown_<name>` ([generated names](tests.md#generated-names)). GCC gives the location of the macro in `naos/suite.h`, Clang that of the test.
-- It applies to every `static` function of the sources that nothing uses, such as a helper left over: remove it, or give `NO_REGISTRATION_CHECK`.
-- Other compilers get no option: MSVC, which does not report an unused `static` function in every build (its warning C4505), and Clang with the command line of MSVC (`clang-cl`) among them. There, a test that no suite adds is not found; the suites are still checked.
-- `naos_discover_tests()` leaves the compile options of its target as they are. Give it the option yourself, or turn on the warning (`-Wall`) and read it.
-
-**Suites**, with both functions: at [discovery](#discovery), the suites the executable lists are compared with those its sources define. A suite defined and not listed fails the build, one line for each, in the form of a compiler diagnostic:
+Each test or suite defined and not added fails the build, one line for each, in the form of a compiler diagnostic:
 
 ```
 slow_test.c:21: error: suite slow is defined but never added, so its tests never run: add it with NAOS_ADD_SUITE(slow), or name it in IGNORE_SUITES of naos_add_executable() or naos_discover_tests() when it is left out on purpose
+left_out_test.c:15: error: test left_out is defined but never added, so it never runs: add it with NAOS_ADD_TEST(left_out) to a suite of this file
 ```
 
-- The sources are those of the target, its `SOURCES` property, once the build has made them: those of `target_sources()` count too. Only C and C++ sources and headers are read, by their extension.
-- A definition is `NAOS_SUITE(<name>` outside comments, preprocessor directives and conditionals. Two kinds of suite are not checked:
-  - A suite inside `#if`, `#ifdef` or `#ifndef`, up to its `#endif`: whether it is built depends on the condition, which only the compiler knows. Its `NAOS_ADD_SUITE` is usually behind the same condition.
-  - A suite defined through a macro of your own (one that expands to `NAOS_SUITE`), which is not found.
-- The suites listed are those with at least one test in `--naos-list`, run without arguments; a suite with no test is a mistake in the suites ([tests and suites](tests.md#suites)). A custom `main()` that adds a suite only on an argument has it named in `IGNORE_SUITES`.
+- **Sources**: those of the target, its `SOURCES` property, once the build has made them: those of `target_sources()` count too. Only C and C++ sources and headers are read, by their extension.
+- **Definitions**: `NAOS_SUITE(<name>` and `NAOS_TEST(<name>` outside comments, preprocessor directives and conditionals.
+- **A suite is added** when `--naos-list`, run without arguments, lists one of its tests; a suite with no test is a mistake in the suites ([tests and suites](tests.md#suites)).
+- **A test is added** when the list holds `<suite>.<test>` for a suite of its own file: a test is `static`, so only a suite of its file can add it, and a test of the same name in another file does not stand for it. A suite whose definition is not found (see below) may be of that file, so it counts too.
+
+Not checked:
+
+- A suite or a test inside `#if`, `#ifdef` or `#ifndef`, up to its `#endif`: whether it is built depends on the condition, which only the compiler knows. Its `NAOS_ADD_SUITE` or `NAOS_ADD_TEST` is usually behind the same condition.
+- A suite or a test defined through a macro of your own (one that expands to `NAOS_SUITE` or `NAOS_TEST`), which is not found.
+- The tests of a file that defines a suite in `IGNORE_SUITES`, or a suite not added: they may be in that suite, whose own line is enough.
+- Setup and teardown, which `--naos-list` does not show. A setup or a teardown that no suite sets is an unused `static` function, which the warnings of GCC and Clang (`-Wall`) report.
+
+A custom `main()` that adds a suite only on an argument has it named in `IGNORE_SUITES` ([custom main()](../guides/custom-main.md)).
 
 ### Without the CMake functions
 
-The suite check is a script of its own, installed beside the functions (`NaosCheckSuites.cmake`). Run it after building the executable:
+The check is a script of its own, installed beside the functions (`NaosCheckRegistration.cmake`). Run it after building the executable:
 
 ```sh
-cmake -D NAOS_EXECUTABLE=build/my_tests -D "NAOS_SOURCES=main.c;parser_test.c" -P NaosCheckSuites.cmake
+cmake -D NAOS_EXECUTABLE=build/my_tests -D "NAOS_SOURCES=main.c;parser_test.c" -P NaosCheckRegistration.cmake
 ```
 
 | Variable | Content |
@@ -119,7 +118,7 @@ cmake -D NAOS_EXECUTABLE=build/my_tests -D "NAOS_SOURCES=main.c;parser_test.c" -
 | `NAOS_SOURCES` | Its sources, separated by `;`. Relative paths start at the current directory |
 | `NAOS_IGNORE_SUITES` | Optional: the suites left out on purpose, separated by `;` |
 
-It exits with 0 when every suite defined is listed, and fails with the lines above otherwise. For the tests, build with `-Werror=unused-function` (GCC, Clang).
+It exits with 0 when every test and suite defined is listed, and fails with the lines above otherwise.
 
 ## Options
 
@@ -146,7 +145,7 @@ The installed files, under the install prefix:
 | `include/naos/` | The public headers |
 | `lib/` (`bin/` for a DLL) | The library |
 | `bin/` | The PDB of a DLL built with MSVC in Debug or RelWithDebInfo |
-| `lib/cmake/Naos/` | `NaosConfig.cmake`, `NaosConfigVersion.cmake`, `NaosTargets*.cmake`, `Naos.cmake`, `NaosDiscover.cmake`, `NaosCheckSuites.cmake` |
+| `lib/cmake/Naos/` | `NaosConfig.cmake`, `NaosConfigVersion.cmake`, `NaosTargets*.cmake`, `Naos.cmake`, `NaosDiscover.cmake`, `NaosCheckRegistration.cmake` |
 | `share/licenses/naos/LICENSE` | The license |
 
 The directories follow `GNUInstallDirs` (`CMAKE_INSTALL_LIBDIR` and so on).
