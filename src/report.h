@@ -2,19 +2,16 @@
  * Copyright (c) 2026 The Naos Authors
  * SPDX-License-Identifier: MIT
  *
- * Everything a run writes. The events of a run go to every writer on (writer.h): the human-readable
- * output on stdout always, and the file of --naos-output when given. The names of --naos-list on stdout and the messages of Naos itself
- * ("naos: ...") on stderr are written here. The other modules decide what to tell and when; only the
- * writers know how it looks. The help and the usage of the command line are left to options.c.
+ * The events of a run, told to every writer on (writer.h): the human-readable output on stdout
+ * always, and the file of --naos-output when given. The other modules decide what to tell and when;
+ * only the writers know how it looks. The names of --naos-list are written here too. The messages of
+ * Naos itself are left to message.h, and the help and the usage of the command line to options.c.
  */
 
 #ifndef NAOS_REPORT_H
 #define NAOS_REPORT_H
 
-#include <stdarg.h>
 #include <stddef.h>
-
-#include <naos/export.h>
 
 #include "writer.h"
 
@@ -47,12 +44,5 @@ int naos_report_end(long failed_rounds, long repeat, long rounds_not_run);
 void naos_report_test_name(const char *suite, const char *test);
 
 void naos_report_flush(void);
-
-/*
- * Writes a message of Naos itself to stderr as "naos: <message>\n", formatted as printf does, after
- * flushing stdout so that it comes after what the tests have written; then flushes stderr.
- */
-void naos_report_error(const char *format, ...) NAOS_PRINTF_FORMAT(1, 2);
-void naos_report_error_v(const char *format, va_list args);
 
 #endif

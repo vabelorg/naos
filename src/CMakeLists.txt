@@ -19,25 +19,25 @@ endif()
 #   1. The run:        session, options, runner, filter, order, version
 #   2. The tests:      suite, test, control, check, diagnostic, context
 #   3. The output:     report, writer.h, human, xml, text
-#   4. Shared parts:   clock, value, format.h
+#   4. Shared parts:   message, clock, value, format.h
 #
 # Dependencies go one way ("a -> b" means a uses b; docs/development/architecture.md draws the main
 # ones). All of them:
-#   session    -> options, suite, runner, report
-#   options    -> order, report, clock
-#   runner     -> options, suite, filter, order, test, report
+#   session    -> options, runner, suite, message
+#   options    -> order, report, message, clock
+#   runner     -> options, filter, order, suite, test, report, message
 #   filter     -> suite
-#   suite      -> report
-#   test       -> suite, context, diagnostic, report, clock
-#   control    -> context, diagnostic, test
+#   suite      -> message
+#   test       -> suite, diagnostic, context, report, message, clock
+#   control    -> test, diagnostic, context
 #   check      -> diagnostic, value
 #   diagnostic -> context, report
 #   context    -> writer
-#   report     -> human, xml, writer
-#   human      -> writer, text, value
-#   xml        -> human, writer, text, value
+#   report     -> writer, human, xml, message
 #   writer     -> clock
-# version, order, text, clock and value use no other module. writer.h has no .c: it is the
+#   human      -> writer, text, value
+#   xml        -> writer, human, text, value
+# order, version, text, message, clock and value use no other module. writer.h has no .c: it is the
 # events report.c tells and the functions a writer has.
 add_library(naos ${naos_library_type}
     # 1. The run
@@ -60,6 +60,7 @@ add_library(naos ${naos_library_type}
     xml.c
     text.c
     # 4. Shared parts
+    message.c
     clock.c
     value.c
 )

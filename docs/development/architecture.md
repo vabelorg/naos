@@ -35,7 +35,7 @@ The files form four layers, from the top: the run, the tests, the output and the
 | 1. The run | `session`, `options`, `runner`, `filter`, `order`, `version` | What happens once for the whole process: the order of the calls of the user, the command line, the choice and order of the tests, the rounds |
 | 2. The tests | `suite`, `test`, `control`, `check`, `diagnostic`, `context` | The tests as registered, and what happens in one of them: setup, body and teardown, the assertions, the stops, the note and the traces, and the outcome they add up to |
 | 3. The output | `report`, `writer.h`, `human`, `xml`, `text` | The events of the run, and how each writer writes them. `writer.h` holds every type the writers are told, such as the outcome and the trace |
-| 4. Shared parts | `clock`, `value`, `format.h` | What layers above use without depending on any other module: the time, how values are written, the formatted output |
+| 4. Shared parts | `message`, `clock`, `value`, `format.h` | What layers above use without depending on any other module: the messages of Naos itself, the time, how values are written, the formatted output |
 
 A file that implements a public header goes into the layer of what it does, not into a layer of its own: `session.c` and `version.c` are in the run, `suite.c`, `control.c` and `check.c` in the tests.
 
@@ -53,14 +53,15 @@ A file that implements a public header goes into the layer of what it does, not 
 | `check.c` | `naos/check.h`: the comparisons of the assertions, and the values printed when they fail |
 | `diagnostic.c` | One diagnostic (begin → gather details → end), and the results of the test |
 | `context.c` | The note (`NAOS_NOTE`) and the stack of traces that go with diagnostics. Prints nothing |
-| `report.c` | Tells the events of the run (a test starts, a diagnostic, a test ends, ...) to every writer on, and writes the names of `--naos-list` and the messages of Naos itself (standard error). `writer.h` declares the events and the functions of a writer |
+| `report.c` | Tells the events of the run (a test starts, a diagnostic, a test ends, ...) to every writer on, and writes the names of `--naos-list`. `writer.h` declares the events and the functions of a writer |
 | `human.c` | The writer of the human-readable output: the form of every line on standard output, and which lines a run writes |
 | `xml.c` | The writer of the JUnit XML file of `--naos-output xml:<path>`: keeps the results while the tests run and writes the whole file at the end |
 | `text.c` | A text that grows as it is added to, for the writers that keep what they write until later |
+| `message.c` | The messages of Naos itself (`naos: ...` on standard error), such as a usage error or a lack of memory. Not an event: the writers never see them |
 | `clock.c` | The clock that times the tests: the monotonic clock of the operating system, or `clock()`. The only file that depends on the platform |
 | `value.c` | How values are written (escaped strings, shortest doubles) |
 
-The layers are a single line, each using every layer below it: the tests use the output because a test writes what happens in it at once (`RUN:` before setup, each failure as it happens), so that what a crashed test wrote is not lost. An arrow points at the module used. `report` is used by every module that prints something (`session`, `suite`, `options`, `runner` and others), and the suites as registered (`suite_internal.h`) by every module that reads them (`runner`, `filter`, `test`), so the diagram leaves those arrows out but `session --> suite`. The dependency comment of `src/CMakeLists.txt` lists them all.
+The layers are a single line, each using every layer below it: the tests use the output because a test writes what happens in it at once (`RUN:` before setup, each failure as it happens), so that what a crashed test wrote is not lost. An arrow points at the module used. `message` is used by every module that writes a message of Naos itself (`session`, `suite`, `options`, `runner`, `test` and `report`), `report` by the modules that tell events (`runner`, `test`, `diagnostic`) and by `options` for the formats of `--naos-output`, and the suites as registered (`suite_internal.h`) by every module that reads them (`runner`, `filter`, `test`), so the diagram leaves those arrows out but `session --> suite` and `diagnostic --> report`. The dependency comment of `src/CMakeLists.txt` lists them all.
 
 ```mermaid
 flowchart TB
@@ -83,6 +84,7 @@ flowchart TB
     writer["writer.h"]
   end
   subgraph shared["4. Shared parts"]
+    message
     clock
     value
   end

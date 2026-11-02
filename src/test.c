@@ -16,6 +16,7 @@
 #include "clock.h"
 #include "context.h"
 #include "diagnostic.h"
+#include "message.h"
 
 /*
  * Where naos_test_leave() goes back to: setup and the body, or teardown. Only run_guarded() calls
@@ -81,7 +82,7 @@ void naos_test_leave(void)
 {
     if (g_jump_armed == 0)
     {
-        naos_report_error("NAOS_REQUIRE_*, NAOS_FAIL or NAOS_SKIP outside a running test");
+        naos_message("NAOS_REQUIRE_*, NAOS_FAIL or NAOS_SKIP outside a running test");
         exit(NAOS_EXIT_USAGE);
     }
 

@@ -20,6 +20,7 @@
 
 #include "clock.h"
 #include "format.h"
+#include "message.h"
 #include "order.h"
 #include "report.h"
 
@@ -191,7 +192,7 @@ static void report_usage_error(const char *format, ...)
     va_list args;
 
     va_start(args, format);
-    naos_report_error_v(format, args);
+    naos_message_v(format, args);
     va_end(args);
 
     g_options.usage_error = 1;

@@ -14,6 +14,7 @@
 #include <naos/exit.h>
 
 #include "filter.h"
+#include "message.h"
 #include "order.h"
 #include "report.h"
 #include "test.h"
@@ -189,7 +190,7 @@ static int run_rounds(const naos_options_t *options, const naos_suite_t *suites,
 
     if (alloc_orders(&orders, suites, count) == 0)
     {
-        naos_report_error("out of memory while ordering the tests");
+        naos_message("out of memory while ordering the tests");
 
         return NAOS_EXIT_FAIL;
     }
@@ -287,7 +288,7 @@ int naos_runner_run(const naos_options_t *options, const naos_suite_t *suites, s
     selected = count_selected(options, suites, count);
     if ((options->filter != NULL) && (selected == 0))
     {
-        naos_report_error("no test matches: %s", options->filter);
+        naos_message("no test matches: %s", options->filter);
         naos_options_print_usage(stderr, options->program);
 
         return NAOS_EXIT_USAGE;

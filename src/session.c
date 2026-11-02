@@ -9,8 +9,8 @@
 
 #include <stdlib.h>
 
+#include "message.h"
 #include "options.h"
-#include "report.h"
 #include "runner.h"
 #include "suite_internal.h"
 
@@ -45,7 +45,7 @@ static int check_phase(naos_phase_t expected, const char *what)
         return 1;
     }
 
-    naos_report_error("%s %s; the order is naos_init(), NAOS_ADD_SUITE, naos_run()", what, when[g_phase]);
+    naos_message("%s %s; the order is naos_init(), NAOS_ADD_SUITE, naos_run()", what, when[g_phase]);
 
     return 0;
 }
