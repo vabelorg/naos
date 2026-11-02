@@ -8,7 +8,7 @@
 # 2. After it, each test is <prefix><suite>.<test>, running --naos-filter <suite>.<test>, with
 #    SKIP_RETURN_CODE 77, the LABELS and the PROPERTIES given; CTest passes, fails and skips them as
 #    the tests do.
-# 3. With the Ninja and Makefile generators, new arguments register the tests again at the next
+# 3. With the single-config Ninja and Makefile generators, new arguments register the tests again at the next
 #    build, without a change to the executable.
 #
 # Defines: those of naos_selftest_add_project_case().
@@ -124,7 +124,7 @@ if(code EQUAL 0 OR NOT output MATCHES "first\\.listed\\.fails[ .]*\\*\\*\\*Faile
 endif()
 
 # 3. New arguments, the executable unchanged.
-if(GENERATOR MATCHES "Ninja|Makefiles")
+if(GENERATOR MATCHES "Ninja|Makefiles" AND NOT MULTI_CONFIG)
     nested_reconfigure("${binary}" -D LISTED_PREFIX=second. -D LISTED_LABELS=l3)
     nested_build("${binary}")
     nested_ctest_json(json "${binary}")

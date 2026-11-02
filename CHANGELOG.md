@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Changing the arguments of `naos_add_executable()` or `naos_discover_tests()` (`PREFIX`, `LABELS`, `PROPERTIES`, `DISCOVERY_TIMEOUT`) now registers the tests again at the next build, with the Ninja and Makefile generators. The tests kept their old names, labels and properties until the executable itself was built again.
+- Changing the arguments of `naos_add_executable()` or `naos_discover_tests()` (`PREFIX`, `LABELS`, `PROPERTIES`, `DISCOVERY_TIMEOUT`) now registers the tests again at the next build, with the single-config Ninja and Makefile generators. The tests kept their old names, labels and properties until the executable itself was built again.
 
 ## [0.2.0] - 2026-11-01
 
