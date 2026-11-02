@@ -32,7 +32,7 @@ Naos 自体を保守・拡張する人向けに、ソースの置き方とモジ
 
 | 層 | ファイル | 役割 |
 |---|---|---|
-| 1. 実行全体 | `session`、`options`、`runner`、`filter`、`order`、`version` | プロセス全体で 1 回だけ起きること。利用者の呼び出しの順番、コマンドライン、テストの選択と順序、繰り返しの各回 |
+| 1. 実行全体 | `session`、`options`、`runner`、`filter`、`shuffle`、`version` | プロセス全体で 1 回だけ起きること。利用者の呼び出しの順番、コマンドライン、テストの選択と順序、繰り返しの各回 |
 | 2. テスト | `suite`、`test`、`control`、`check`、`diagnostic`、`context` | 登録されたテストと、1 つのテストの中で起きること。setup・本体・teardown、アサーション、停止、メモと trace、それらから決まる結果 |
 | 3. 出力 | `report`、`writer.h`、`human`、`xml`、`text` | 実行のイベントと、それを各書き手がどう書くか。結果や trace など、書き手に伝える型はすべて `writer.h` にある |
 | 4. 共通部品 | `message`、`clock`、`value`、`format.h` | 上の層から使われ、ほかのモジュールを使わないもの。Naos 自身のメッセージ、時間、値の表記、書式付きの出力 |
@@ -45,7 +45,7 @@ Naos 自体を保守・拡張する人向けに、ソースの置き方とモジ
 | `options.c` | コマンドライン（`--naos-*`）の解析、ヘルプと使い方 |
 | `runner.c` | 繰り返し・シャッフル・fail fast を含む全体の実行と集計 |
 | `filter.c` | `--naos-filter` のパターン照合 |
-| `order.c` | `--naos-shuffle` の順序と種（自前の xorshift） |
+| `shuffle.c` | `--naos-shuffle` の順序と種（自前の xorshift） |
 | `version.c` | `naos/version.h`: 実行時のバージョン |
 | `suite.c` | `naos/suite.h`: スイートの登録と、実行前の誤りの検出 |
 | `test.c` | 1 つのテストの実行（setup・本体・teardown と `setjmp` / `longjmp`）と、その時間 |
@@ -66,9 +66,9 @@ Naos 自体を保守・拡張する人向けに、ソースの置き方とモジ
 ```mermaid
 flowchart TB
   subgraph run["1. 実行全体"]
-    session --> options --> order
+    session --> options --> shuffle
     session --> runner
-    runner --> options & filter & order
+    runner --> options & filter & shuffle
   end
   subgraph tests["2. テスト"]
     test --> diagnostic --> context

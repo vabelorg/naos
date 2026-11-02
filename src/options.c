@@ -21,8 +21,8 @@
 #include "clock.h"
 #include "format.h"
 #include "message.h"
-#include "order.h"
 #include "report.h"
+#include "shuffle.h"
 
 /* What every Naos option starts with; the other arguments are left for the program. */
 #define NAOS_OPTION_PREFIX "--naos-"
@@ -30,8 +30,8 @@
 /* The one option without the prefix; it stays in argv so that the program can print its help too. */
 #define NAOS_HELP_OPTION "--help"
 
-/* The values of --naos-random-seed: the seeds of order.h, or 0 to choose one from the time. */
-#define NAOS_RANDOM_SEED_RANGE "0 to " NAOS_ORDER_SEED_MAX_STRING
+/* The values of --naos-random-seed: the seeds of shuffle.h, or 0 to choose one from the time. */
+#define NAOS_RANDOM_SEED_RANGE "0 to " NAOS_SHUFFLE_SEED_MAX_STRING
 
 /* Width of the usage lines, and of the option column of the help. */
 #define NAOS_USAGE_WIDTH 100
@@ -96,7 +96,7 @@ static const naos_option_entry_t g_option_table[] =
     },
     {
         "--naos-random-seed", "<n>", "a number", NULL, take_random_seed,
-        "seed of that order, 1 to " NAOS_ORDER_SEED_MAX_STRING "; 0 or none chooses one from the time"
+        "seed of that order, 1 to " NAOS_SHUFFLE_SEED_MAX_STRING "; 0 or none chooses one from the time"
     },
     {
         "--naos-repeat", "<n>", "a number", NULL, take_repeat,
@@ -257,7 +257,7 @@ static void take_random_seed(const char *name, const char *value)
 {
     unsigned long number;
 
-    if (parse_number(name, value, 0, NAOS_ORDER_SEED_MAX, NAOS_RANDOM_SEED_RANGE, &number) != 0)
+    if (parse_number(name, value, 0, NAOS_SHUFFLE_SEED_MAX, NAOS_RANDOM_SEED_RANGE, &number) != 0)
     {
         g_options.random_seed = number;
     }

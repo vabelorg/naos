@@ -58,7 +58,7 @@ static size_t add_saturated(size_t a, size_t b)
 #include <naos/exit.h>       /* other public headers */
 
 #include "filter.h"          /* other internal headers */
-#include "order.h"
+#include "shuffle.h"
 ```
 
 A blank line between groups, each group in alphabetical order. Public headers are included as `<naos/...>`, internal ones as `"..."`.

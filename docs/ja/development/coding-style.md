@@ -58,7 +58,7 @@ static size_t add_saturated(size_t a, size_t b)
 #include <naos/exit.h>       /* ほかの公開ヘッダ */
 
 #include "filter.h"          /* ほかの内部ヘッダ */
-#include "order.h"
+#include "shuffle.h"
 ```
 
 各グループの間は空行で、グループの中はアルファベット順。公開ヘッダは `<naos/...>`、内部ヘッダは `"..."` で読み込みます。

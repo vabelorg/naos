@@ -10,7 +10,7 @@ Naos はテストハーネスなので、自己テストの多くは Naos 自身
 |---|---|---|
 | `contract/` | 終了コード、正規表現、XML のスキーマ。golden ファイルは使わない | Naos が互換を保つもの（[出力](../reference/output.md#互換を保つもの)、[JUnit XML](../reference/xml.md#互換性)）: 終了コード、診断の行の先頭、`--naos-list` の名前、JUnit XML のファイル |
 | `api/` | Naos 自身 | 公開 API を、プロジェクトが使うとおりに C と C++ で。公開ヘッダごとに 1 ファイル |
-| `unit/` | Naos 自身 | 内部のモジュール。結果が引数だけで決まるもの（`value`、`filter`、`order`、`text`）と、イベントで動かす writer（`xml` の JUnit XML のファイル、`human` の診断）。モジュールごとに 1 ファイル |
+| `unit/` | Naos 自身 | 内部のモジュール。結果が引数だけで決まるもの（`value`、`filter`、`shuffle`、`text`）と、イベントで動かす writer（`xml` の JUnit XML のファイル、`human` の診断）。モジュールごとに 1 ファイル |
 | `behavior/` | golden ファイル（[下記](#出力を照合するケース)） | テストの実行について[リファレンス](../reference/README.md)が述べることすべて。ページごとに 1 ディレクトリ: `tests/`、`assertions/`、`control/`、`command-line/`、`output/`、`xml/` |
 | `build/` | コンパイラと CMake | コンパイルできてはいけないプログラム（`misuse/`）、テストの検出のメッセージ（`discovery/`）、[CMake の関数](../reference/cmake.md#関数)（`functions/`）、`add_subdirectory()` で加えた Naos（`subproject/`） |
 | `examples/` | 両方 | `examples/` のプロジェクトと、ドキュメントが引用する出力（[下記](#サンプルとドキュメント)） |

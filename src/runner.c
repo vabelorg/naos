@@ -15,8 +15,8 @@
 
 #include "filter.h"
 #include "message.h"
-#include "order.h"
 #include "report.h"
+#include "shuffle.h"
 #include "test.h"
 
 /* Order of the suites, and of the tests of one suite at a time; malloc as for the builder. */
@@ -54,11 +54,11 @@ static void run_round(const naos_options_t *options, const naos_suite_t *suites,
     size_t i;
     size_t j;
 
-    naos_order_make(orders->suites, count, options->shuffle);
+    naos_shuffle_make(orders->suites, count, options->shuffle);
     for (i = 0; i < count; i++)
     {
         suite = &suites[orders->suites[i]];
-        naos_order_make(orders->tests, suite->count, options->shuffle);
+        naos_shuffle_make(orders->tests, suite->count, options->shuffle);
 
         for (j = 0; j < suite->count; j++)
         {
@@ -147,7 +147,7 @@ static void free_orders(naos_orders_t *orders)
 /* Seed of the first round: the one given, or with --naos-shuffle and none given, one from the time. */
 static unsigned long choose_seed(const naos_options_t *options)
 {
-    return (options->shuffle != 0) ? naos_order_pick_seed(options->random_seed) : options->random_seed;
+    return (options->shuffle != 0) ? naos_shuffle_pick_seed(options->random_seed) : options->random_seed;
 }
 
 /*
@@ -175,7 +175,7 @@ static int end_round(const naos_options_t *options, const naos_round_t *round, s
 
 /*
  * Runs the selected tests options->repeat times; the seed of --naos-shuffle goes up by 1 each
- * time, from NAOS_ORDER_SEED_MAX back to 1. --naos-fail-fast stops them all at the first failing
+ * time, from NAOS_SHUFFLE_SEED_MAX back to 1. --naos-fail-fast stops them all at the first failing
  * test. Returns the result of all the runs together.
  */
 static int run_rounds(const naos_options_t *options, const naos_suite_t *suites, size_t count, size_t selected)
@@ -216,7 +216,7 @@ static int run_rounds(const naos_options_t *options, const naos_suite_t *suites,
         if (options->shuffle != 0)
         {
             /* --naos-shuffle --naos-random-seed <seed> runs the same order again. */
-            naos_order_start(seed);
+            naos_shuffle_start(seed);
         }
 
         run_round(options, suites, count, &orders, &tally);
@@ -224,7 +224,7 @@ static int run_rounds(const naos_options_t *options, const naos_suite_t *suites,
 
         failed_rounds += (tally.failed > 0) ? 1 : 0;
         tally_add(&total, &tally);
-        seed = naos_order_next_seed(seed);
+        seed = naos_shuffle_next_seed(seed);
     }
 
     free_orders(&orders);

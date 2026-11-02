@@ -2,7 +2,7 @@
  * Copyright (c) 2026 The Naos Authors
  * SPDX-License-Identifier: MIT
  *
- * order.c: the seeds of --naos-shuffle and the orders they give. These tests restart the random
+ * shuffle.c: the seeds of --naos-shuffle and the orders they give. These tests restart the random
  * order that this executable shares with the harness; under --naos-shuffle that changes the order
  * of the tests after them, the same way for the same seed.
  */
@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "order.h"
+#include "shuffle.h"
 
 #define ORDER_COUNT 8
 
@@ -38,9 +38,9 @@ static int is_permutation(const size_t *order, size_t count)
 
 NAOS_TEST(pick_seed_keeps_given)
 {
-    NAOS_CHECK_UINT_EQ(1, naos_order_pick_seed(1));
-    NAOS_CHECK_UINT_EQ(12345, naos_order_pick_seed(12345));
-    NAOS_CHECK_UINT_EQ(NAOS_ORDER_SEED_MAX, naos_order_pick_seed(NAOS_ORDER_SEED_MAX));
+    NAOS_CHECK_UINT_EQ(1, naos_shuffle_pick_seed(1));
+    NAOS_CHECK_UINT_EQ(12345, naos_shuffle_pick_seed(12345));
+    NAOS_CHECK_UINT_EQ(NAOS_SHUFFLE_SEED_MAX, naos_shuffle_pick_seed(NAOS_SHUFFLE_SEED_MAX));
 }
 
 /* 0 stands for none given: one is chosen from the time, within the range. */
@@ -48,25 +48,25 @@ NAOS_TEST(pick_seed_chooses_in_range)
 {
     unsigned long seed;
 
-    seed = naos_order_pick_seed(0);
+    seed = naos_shuffle_pick_seed(0);
     NAOS_CHECK_UINT_GE(seed, 1);
-    NAOS_CHECK_UINT_LE(seed, NAOS_ORDER_SEED_MAX);
+    NAOS_CHECK_UINT_LE(seed, NAOS_SHUFFLE_SEED_MAX);
 }
 
 /* --naos-repeat takes the seeds one after another, from the largest back to 1. */
 NAOS_TEST(next_seed_wraps)
 {
-    NAOS_CHECK_UINT_EQ(2, naos_order_next_seed(1));
-    NAOS_CHECK_UINT_EQ(NAOS_ORDER_SEED_MAX, naos_order_next_seed(NAOS_ORDER_SEED_MAX - 1));
-    NAOS_CHECK_UINT_EQ(1, naos_order_next_seed(NAOS_ORDER_SEED_MAX));
+    NAOS_CHECK_UINT_EQ(2, naos_shuffle_next_seed(1));
+    NAOS_CHECK_UINT_EQ(NAOS_SHUFFLE_SEED_MAX, naos_shuffle_next_seed(NAOS_SHUFFLE_SEED_MAX - 1));
+    NAOS_CHECK_UINT_EQ(1, naos_shuffle_next_seed(NAOS_SHUFFLE_SEED_MAX));
 }
 
 NAOS_TEST(seed_max_string_matches)
 {
     char text[16];
 
-    snprintf(text, sizeof(text), "%lu", (unsigned long)NAOS_ORDER_SEED_MAX);
-    NAOS_CHECK_STR_EQ(NAOS_ORDER_SEED_MAX_STRING, text);
+    snprintf(text, sizeof(text), "%lu", (unsigned long)NAOS_SHUFFLE_SEED_MAX);
+    NAOS_CHECK_STR_EQ(NAOS_SHUFFLE_SEED_MAX_STRING, text);
 }
 
 /* Without shuffling the order is the order of registration, whatever the state. */
@@ -75,8 +75,8 @@ NAOS_TEST(no_shuffle_keeps_order)
     static const size_t expected[ORDER_COUNT] = { 0, 1, 2, 3, 4, 5, 6, 7 };
     size_t order[ORDER_COUNT];
 
-    naos_order_start(1);
-    naos_order_make(order, ORDER_COUNT, 0);
+    naos_shuffle_start(1);
+    naos_shuffle_make(order, ORDER_COUNT, 0);
     NAOS_CHECK_MEM_EQ(expected, sizeof(expected), order, sizeof(order));
 }
 
@@ -85,10 +85,10 @@ NAOS_TEST(shuffle_small_counts)
 {
     size_t order[1];
 
-    naos_order_start(1);
-    naos_order_make(NULL, 0, 1);
+    naos_shuffle_start(1);
+    naos_shuffle_make(NULL, 0, 1);
     order[0] = 99;
-    naos_order_make(order, 1, 1);
+    naos_shuffle_make(order, 1, 1);
     NAOS_CHECK_UINT_EQ(0, order[0]);
 }
 
@@ -100,10 +100,10 @@ NAOS_TEST(shuffle_is_permutation)
 
     for (seed = 1; seed <= 50; seed++)
     {
-        naos_order_start(seed);
+        naos_shuffle_start(seed);
         for (count = 2; count <= ORDER_COUNT; count++)
         {
-            naos_order_make(order, count, 1);
+            naos_shuffle_make(order, count, 1);
             NAOS_NOTE("seed %lu, count %u", seed, (unsigned int)count);
             NAOS_CHECK_TRUE(is_permutation(order, count));
         }
@@ -122,14 +122,14 @@ NAOS_TEST(seed_gives_fixed_orders)
     static const size_t seed_2_first[ORDER_COUNT] = { 6, 3, 5, 0, 1, 7, 2, 4 };
     size_t order[ORDER_COUNT];
 
-    naos_order_start(1);
-    naos_order_make(order, ORDER_COUNT, 1);
+    naos_shuffle_start(1);
+    naos_shuffle_make(order, ORDER_COUNT, 1);
     NAOS_CHECK_MEM_EQ(seed_1_first, sizeof(seed_1_first), order, sizeof(order));
-    naos_order_make(order, ORDER_COUNT, 1);
+    naos_shuffle_make(order, ORDER_COUNT, 1);
     NAOS_CHECK_MEM_EQ(seed_1_second, sizeof(seed_1_second), order, sizeof(order));
 
-    naos_order_start(2);
-    naos_order_make(order, ORDER_COUNT, 1);
+    naos_shuffle_start(2);
+    naos_shuffle_make(order, ORDER_COUNT, 1);
     NAOS_CHECK_MEM_EQ(seed_2_first, sizeof(seed_2_first), order, sizeof(order));
 }
 
@@ -139,10 +139,10 @@ NAOS_TEST(restart_repeats_order)
     size_t first[ORDER_COUNT];
     size_t again[ORDER_COUNT];
 
-    naos_order_start(4242);
-    naos_order_make(first, ORDER_COUNT, 1);
-    naos_order_start(4242);
-    naos_order_make(again, ORDER_COUNT, 1);
+    naos_shuffle_start(4242);
+    naos_shuffle_make(first, ORDER_COUNT, 1);
+    naos_shuffle_start(4242);
+    naos_shuffle_make(again, ORDER_COUNT, 1);
     NAOS_CHECK_MEM_EQ(first, sizeof(first), again, sizeof(again));
 }
 
@@ -161,8 +161,8 @@ NAOS_TEST(every_position_reached)
     memset(reached, 0, sizeof(reached));
     for (seed = 1; seed <= 200; seed++)
     {
-        naos_order_start(seed);
-        naos_order_make(order, 4, 1);
+        naos_shuffle_start(seed);
+        naos_shuffle_make(order, 4, 1);
         for (position = 0; position < 4; position++)
         {
             reached[position][order[position]] = 1;
@@ -179,7 +179,7 @@ NAOS_TEST(every_position_reached)
     }
 }
 
-NAOS_SUITE(order,
+NAOS_SUITE(shuffle,
     NAOS_ADD_TEST(pick_seed_keeps_given),
     NAOS_ADD_TEST(pick_seed_chooses_in_range),
     NAOS_ADD_TEST(next_seed_wraps),

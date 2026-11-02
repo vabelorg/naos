@@ -16,7 +16,7 @@ endif()
 # The files form four layers, listed below from the top. A file uses only files of its own layer or
 # of a layer below it, never one above, so the layers never form a cycle
 # (docs/development/architecture.md tells what each layer is for):
-#   1. The run:        session, options, runner, filter, order, version
+#   1. The run:        session, options, runner, filter, shuffle, version
 #   2. The tests:      suite, test, control, check, diagnostic, context
 #   3. The output:     report, writer.h, human, xml, text
 #   4. Shared parts:   message, clock, value, format.h
@@ -24,8 +24,8 @@ endif()
 # Dependencies go one way ("a -> b" means a uses b; docs/development/architecture.md draws the main
 # ones). All of them:
 #   session    -> options, runner, suite, message
-#   options    -> order, report, message, clock
-#   runner     -> options, filter, order, suite, test, report, message
+#   options    -> shuffle, report, message, clock
+#   runner     -> options, filter, shuffle, suite, test, report, message
 #   filter     -> suite
 #   suite      -> message
 #   test       -> suite, diagnostic, context, report, message, clock
@@ -37,7 +37,7 @@ endif()
 #   writer     -> clock
 #   human      -> writer, text, value
 #   xml        -> writer, human, text, value
-# order, version, text, message, clock and value use no other module. writer.h has no .c: it is the
+# shuffle, version, text, message, clock and value use no other module. writer.h has no .c: it is the
 # events report.c tells and the functions a writer has.
 add_library(naos ${naos_library_type}
     # 1. The run
@@ -45,7 +45,7 @@ add_library(naos ${naos_library_type}
     options.c
     runner.c
     filter.c
-    order.c
+    shuffle.c
     version.c
     # 2. The tests
     suite.c

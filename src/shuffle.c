@@ -2,11 +2,11 @@
  * Copyright (c) 2026 The Naos Authors
  * SPDX-License-Identifier: MIT
  *
- * The random order of --naos-shuffle and its seeds (order.h), with a generator of its own so that
+ * The random order of --naos-shuffle and its seeds (shuffle.h), with a generator of its own so that
  * a seed gives the same order on every platform.
  */
 
-#include "order.h"
+#include "shuffle.h"
 
 #include <time.h>
 
@@ -29,22 +29,22 @@ static size_t random_below(size_t bound)
     return (size_t)(x % (unsigned long)bound);
 }
 
-unsigned long naos_order_pick_seed(unsigned long seed)
+unsigned long naos_shuffle_pick_seed(unsigned long seed)
 {
     if (seed == 0)
     {
-        return ((unsigned long)time(NULL) % NAOS_ORDER_SEED_MAX) + 1;
+        return ((unsigned long)time(NULL) % NAOS_SHUFFLE_SEED_MAX) + 1;
     }
 
     return seed;
 }
 
-unsigned long naos_order_next_seed(unsigned long seed)
+unsigned long naos_shuffle_next_seed(unsigned long seed)
 {
-    return (seed % NAOS_ORDER_SEED_MAX) + 1;
+    return (seed % NAOS_SHUFFLE_SEED_MAX) + 1;
 }
 
-void naos_order_start(unsigned long seed)
+void naos_shuffle_start(unsigned long seed)
 {
     unsigned long x = seed;
 
@@ -61,7 +61,7 @@ void naos_order_start(unsigned long seed)
     g_random_state = x;
 }
 
-void naos_order_make(size_t *order, size_t count, int shuffle)
+void naos_shuffle_make(size_t *order, size_t count, int shuffle)
 {
     size_t swap;
     size_t i;

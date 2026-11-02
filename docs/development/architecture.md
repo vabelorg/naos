@@ -32,7 +32,7 @@ The files form four layers, from the top: the run, the tests, the output and the
 
 | Layer | Files | What it is for |
 |---|---|---|
-| 1. The run | `session`, `options`, `runner`, `filter`, `order`, `version` | What happens once for the whole process: the order of the calls of the user, the command line, the choice and order of the tests, the rounds |
+| 1. The run | `session`, `options`, `runner`, `filter`, `shuffle`, `version` | What happens once for the whole process: the order of the calls of the user, the command line, the choice and order of the tests, the rounds |
 | 2. The tests | `suite`, `test`, `control`, `check`, `diagnostic`, `context` | The tests as registered, and what happens in one of them: setup, body and teardown, the assertions, the stops, the note and the traces, and the outcome they add up to |
 | 3. The output | `report`, `writer.h`, `human`, `xml`, `text` | The events of the run, and how each writer writes them. `writer.h` holds every type the writers are told, such as the outcome and the trace |
 | 4. Shared parts | `message`, `clock`, `value`, `format.h` | What layers above use without depending on any other module: the messages of Naos itself, the time, how values are written, the formatted output |
@@ -45,7 +45,7 @@ A file that implements a public header goes into the layer of what it does, not 
 | `options.c` | The command line (`--naos-*`): parsing, help and usage |
 | `runner.c` | The whole run, with repeat, shuffle and fail fast, and the summary |
 | `filter.c` | Matching the patterns of `--naos-filter` |
-| `order.c` | The order and the seed of `--naos-shuffle` (its own xorshift generator) |
+| `shuffle.c` | The order and the seed of `--naos-shuffle` (its own xorshift generator) |
 | `version.c` | `naos/version.h`: the version at run time |
 | `suite.c` | `naos/suite.h`: registering suites, and finding their mistakes before the run |
 | `test.c` | Running one test: setup, body and teardown, with `setjmp` / `longjmp`, and its time |
@@ -66,9 +66,9 @@ The layers are a single line, each using every layer below it: the tests use the
 ```mermaid
 flowchart TB
   subgraph run["1. The run"]
-    session --> options --> order
+    session --> options --> shuffle
     session --> runner
-    runner --> options & filter & order
+    runner --> options & filter & shuffle
   end
   subgraph tests["2. The tests"]
     test --> diagnostic --> context
