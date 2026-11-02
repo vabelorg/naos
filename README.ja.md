@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![C99](https://img.shields.io/badge/C-99-blue.svg)
 
-C と C++ 向けのテストハーネスです。標準 C ライブラリ以外に依存せず、コンパイラ拡張も使いません。素の C99 で、CMake でも、コンパイラだけでもビルドできます。
+C と C++ 向けのテストハーネスです。標準 C ライブラリ以外に依存せず、コンパイラ拡張も使いません。素の C99 で、CMake でビルドし、どのビルドシステムからも使えます。
 
 ```c
 #include <naos/naos.h>
@@ -54,12 +54,12 @@ SUMMARY: 1 passed, 1 failed, 0 skipped (0 ms)
 - **1 テストずつ別プロセスで実行**: `naos_add_executable()` がテストを 1 件ずつ CTest に登録し、クラッシュの分離、並列実行、時間制限は CTest が担います。
 - **隠れた依存をあぶり出す**: 種付きで再現できる `--naos-shuffle`、`--naos-repeat`、`--naos-fail-fast`。
 - **エディタが読める失敗**: `file:line: error: ...` の形で、文書化された安定した形式です。
-- **導入しやすい**: `FetchContent`、`add_subdirectory`、`find_package`、または `src/` のソースだけ。
+- **導入しやすい**: `FetchContent`、`add_subdirectory`、`find_package`、またはインストールしたライブラリを任意のビルドシステムから。
 
 ## 必要なもの
 
 - C99 のコンパイラ（GCC、Clang、MSVC）。C++ でテストを書く場合は C++11。
-- CMake 3.21 以降（なくても使えます）。
+- CMake 3.21 以降（Naos のビルドに使います）。
 
 すべての変更を Linux（GCC、Clang）、macOS（Clang）、Windows（MSVC、MSYS2 の MinGW-w64 の GCC）でビルドしてテストしています。
 
@@ -76,7 +76,7 @@ FetchContent_Declare(Naos
 FetchContent_MakeAvailable(Naos)
 ```
 
-`add_subdirectory()` や `find_package(Naos)` でも取り込めます。CMake を使わない場合は、`include/` をインクルードパスに、`src/` の `.c` ファイルをビルドに加えます。4 通りすべてを[インストール](docs/ja/getting-started/installation.md)にまとめています。
+`add_subdirectory()` や `find_package(Naos)` でも取り込めます。ほかのビルドシステムからは、CMake でビルドしてインストールしたライブラリをリンクします。どの方法も[インストール](docs/ja/getting-started/installation.md)にまとめています。
 
 ## クイックスタート
 

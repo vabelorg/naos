@@ -2,7 +2,7 @@
 
 To isolate crashes, run in parallel or set time limits, start each test in a process of its own: list the names with `--naos-list` and run them one by one with `--naos-filter`. An exit code of `0` is a pass, `77` a skip, anything else a failure. Naos leaves process management to the caller: CTest, a script or a CI service.
 
-## With CMake
+## With CTest
 
 The tests of an executable made with `naos_add_executable()` are registered with CTest one by one, at each build. CTest starts each test in a process of its own, so running CTest is all there is to do. The CTest name of a test is `<target>.<suite>.<test>`, such as `my_tests.parser.empty_object`. `-C Debug` chooses the configuration with a multi-config generator such as Visual Studio.
 
@@ -25,7 +25,7 @@ naos_add_executable(io_tests
 
 `ctest -L slow` then selects the tests labeled `slow`, and `ctest -LE slow` leaves them out. Every argument is in the [CMake reference](../reference/cmake.md).
 
-## Without CMake
+## Without CTest
 
 A shell script does the same.
 

@@ -6,7 +6,7 @@ English · [日本語](README.ja.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![C99](https://img.shields.io/badge/C-99-blue.svg)
 
-A test harness for C and C++. No dependency besides the standard C library, no compiler extension: plain C99, built with CMake or with nothing but a compiler.
+A test harness for C and C++. No dependency besides the standard C library, no compiler extension: plain C99, built with CMake and usable from any build system.
 
 ```c
 #include <naos/naos.h>
@@ -54,12 +54,12 @@ SUMMARY: 1 passed, 1 failed, 0 skipped (0 ms)
 - **One process per test**: `naos_add_executable()` registers each test with CTest, which isolates crashes, runs in parallel and sets time limits.
 - **Hidden dependencies shaken out**: `--naos-shuffle` (replayable seed), `--naos-repeat`, `--naos-fail-fast`.
 - **Failures your editor understands**: `file:line: error: ...`, in a stable, documented format.
-- **Easy to adopt**: `FetchContent`, `add_subdirectory`, `find_package`, or just the sources in `src/`.
+- **Easy to adopt**: `FetchContent`, `add_subdirectory`, `find_package`, or the installed library from any build system.
 
 ## Requirements
 
 - A C99 compiler (GCC, Clang or MSVC); C++11 for tests written in C++.
-- CMake 3.21 or later, optional.
+- CMake 3.21 or later, to build Naos.
 
 Every change is built and tested on Linux (GCC, Clang), macOS (Clang) and Windows (MSVC, and GCC of MinGW-w64 in MSYS2).
 
@@ -76,7 +76,7 @@ FetchContent_Declare(Naos
 FetchContent_MakeAvailable(Naos)
 ```
 
-`add_subdirectory()` and `find_package(Naos)` work as well. Without CMake, add `include/` to the include path and the `.c` files of `src/` to your build. All four ways are in [Installation](docs/getting-started/installation.md).
+`add_subdirectory()` and `find_package(Naos)` work as well. Another build system links the library that CMake built and installed. Every way is in [Installation](docs/getting-started/installation.md).
 
 ## Quick start
 

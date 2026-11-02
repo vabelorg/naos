@@ -71,10 +71,6 @@ cmake --install build/default --prefix /tmp/naos-install
 
 インストールされる配置は [CMake のリファレンス](../reference/cmake.md#パッケージ)にあります。プロジェクトからは `find_package(Naos)` と `-DCMAKE_PREFIX_PATH=/tmp/naos-install` で使えます。`tests/consumer/` がそのようなプロジェクトです。`cmake -D PRESET=<preset> -P scripts/TestPackage.cmake` が、ビルドしたプリセットをインストールしてこのプロジェクトをテストします。CI もビルドごとにこれを実行します。
 
-## CMake を使わない場合
-
-ライブラリは、コンパイラだけでもビルドできなければなりません。自己テスト `naos.build.no_cmake.build` が、GCC 互換のコンパイラで、[インストール](../getting-started/installation.md#cmake-を使わない場合)に書いたとおりにビルドして確かめます。
-
 ## 継続的インテグレーション
 
 `.github/workflows/ci.yml` は、すべての push とプルリクエストを確かめます。どのステップも、手元でも同じように実行できるコマンドです。

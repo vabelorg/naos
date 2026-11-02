@@ -12,7 +12,7 @@ Naos はテストハーネスなので、自己テストの多くは Naos 自身
 | `api/` | Naos 自身 | 公開 API を、プロジェクトが使うとおりに C と C++ で。公開ヘッダごとに 1 ファイル |
 | `unit/` | Naos 自身 | 内部のモジュール。結果が引数だけで決まるもの（`value`、`filter`、`order`、`text`）と、イベントで動かす writer（`xml` の JUnit XML のファイル、`human` の診断）。モジュールごとに 1 ファイル |
 | `behavior/` | golden ファイル（[下記](#出力を照合するケース)） | テストの実行について[リファレンス](../reference/README.md)が述べることすべて。ページごとに 1 ディレクトリ: `tests/`、`assertions/`、`control/`、`command-line/`、`output/`、`xml/` |
-| `build/` | コンパイラと CMake | コンパイルできてはいけないプログラム（`misuse/`）、CMake を使わないビルド（`no_cmake/`）、テストの検出のメッセージ（`discovery/`）、[CMake の関数](../reference/cmake.md#関数)（`functions/`）、`add_subdirectory()` で加えた Naos（`subproject/`） |
+| `build/` | コンパイラと CMake | コンパイルできてはいけないプログラム（`misuse/`）、テストの検出のメッセージ（`discovery/`）、[CMake の関数](../reference/cmake.md#関数)（`functions/`）、`add_subdirectory()` で加えた Naos（`subproject/`） |
 | `examples/` | 両方 | `examples/` のプロジェクトと、ドキュメントが引用する出力（[下記](#サンプルとドキュメント)） |
 
 `tests/consumer/` は層ではありません。Naos を使うプロジェクトで、`build/subproject/` が `add_subdirectory()` で、`scripts/TestPackage.cmake` がビルドをインストールしたあと `find_package(Naos <version>)` で Naos を加えます（[ビルド](building.md#インストールする)）。仕組みは `tests/harness/` にあります。`NaosSelftest.cmake` の関数、ケースを 1 つ実行する `RunCase.cmake`、自分のプロジェクトをビルドするケースのための `NestedProject.cmake` です。

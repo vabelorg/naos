@@ -14,7 +14,7 @@ cmake --install naos/build --config Release --prefix /opt/naos
 
 ほかのプロジェクトに組み込んだとき（`add_subdirectory` や `FetchContent`）は、`BUILD_SHARED_LIBS` によらず常に静的ライブラリです。
 
-- `find_package(Naos)` で使えば、ヘッダが必要とする定義 `NAOS_SHARED` は CMake が付けます。CMake を使わない場合は、テストをコンパイルするときに `NAOS_SHARED` を定義してください。
+- `find_package(Naos)` で使えば、ヘッダが必要とする定義 `NAOS_SHARED` は CMake が付けます。[ほかのビルドシステム](../getting-started/installation.md#ほかのビルドシステム)から使う場合は、テストをコンパイルするときに `NAOS_SHARED` を定義してください。
 - 公開関数は呼び出し規約を指定していません。Naos とテストは同じ既定の規約でビルドしてください（32 ビット Windows で `/Gz` などを使わない）。
 
 ## ビルド時に DLL が見つかるようにする

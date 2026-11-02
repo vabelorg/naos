@@ -10,7 +10,7 @@
 
 /*
  * NAOS_API marks the functions exported from a shared Naos.
- * - Static library (the default, also without CMake): define nothing.
+ * - Static library (the default): define nothing.
  * - Shared library: define NAOS_SHARED when using it (CMake does this for consumers) and
  *   NAOS_BUILDING while building Naos itself.
  */

@@ -14,8 +14,8 @@
 #   behavior/   judged by RunCase.cmake against golden files: one directory per page of
 #               docs/reference/ (tests, assertions, control, command-line, output, xml)
 #   build/      judged by the compiler and CMake: programs that must not compile (misuse/), the
-#               build without CMake (no_cmake/), the messages of test discovery (discovery/), the
-#               CMake functions (functions/), Naos added with add_subdirectory() (subproject/).
+#               messages of test discovery (discovery/), the CMake functions (functions/), Naos
+#               added with add_subdirectory() (subproject/).
 #               The cases that build a project of their own have the label slow too
 #   examples/   the projects of examples/, and the outputs the documentation quotes from them
 # Not a layer: a project using Naos, which build/subproject/ adds Naos to with add_subdirectory(),
