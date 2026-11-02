@@ -61,6 +61,7 @@ naos_discover_tests(<target>
 テストは、実行ファイルをビルドするたびに、`--naos-list` で起動して列挙します。テストを足したり消したりしても、configure し直す必要はありません。
 
 - 実行ファイルをビルドするまでは、テストの代わりに失敗するテスト `<prefix>NOT_BUILT` が 1 件だけ登録されています。`LABELS` も付くので、`ctest -L` で選んでも見落としません。マルチコンフィグのジェネレータで、ビルドしていない構成を `-C` で選んだときも同じです。
+- 引数（`PREFIX`、`LABELS`、`PROPERTIES`、`DISCOVERY_TIMEOUT`）を変えると、Ninja と Makefile のジェネレータでは次のビルドで実行ファイルをリンクし直し、テストを列挙し直します。Visual Studio や Xcode などほかのジェネレータでは、実行ファイルをビルドし直すまでテストは前のままです。
 - 列挙に失敗するとビルドが失敗し、その理由と対処がメッセージに出ます。制限時間を超えたときは `DISCOVERY_TIMEOUT` を延ばすよう、それ以外では共有ライブラリ（DLL）が見つからない場合の対処を出します（[共有ライブラリ](../guides/shared-library.md)）。Windows で DLL が見つからないと、出力はなく `Exit code 0xc0000135` とだけ返るので、この場合は原因を言い切ります。
 - `add_custom_command(TARGET ... POST_BUILD)` でターゲットに足したコマンドは、足した順に実行されます。列挙より前に実行したいコマンド（DLL のコピーなど）は、`add_executable()` の後、`naos_discover_tests()` より前に足します。`naos_add_executable()` では、列挙が常に先になります。
 

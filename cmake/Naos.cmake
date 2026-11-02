@@ -114,6 +114,11 @@ function(_naos_discover caller target prefix labels properties timeout)
         OUTPUT "${tests_file}"
     )
     file(GENERATE OUTPUT "${params_file}" CONTENT "${params}")
+    # A change to the arguments rewrites the parameter file, which then links the executable again,
+    # and so lists its tests again: without it, the tests kept their old names, labels and
+    # properties until the executable changed. file(GENERATE) leaves an unchanged file as it is.
+    # Only the Ninja and Makefile generators honor LINK_DEPENDS.
+    set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS "${params_file}")
 
     add_custom_command(TARGET ${target} POST_BUILD
         COMMAND "${CMAKE_COMMAND}" -D "NAOS_PARAMS=${params_file}" -P "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/NaosDiscover.cmake"
