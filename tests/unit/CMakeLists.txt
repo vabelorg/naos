@@ -1,8 +1,9 @@
 # Copyright (c) 2026 The Naos Authors
 # SPDX-License-Identifier: MIT
 #
-# Unit tests of the internal modules whose results depend only on their arguments (value, filter,
-# order), run by Naos itself, one CTest test each.
+# Unit tests of the internal modules, run by Naos itself, one CTest test each: those whose results
+# depend only on their arguments (value, filter, order, text), and the writers driven through their
+# events (the JUnit XML file of xml, the diagnostics of human).
 #
 # The executable is built from the sources of the library rather than linked to Naos::naos: a
 # static Naos would also do, but a shared one exports only NAOS_API. Built this way the unit tests
@@ -10,7 +11,7 @@
 
 get_target_property(naos_library_sources naos SOURCES)
 list(TRANSFORM naos_library_sources PREPEND "${PROJECT_SOURCE_DIR}/src/")
-add_executable(naos_selftest_unit main.c value.c filter.c order.c ${naos_library_sources})
+add_executable(naos_selftest_unit main.c value.c filter.c order.c text.c xml.c human.c ${naos_library_sources})
 target_include_directories(naos_selftest_unit PRIVATE
     "${PROJECT_SOURCE_DIR}/include"
     "${PROJECT_SOURCE_DIR}/src"
