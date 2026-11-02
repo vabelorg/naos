@@ -72,23 +72,14 @@ jobs:
       - name: Test
         run: ctest --preset ${{ matrix.preset }}
 
-      # The package installed, used by a project with find_package(Naos <version>): tests/package.
+      # The package installed, used by a project with find_package(Naos <version>): tests/consumer.
       - name: Test the installed package
         shell: bash
         run: |
           if [ -n "${{ matrix.cc }}" ]; then
             export CC="${{ matrix.cc }}"
           fi
-          # A path CMake reads on Windows too (D:/a/... rather than /d/a/...).
-          build="$(pwd -W 2>/dev/null || pwd)/build"
-          cmake --install build/${{ matrix.preset }} --config Debug --prefix "$build/${{ matrix.preset }}-install"
-          # Warnings for the authors as errors: one from the installed package would show in every
-          # project using it. The option depends on the version of CMake: WerrorOption.cmake.
-          werror="$(cmake -DBINARY_DIR="$build/${{ matrix.preset }}-werror" -P tests/package/WerrorOption.cmake)" || exit 1
-          cmake -S tests/package -B "$build/${{ matrix.preset }}-package" "$werror" \
-            -DCMAKE_PREFIX_PATH="$build/${{ matrix.preset }}-install" -DCMAKE_BUILD_TYPE=Debug
-          cmake --build "$build/${{ matrix.preset }}-package" --config Debug
-          ctest --test-dir "$build/${{ matrix.preset }}-package" -C Debug --output-on-failure
+          cmake -D PRESET=${{ matrix.preset }} -P scripts/TestPackage.cmake
 
   # GCC of MinGW-w64 in MSYS2: UCRT64 with the C library of current Windows (UCRT), MINGW64 with
   # the old one (msvcrt), whose default printf does not follow C99 (src/format.h).
@@ -127,12 +118,4 @@ jobs:
         run: ctest --preset ${{ matrix.preset }}
 
       - name: Test the installed package
-        run: |
-          # A path CMake reads (D:/a/... rather than /d/a/...).
-          build="$(pwd -W)/build"
-          cmake --install build/${{ matrix.preset }} --prefix "$build/${{ matrix.preset }}-install"
-          werror="$(cmake -DBINARY_DIR="$build/${{ matrix.preset }}-werror" -P tests/package/WerrorOption.cmake)" || exit 1
-          cmake -S tests/package -B "$build/${{ matrix.preset }}-package" "$werror" \
-            -DCMAKE_PREFIX_PATH="$build/${{ matrix.preset }}-install" -DCMAKE_BUILD_TYPE=Debug
-          cmake --build "$build/${{ matrix.preset }}-package"
-          ctest --test-dir "$build/${{ matrix.preset }}-package" --output-on-failure
+        run: cmake -D PRESET=${{ matrix.preset }} -P scripts/TestPackage.cmake

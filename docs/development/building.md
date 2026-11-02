@@ -65,7 +65,7 @@ The checks that need no build, such as the links of the documentation, are not s
 cmake --install build/default --prefix /tmp/naos-install
 ```
 
-The layout installed is in the [CMake reference](../reference/cmake.md#package). A project can then use it with `find_package(Naos)` and `-DCMAKE_PREFIX_PATH=/tmp/naos-install`. `tests/package/` is such a project; CI builds and tests it against each package installed.
+The layout installed is in the [CMake reference](../reference/cmake.md#package). A project can then use it with `find_package(Naos)` and `-DCMAKE_PREFIX_PATH=/tmp/naos-install`. `tests/consumer/` is such a project; `cmake -D PRESET=<preset> -P scripts/TestPackage.cmake` installs a preset built and tests the project against it, as CI does for each build.
 
 ## Without CMake
 

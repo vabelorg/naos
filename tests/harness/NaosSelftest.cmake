@@ -22,6 +22,13 @@
 # naos_selftest_add_test(<case> <command>...)
 #   A case that runs a command and passes when it exits with 0.
 #
+# naos_selftest_add_project_case(<case> <script> [<define>...])
+#   A case that runs <script> with cmake -P, which configures, builds and tests a project of its own
+#   through harness/NestedProject.cmake: the script gets the generator, the compiler and the
+#   configuration of this build, and NAOS_SOURCE_DIR, WORK_DIR (a directory of its own in the
+#   build directory) and the defines given, each as "NAME=value". Such a case builds a project, so it
+#   is slow; it gets the label slow as well.
+#
 # naos_expect(<case> <target> [ARGS <arg>...] [OUTPUT_FILE <name> [FILE_ONLY]])
 #   Golden case: runs <target> with the arguments and compares them, its exit code, its stdout and
 #   its stderr with expected/<case>.txt, after making the output independent of the platform (see
@@ -103,6 +110,33 @@ function(naos_selftest_add_test case)
     set(name "naos.${path}.${case}")
     add_test(NAME ${name} COMMAND ${ARGN})
     set_tests_properties(${name} PROPERTIES LABELS "naos;${layer}")
+endfunction()
+
+function(naos_selftest_add_project_case case script)
+    get_property(multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+    if(multi_config)
+        set(config Debug)
+    elseif(CMAKE_BUILD_TYPE)
+        set(config "${CMAKE_BUILD_TYPE}")
+    else()
+        set(config Debug)
+    endif()
+    set(defines
+        -D "GENERATOR=${CMAKE_GENERATOR}"
+        -D "GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}"
+        -D "GENERATOR_TOOLSET=${CMAKE_GENERATOR_TOOLSET}"
+        -D "MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
+        -D "C_COMPILER=${CMAKE_C_COMPILER}"
+        -D "CONFIG=${config}"
+        -D "MULTI_CONFIG=$<BOOL:${multi_config}>"
+        -D "NAOS_SOURCE_DIR=${PROJECT_SOURCE_DIR}"
+        -D "WORK_DIR=${CMAKE_CURRENT_BINARY_DIR}/${case}")
+    foreach(define IN LISTS ARGN)
+        list(APPEND defines -D "${define}")
+    endforeach()
+    naos_selftest_add_test(${case} "${CMAKE_COMMAND}" ${defines} -P "${script}")
+    naos_selftest_where(path layer)
+    set_property(TEST "naos.${path}.${case}" APPEND PROPERTY LABELS slow)
 endfunction()
 
 # Registers a case that runs RunCase.cmake with the defines given.
