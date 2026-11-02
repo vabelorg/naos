@@ -1,6 +1,8 @@
 # Checks what needs no build once (lint), then builds Naos and runs its self tests (examples
-# included) with each preset of CMakePresets.json, on every platform and compiler supported, then
-# tests the package it installs. MinGW-w64 has a job of its own, since it runs in the shell of MSYS2.
+# included) on every platform and compiler supported, each with the presets of CMakePresets.json that
+# matter there, then tests the package each build installs. MinGW-w64 has a job of its own, since it
+# runs in the shell of MSYS2. Every step is a command of its own that runs the same locally
+# (docs/development/building.md#continuous-integration).
 
 name: CI
 
@@ -20,43 +22,47 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Links of the Markdown files
-        run: cmake -D ROOT=. -P scripts/CheckMarkdownLinks.cmake
+      - name: Lint
+        run: cmake -D ROOT=. -P scripts/Lint.cmake
 
-      - name: printf calls of src/
-        run: cmake -D ROOT=. -P scripts/CheckPrintfCalls.cmake
-
+  # default and shared: the static and the shared library, everywhere. release: optimized, where the
+  # compilers optimize differently (GCC, Clang, MSVC). sanitize: AddressSanitizer and
+  # UndefinedBehaviorSanitizer, once. cmake: the oldest CMake supported, cmake_minimum_required() of
+  # CMakeLists.txt, once.
   test:
     name: ${{ matrix.toolchain }} (${{ matrix.preset }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        toolchain: [gcc, clang, macos-clang, msvc]
-        preset: [default, shared]
         include:
-          - toolchain: gcc
-            os: ubuntu-latest
-            cc: gcc
-            cxx: g++
-          - toolchain: clang
-            os: ubuntu-latest
-            cc: clang
-            cxx: clang++
-          - toolchain: macos-clang
-            os: macos-latest
-            cc: clang
-            cxx: clang++
-          - toolchain: msvc
-            os: windows-latest
+          - { toolchain: gcc, preset: default, os: ubuntu-latest, cc: gcc, cxx: g++ }
+          - { toolchain: gcc, preset: shared, os: ubuntu-latest, cc: gcc, cxx: g++ }
+          - { toolchain: gcc, preset: release, os: ubuntu-latest, cc: gcc, cxx: g++ }
+          - { toolchain: gcc, preset: sanitize, os: ubuntu-latest, cc: gcc, cxx: g++ }
+          - { toolchain: gcc CMake 3.21, preset: default, os: ubuntu-latest, cc: gcc, cxx: g++, cmake: 3.21.7 }
+          - { toolchain: clang, preset: default, os: ubuntu-latest, cc: clang, cxx: clang++ }
+          - { toolchain: clang, preset: release, os: ubuntu-latest, cc: clang, cxx: clang++ }
+          - { toolchain: macos-clang, preset: default, os: macos-latest, cc: clang, cxx: clang++ }
+          - { toolchain: macos-clang, preset: shared, os: macos-latest, cc: clang, cxx: clang++ }
+          - { toolchain: msvc, preset: default, os: windows-latest }
+          - { toolchain: msvc, preset: shared, os: windows-latest }
+          - { toolchain: msvc, preset: release, os: windows-latest }
     steps:
       - uses: actions/checkout@v7
 
-      # The self tests check that the JUnit XML of --naos-output is well-formed where xmllint is
-      # found; macOS has it, and Ubuntu has it in libxml2-utils.
+      # The self tests check the JUnit XML of --naos-output against a schema where xmllint is found;
+      # macOS has it, and Ubuntu has it in libxml2-utils.
       - name: Install xmllint
         if: runner.os == 'Linux'
         run: command -v xmllint || { sudo apt-get update && sudo apt-get install -y libxml2-utils; }
+
+      - name: Install CMake ${{ matrix.cmake }}
+        if: matrix.cmake
+        run: |
+          curl -fsSL "https://github.com/Kitware/CMake/releases/download/v${{ matrix.cmake }}/cmake-${{ matrix.cmake }}-linux-x86_64.tar.gz" \
+            | tar -xz -C "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/cmake-${{ matrix.cmake }}-linux-x86_64/bin" >> "$GITHUB_PATH"
 
       - name: Configure
         shell: bash
@@ -64,6 +70,7 @@ jobs:
           if [ -n "${{ matrix.cc }}" ]; then
             export CC="${{ matrix.cc }}" CXX="${{ matrix.cxx }}"
           fi
+          cmake --version
           cmake --preset ${{ matrix.preset }}
 
       - name: Build
@@ -73,7 +80,9 @@ jobs:
         run: ctest --preset ${{ matrix.preset }}
 
       # The package installed, used by a project with find_package(Naos <version>): tests/consumer.
+      # The sanitizers would have to be in the flags of that project too; the other builds test it.
       - name: Test the installed package
+        if: matrix.preset != 'sanitize'
         shell: bash
         run: |
           if [ -n "${{ matrix.cc }}" ]; then
@@ -82,15 +91,20 @@ jobs:
           cmake -D PRESET=${{ matrix.preset }} -P scripts/TestPackage.cmake
 
   # GCC of MinGW-w64 in MSYS2: UCRT64 with the C library of current Windows (UCRT), MINGW64 with
-  # the old one (msvcrt), whose default printf does not follow C99 (src/format.h).
+  # the old one (msvcrt), whose default printf does not follow C99 (src/format.h). MINGW64 is there
+  # for that printf, which the type of the library does not change; a DLL depends on the compiler
+  # and the linker, the same as those of UCRT64, which builds the shared library. The public API
+  # passes no FILE * and no memory to free across the DLL, which the two C libraries could disagree on.
   mingw:
     name: mingw ${{ matrix.msystem }} (${{ matrix.preset }})
     runs-on: windows-latest
     strategy:
       fail-fast: false
       matrix:
-        msystem: [UCRT64, MINGW64]
-        preset: [default, shared]
+        include:
+          - { msystem: UCRT64, preset: default }
+          - { msystem: UCRT64, preset: shared }
+          - { msystem: MINGW64, preset: default }
     defaults:
       run:
         shell: msys2 {0}
