@@ -74,9 +74,10 @@ scripts/
 ### unit/
 
 - 残す: `value`、`filter`、`order`。
-- **足す: `text.c` と `xml.c` の writer。** `naos_xml_writer()` を通して、ビルドディレクトリのファイルで `begin` し、`writer.h` のイベントを呼び、`end` してから、ファイルを読み戻して比べます。XML のエスケープの境界(不正な UTF-8、XML が許さない制御文字、属性の改行とタブ、`]]>`)は、テストプログラムを通すよりこの方が網羅しやすいためです。golden のケース `xml/text` は代表するテスト 1 つだけにします。
-- `human.c` の writer は入れません。標準出力に書くので同じプロセスのテストからは読み戻せず、書く行はすべて `behavior/` の golden ファイルが確かめているためです。
-- 先に確かめること: `xml.c` の writer は状態を `static` 変数(`g_cases`、`g_suites` など)に持ちます。1 つのプロセスで何度もファイルを書くには、`end` のあとの状態が `begin` の期待どおりである必要があります。そうでなければ、`end` で状態を戻すようにする(ライブラリの変更として別のコミットで)か、この追加をやめます。
+- **足す: `text.c`、`xml.c` の writer、`human.c` の診断。** `xml.c` の writer は `naos_xml_writer()` を通して、ビルドディレクトリのファイルで `begin` し、`writer.h` のイベントを呼び、`end` してから、ファイルを読み戻して比べます。XML のエスケープの境界(不正な UTF-8、XML が許さない制御文字、属性の改行とタブ、`]]>`)は、テストプログラムを通すよりこの方が網羅しやすいためです。golden のケース `xml/text` は代表するテスト 1 つだけにします。
+- 1 つのプロセスで何度もファイルを書けます。`xml.c` の writer の、実行の始めの状態は `begin` が設定し、残りは `end` が解放します(`release_all()`)。
+- `human.c` の診断は `naos_human_put_diagnostic()` を通して確かめます。渡された sink に書く関数で、`xml.c` も `<failure>` のテキストに使っています。テストはテキストを集めて比べます。わざと失敗するプログラムを種類ごとに作らずに、どの種類の記録についても詳細の行、ノート、トレースを網羅できます。
+- `human.c` のほかの行(`RUN:`、`PASS:`、`SUMMARY:` など)は入れません。writer が標準出力に直接書くので、同じプロセスのテストからは読み戻せないためです。writer がこれらも sink を通して書くようにはできます。`put_stdout()` がすでに sink なので小さな変更ですが、行いません。これらの行はどの種類も `behavior/` の golden ファイルが確かめており、これほど単純な行には unit テストで見つかる境界がほとんどないためです。
 
 ### api/
 
@@ -163,7 +164,7 @@ scripts/
 - [ ] 1. **ハーネス**: `support/` を `harness/` にする。パスから作る名前、ラベル、exit code だけで判定するケース。既存のケースはすべて成功したまま。
 - [ ] 2. **`behavior/` と `build/` へ移す**: `git mv` だけで、golden ファイルは変えない。ケースの数は前後で同じ。
 - [ ] 3. **`contract/`**。`junit.xsd` と `FIXTURES_REQUIRED naos_trust` も。
-- [ ] 4. **`unit/`**: `text` と `xml` の writer。
+- [ ] 4. **`unit/`**: `text`、`xml` の writer、`human` の診断。
 - [ ] 5. **`build/functions` と `build/subproject`**。`package/` を `consumer/` に、`scripts/TestPackage.cmake`。
 - [ ] 6. **プリセット `release` と `sanitize`**。見つかったバグはそれぞれ別のコミットで直す。
 - [ ] 7. **CI**: `Lint.cmake`、`CheckReleaseScripts.cmake`、CMake 3.21 のジョブ。

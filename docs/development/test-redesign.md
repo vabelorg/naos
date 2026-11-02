@@ -74,9 +74,10 @@ Every case is judged by its exit code and regexes, so updating the golden files 
 ### unit/
 
 - Kept: `value`, `filter`, `order`.
-- **Added: `text.c`, and the writer of `xml.c`**, driven through `naos_xml_writer()`: `begin` with a file of the build directory, the events of `writer.h`, `end`, then the file read back and compared. The edge cases of XML escaping (invalid UTF-8, control characters XML does not allow, line breaks and tabs in attributes, `]]>`) are easier to cover this way than through a test program. The golden case `xml/text` then keeps one representative test.
-- The writer of `human.c` stays out: it writes to standard output, which a test in the same process cannot read back, and the golden files of `behavior/` already cover every line it writes.
-- To check first: the writer of `xml.c` keeps its state in `static` variables (`g_cases`, `g_suites` and others). The tests need `end` to leave it as `begin` expects it, so that one process can write many files. If it does not, either `end` is made to reset it (a change to the library, in a commit of its own), or this addition is dropped.
+- **Added: `text.c`, the writer of `xml.c`, and the diagnostics of `human.c`.** The writer of `xml.c` is driven through `naos_xml_writer()`: `begin` with a file of the build directory, the events of `writer.h`, `end`, then the file read back and compared. The edge cases of XML escaping (invalid UTF-8, control characters XML does not allow, line breaks and tabs in attributes, `]]>`) are easier to cover this way than through a test program. The golden case `xml/text` then keeps one representative test.
+- One process can write many files: `begin` sets the state of the writer of `xml.c` that a run starts from, and `end` releases the rest (`release_all()`).
+- The diagnostics of `human.c` are driven through `naos_human_put_diagnostic()`, which writes to a sink it is given, as `xml.c` uses it for the text of a `<failure>`: the test collects the text and compares it. This covers the detail lines, the note and the traces of every kind of record, without a program that fails on purpose for each.
+- The other lines of `human.c` (`RUN:`, `PASS:`, `SUMMARY:` and the like) stay out: the writer puts them on standard output directly, which a test in the same process cannot read back. The writer could put them through a sink as well, a small change since `put_stdout()` already is one, but it is not made: the golden files of `behavior/` cover every kind of these lines, and lines this simple have few edge cases for a unit test to find.
 
 ### api/
 
@@ -163,7 +164,7 @@ Each step is one pull request, with the English documentation it changes.
 - [ ] 1. **Harness**: `support/` becomes `harness/`; names made from the path; labels; cases judged by the exit code alone. Every existing case still passes.
 - [ ] 2. **Move to `behavior/` and `build/`**: `git mv` only, the golden files unchanged. The number of cases is the same before and after.
 - [ ] 3. **`contract/`**, with `junit.xsd` and `FIXTURES_REQUIRED naos_trust`.
-- [ ] 4. **`unit/`**: `text` and the writer of `xml`.
+- [ ] 4. **`unit/`**: `text`, the writer of `xml` and the diagnostics of `human`.
 - [ ] 5. **`build/functions` and `build/subproject`**; `package/` becomes `consumer/`; `scripts/TestPackage.cmake`.
 - [ ] 6. **The presets `release` and `sanitize`**; each bug they find is fixed in a commit of its own.
 - [ ] 7. **CI**: `Lint.cmake`, `CheckReleaseScripts.cmake`, the CMake 3.21 job.
