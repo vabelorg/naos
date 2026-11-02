@@ -124,7 +124,7 @@ A nested configure uses the generator, compilers, make program and configuration
 |---|---|
 | `lint` | `cmake -D ROOT=. -P scripts/Lint.cmake`, alone |
 | `test` | linux-gcc {default, shared, **release**}, linux-clang {default, **sanitize**}, macos-clang {default, shared}, msvc {default, shared, **release**}, **cmake-3.21** (linux-gcc, default) |
-| `mingw` | UCRT64 {default, shared}, MINGW64 {default}: MINGW64 is there for the printf of msvcrt, which static checks |
+| `mingw` | UCRT64 {default, shared}, MINGW64 {default}: MINGW64 is there for the printf of msvcrt, which static checks ([decisions](#decisions)) |
 
 - The installed package is tested with one line, `cmake -D PRESET=<preset> -P scripts/TestPackage.cmake`, in every job but `sanitize`. With CMake 3.21 it checks `find_package(Naos)` with the oldest CMake users may have.
 - **The CMake 3.21 job is new**: `cmake_minimum_required(VERSION 3.21)` is never checked today.
@@ -147,6 +147,14 @@ A nested configure uses the generator, compilers, make program and configuration
 | `docs/ja/` | The same pages, in a later pull request as [documentation style](docs-style.md#languages) allows |
 
 `CHANGELOG.md` needs no entry, since users see no change, unless `release` or `sanitize` finds a bug: its fix gets one.
+
+## Decisions
+
+Settled after reviewing the plan:
+
+- **The golden files keep what the contract checks.** Exit codes and diagnostic lines stay in them as they are, and are not normalized away. The overlap is what makes the contract work: when an update of the golden files changes an exit code, the contract case, which the update does not touch, still fails. Normalizing them away would also leave the golden files short of the whole output.
+- **MINGW64 is built static only.** It is in CI for the printf of msvcrt, which does not depend on the type of the library; what a DLL depends on (exports, `NAOS_SHARED`, finding the DLL) is the compiler and the linker, the same GCC and binutils as UCRT64, whose shared build stays. To check before CI changes (step 7): that the public API passes no `FILE *` and no memory to be freed on the other side, the one thing a DLL and an executable on different C libraries could disagree on. If it does, MINGW64 keeps its shared build.
+- **The tests of `examples/` stay out of `naos_trust`.** The property would have to be written in their `CMakeLists.txt`, which users copy, since the names of discovered tests are not known until the build. Leaving them out loses no failure: when Naos judges wrongly, the contract fails and so does the whole run. The fixture only keeps misleading passes from hiding the cause, which `unit/` and `api/` are enough for.
 
 ## Steps
 

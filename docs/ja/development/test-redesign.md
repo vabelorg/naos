@@ -124,7 +124,7 @@ scripts/
 |---|---|
 | `lint` | `cmake -D ROOT=. -P scripts/Lint.cmake` だけ |
 | `test` | linux-gcc {default, shared, **release**}、linux-clang {default, **sanitize**}、macos-clang {default, shared}、msvc {default, shared, **release**}、**cmake-3.21**(linux-gcc、default) |
-| `mingw` | UCRT64 {default, shared}、MINGW64 {default}。MINGW64 は msvcrt の printf のためにあり、静的で確かめられる |
+| `mingw` | UCRT64 {default, shared}、MINGW64 {default}。MINGW64 は msvcrt の printf のためにあり、静的で確かめられる([決定](#決定)) |
 
 - インストールしたパッケージは `cmake -D PRESET=<preset> -P scripts/TestPackage.cmake` の 1 行でテストし、`sanitize` 以外のすべてのジョブで実行します。CMake 3.21 では、利用者の持ちうるいちばん古い CMake で `find_package(Naos)` を確かめることになります。
 - **CMake 3.21 のジョブは新規です。** 今は `cmake_minimum_required(VERSION 3.21)` を一度も確かめていません。
@@ -147,6 +147,14 @@ scripts/
 | `docs/ja/` | 同じページを、[文書の書き方](docs-style.md#言語)のとおり後のプルリクエストで |
 
 利用者に見える変更はないので `CHANGELOG.md` の項目は要りません。ただし `release` や `sanitize` がバグを見つけたら、その修正には項目を付けます。
+
+## 決定
+
+プランをレビューして決めたこと:
+
+- **契約が確かめるものは golden ファイルにも残す。** exit code と診断の行はそのまま残し、正規化で落としません。この重なりが契約を効かせます。golden ファイルの更新で exit code が変わっても、更新が触れない契約のケースは失敗します。落とすと、golden ファイルが出力の全体を表さなくもなります。
+- **MINGW64 は静的だけでビルドする。** MINGW64 が CI にあるのは msvcrt の printf のためで、それはライブラリの種類によりません。DLL が頼るもの(エクスポート、`NAOS_SHARED`、DLL が見つかること)はコンパイラとリンカで、共有ビルドを残す UCRT64 と同じ GCC と binutils です。CI を変える前(手順 7)に確かめること: 公開 API が `FILE *` も、反対側で解放するメモリも渡さないこと。C ライブラリの違う DLL と実行ファイルで食い違いうるのはそれだけです。渡すなら、MINGW64 は共有ビルドを残します。
+- **`examples/` のテストは `naos_trust` に入れない。** discovery のテストの名前はビルドまでわからないので、プロパティは利用者が写す `CMakeLists.txt` に書くしかありません。入れなくても失敗は失われません。Naos の判定が誤れば契約が失敗し、実行全体も失敗します。フィクスチャが防ぐのは誤った成功が原因を隠すことだけで、それには `unit/` と `api/` で足ります。
 
 ## 手順
 
