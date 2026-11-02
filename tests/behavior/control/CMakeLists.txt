@@ -1,6 +1,10 @@
 # Copyright (c) 2026 The Naos Authors
 # SPDX-License-Identifier: MIT
 #
+# The behavior that docs/reference/control.md states, checked against golden
+# files: a program per subject, and the cases that run it.
+
+# control
 # Going on and stopping: NAOS_CHECK_* goes on, NAOS_REQUIRE_*, NAOS_FAIL and NAOS_SKIP stop the test
 # from any depth; the result line of each test, the summary and the exit code.
 
@@ -25,3 +29,21 @@ naos_expect(skip_among_passes ${exe} ARGS --naos-filter skips.*)
 # A process ending abruptly: stdout is a pipe here and fully buffered, so only what Naos has written
 # out by then is left: the RUN line, and the diagnostic of a failure.
 naos_expect_tests(${exe} crash.exits crash.exits_after_failure)
+
+# context
+# Notes and traces: where they are written in a failure, when they are used up or popped, and the
+# misuses of NAOS_TRACE_PUSH and NAOS_TRACE_POP.
+
+set(exe naos_selftest_context)
+naos_selftest_program(${exe} context_main.c note.c trace.c)
+
+naos_expect_tests(${exe}
+    note.in_loop note.used_up_by_pass note.replaced note.on_require note.on_fail note.on_skip
+    note.cut_short note.c99_formats note.with_double note.with_mem note_before_teardown.leaves_note
+    trace.nested trace.popped trace.left_by_jump trace.missing_pop trace.missing_pop_nested
+    trace.pop_without_push trace.too_deep trace.too_deep_with_note trace.on_skip
+    trace_phases.pops_setup_trace trace_phases.jumps_with_trace trace_teardown.body
+)
+naos_expect(note_reset ${exe} ARGS --naos-filter note_reset.*)
+# Every test in one process: a note or trace left by one test must not reach the next.
+naos_expect(context_run_all ${exe})

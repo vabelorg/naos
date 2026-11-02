@@ -1,6 +1,10 @@
 # Copyright (c) 2026 The Naos Authors
 # SPDX-License-Identifier: MIT
 #
+# The behavior that docs/reference/assertions.md states, checked against golden
+# files: a program per subject, and the cases that run it.
+
+# assertions
 # Failure messages: the error line and the detail lines of each kind of assertion. Every label is
 # followed by its colon and one space, except that left and left size get one more to line up with
 # right and right size.

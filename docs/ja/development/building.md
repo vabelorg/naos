@@ -51,7 +51,7 @@ ctest --test-dir build --output-on-failure
 自己テストの CTest 名はすべて `naos.` で始まり、ラベル `naos` が付いています。[サンプルのテスト](testing.md#サンプルとドキュメント)は、実行ファイルの名前で始まります。
 
 ```sh
-ctest --preset default -R '^naos\.cli\.'          # 1 つの観点
+ctest --preset default -R '^naos\.behavior\.command-line\.'   # 1 つの領域
 ctest --preset default -j8                        # 並列
 ```
 
@@ -69,7 +69,7 @@ cmake --install build/default --prefix /tmp/naos-install
 
 ## CMake を使わない場合
 
-ライブラリは、コンパイラだけでもビルドできなければなりません。自己テスト `naos.no_cmake.build` が、GCC 互換のコンパイラで、[インストール](../getting-started/installation.md#cmake-を使わない場合)に書いたとおりにビルドして確かめます。
+ライブラリは、コンパイラだけでもビルドできなければなりません。自己テスト `naos.build.no_cmake.build` が、GCC 互換のコンパイラで、[インストール](../getting-started/installation.md#cmake-を使わない場合)に書いたとおりにビルドして確かめます。
 
 ## 継続的インテグレーション
 

@@ -67,7 +67,7 @@ prog --naos-filter 'parser.*' --naos-output=xml:build/parser.xml
 
 ## 出力例
 
-Naos の自己テストのうち 4 つのテスト（`tests/report/report.c`）を、`--naos-output xml:results.xml --naos-filter 'results.passes:results.fails_twice:results.skips:results.with_context'` で実行したもの:
+Naos の自己テストのうち 4 つのテスト（`tests/behavior/xml/report.c`）を、`--naos-output xml:results.xml --naos-filter 'results.passes:results.fails_twice:results.skips:results.with_context'` で実行したもの:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -109,4 +109,4 @@ report.c:44: note: outer
 </testsuites>
 ```
 
-スイート全体は `tests/report/expected/all.txt` に、あらゆる種類のエスケープは `text.txt` にあります。
+スイート全体は `tests/behavior/xml/expected/all.txt` に、あらゆる種類のエスケープは `text.txt` にあります。

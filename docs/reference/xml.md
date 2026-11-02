@@ -67,7 +67,7 @@ Not kept compatible, since the common tools only show it or leave it out: the te
 
 ## Example
 
-Four tests of the self tests of Naos (`tests/report/report.c`), run with `--naos-output xml:results.xml --naos-filter 'results.passes:results.fails_twice:results.skips:results.with_context'`:
+Four tests of the self tests of Naos (`tests/behavior/xml/report.c`), run with `--naos-output xml:results.xml --naos-filter 'results.passes:results.fails_twice:results.skips:results.with_context'`:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -109,4 +109,4 @@ report.c:44: note: outer
 </testsuites>
 ```
 
-`tests/report/expected/all.txt` has the whole suite, and `text.txt` every kind of escape.
+`tests/behavior/xml/expected/all.txt` has the whole suite, and `text.txt` every kind of escape.

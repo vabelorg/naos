@@ -51,7 +51,7 @@ The options are in the [CMake reference](../reference/cmake.md#options).
 Every self test has a CTest name starting with `naos.` and the label `naos`; the [tests of the examples](testing.md#examples-and-documentation) are named after their executables.
 
 ```sh
-ctest --preset default -R '^naos\.cli\.'          # one subject
+ctest --preset default -R '^naos\.behavior\.command-line\.'   # one area
 ctest --preset default -j8                        # in parallel
 ```
 
@@ -69,7 +69,7 @@ The layout installed is in the [CMake reference](../reference/cmake.md#package).
 
 ## Without CMake
 
-The library must also build with nothing but a compiler; the self test `naos.no_cmake.build` checks it as [installation](../getting-started/installation.md#without-cmake) describes, on GCC-compatible compilers.
+The library must also build with nothing but a compiler; the self test `naos.build.no_cmake.build` checks it as [installation](../getting-started/installation.md#without-cmake) describes, on GCC-compatible compilers.
 
 ## Continuous integration
 

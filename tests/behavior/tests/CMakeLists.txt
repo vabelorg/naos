@@ -1,6 +1,10 @@
 # Copyright (c) 2026 The Naos Authors
 # SPDX-License-Identifier: MIT
 #
+# The behavior that docs/reference/tests.md states, checked against golden
+# files: a program per subject, and the cases that run it.
+
+# session
 # The main() side: the order of naos_init(), NAOS_ADD_SUITE and naos_run(), the arguments
 # naos_init() leaves to the program, and the mistakes in the suites, all reported before anything
 # runs.
@@ -28,3 +32,15 @@ naos_expect(init_after_run ${exe} ARGS init-after-run --naos-list)
 naos_expect(add_before_init ${exe} ARGS add-before-init --naos-list)
 naos_expect(run_without_init ${exe} ARGS run-without-init --naos-list)
 naos_expect(require_outside_test ${exe} ARGS require-outside)
+
+# fixtures
+# Setup and teardown: what runs, what is left out and what counts, one case per arrangement of
+# fixtures.c.
+
+set(exe naos_selftest_fixtures)
+naos_selftest_program(${exe} fixtures.c)
+
+naos_expect_tests(${exe}
+    setup_fails.body setup_skips.body setup_check_continues.body teardown_fails.body
+    body_fails.fatal_body teardown_requires.body body_and_teardown_require.fatal_body
+)
