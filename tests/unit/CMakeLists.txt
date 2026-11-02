@@ -21,4 +21,6 @@ set_target_properties(naos_selftest_unit PROPERTIES
     C_EXTENSIONS NO
 )
 naos_selftest_strict(naos_selftest_unit)
-naos_discover_tests(naos_selftest_unit PREFIX "naos.unit." LABELS naos)
+naos_selftest_prefix(prefix)
+naos_selftest_labels(labels)
+naos_discover_tests(naos_selftest_unit PREFIX "${prefix}" LABELS ${labels})

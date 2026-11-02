@@ -6,15 +6,14 @@
 # is theirs.
 
 function(naos_misuse_case name)
-    add_test(NAME naos.misuse.${name}
-        COMMAND "${CMAKE_COMMAND}"
+    naos_selftest_add_test(${name}
+        "${CMAKE_COMMAND}"
             -D "CC=${CMAKE_C_COMPILER}"
             -D "INCLUDE_DIR=${PROJECT_SOURCE_DIR}/include"
             -D "SOURCE=${CMAKE_CURRENT_SOURCE_DIR}/${name}.c"
             -D "EXPECT=${ARGN}"
             -P "${CMAKE_CURRENT_SOURCE_DIR}/CheckMisuse.cmake"
     )
-    set_tests_properties(naos.misuse.${name} PROPERTIES LABELS naos)
 endfunction()
 
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang" AND NOT CMAKE_C_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")

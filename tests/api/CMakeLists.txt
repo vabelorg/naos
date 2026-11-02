@@ -4,10 +4,12 @@
 # The public API, used the way a project uses it: test executables made with naos_add_executable(),
 # whose tests must all pass and become one CTest test each.
 
+naos_selftest_prefix(prefix)
+naos_selftest_labels(labels)
 naos_add_executable(naos_selftest_api
     SOURCES main.c check.c control.c fixture.c version.c
-    PREFIX "naos.api."
-    LABELS naos
+    PREFIX "${prefix}"
+    LABELS ${labels}
     DISCOVERY_TIMEOUT 30
 )
 naos_selftest_strict(naos_selftest_api)
@@ -26,8 +28,8 @@ if(CMAKE_CXX_COMPILER)
     enable_language(CXX)
     naos_add_executable(naos_selftest_api_cpp
         SOURCES cpp.cpp
-        PREFIX "naos.api.cpp."
-        LABELS naos
+        PREFIX "${prefix}cpp."
+        LABELS ${labels}
     )
     # Variadic macros need C++11.
     set_target_properties(naos_selftest_api_cpp PROPERTIES

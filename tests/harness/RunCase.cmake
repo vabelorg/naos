@@ -10,13 +10,16 @@
 # -D EXPECTED=<file>      the expected arguments, exit code, stdout and stderr, as written below
 # -D OUTPUT_FILE=<path>   a file the executable writes, which {output} in ARGS stands for: removed
 #                         before the run, and compared after it in a third part (optional)
-# -D XMLLINT=<path>       xmllint, which then checks that the file is well-formed XML (optional)
+# -D XMLLINT=<path>       xmllint, which then checks that a file written is well-formed XML (optional)
 # -D FILE_ONLY=1          with OUTPUT_FILE: stdout and stderr are left out of the comparison
 #                         (optional)
 # Regex case:
 # -D EXIT_CODE=<n>        the exit code required
 # -D EXPECT_<i>=<regex>   must match stdout followed by stderr, for i = 0, 1, ... (optional)
 # -D REJECT_<i>=<regex>   must not match it (optional)
+# -D OUTPUT_FILE=<path>   as for a golden case, without the comparison (optional)
+# -D FILE_STATE=<state>   with OUTPUT_FILE: the file must be absent, empty or written (optional)
+# -D SCHEMA=<xsd>         with OUTPUT_FILE and XMLLINT: a file written must be valid against it (optional)
 #
 # With the environment variable NAOS_UPDATE_EXPECTED set to 1, a golden case writes what the
 # executable did into its file instead of comparing, and passes.
@@ -174,6 +177,36 @@ function(check_regexes output prefix must_match)
     set(problems "${problems}" PARENT_SCOPE)
 endfunction()
 
+# Appends to problems what is wrong with OUTPUT_FILE, for a regex case: its state, and its validity
+# against SCHEMA.
+function(check_output_file)
+    if(NOT EXISTS "${OUTPUT_FILE}")
+        set(state absent)
+    else()
+        file(SIZE "${OUTPUT_FILE}" size)
+        if(size EQUAL 0)
+            set(state empty)
+        else()
+            set(state written)
+        endif()
+    endif()
+    if(DEFINED FILE_STATE AND (NOT state STREQUAL FILE_STATE))
+        string(APPEND problems "${OUTPUT_FILE}: expected ${FILE_STATE}, found ${state}\n")
+    endif()
+    if(state STREQUAL "written" AND DEFINED XMLLINT)
+        set(schema_args "")
+        if(DEFINED SCHEMA)
+            set(schema_args --schema "${SCHEMA}")
+        endif()
+        execute_process(COMMAND "${XMLLINT}" --noout ${schema_args} "${OUTPUT_FILE}"
+            RESULT_VARIABLE lint_code OUTPUT_VARIABLE lint_output ERROR_VARIABLE lint_output)
+        if(NOT lint_code EQUAL 0)
+            string(APPEND problems "${OUTPUT_FILE} is not valid XML:\n${lint_output}")
+        endif()
+    endif()
+    set(problems "${problems}" PARENT_SCOPE)
+endfunction()
+
 # Regex case: the exit code and the regexes, against stdout followed by stderr with CR removed.
 function(check_match)
     string(REPLACE "\r" "" output "${stdout}${stderr}")
@@ -181,11 +214,14 @@ function(check_match)
     if(NOT code STREQUAL EXIT_CODE)
         string(APPEND problems "exit code: expected ${EXIT_CODE}, got ${code}\n")
     endif()
+    if(DEFINED OUTPUT_FILE)
+        check_output_file()
+    endif()
     check_regexes("${output}" EXPECT TRUE)
     check_regexes("${output}" REJECT FALSE)
     if(NOT problems STREQUAL "")
         message(NOTICE "${problems}--- output ---\n${output}")
-        message(FATAL_ERROR "the output does not match the regexes of the case")
+        message(FATAL_ERROR "the run does not do what the case requires")
     endif()
 endfunction()
 

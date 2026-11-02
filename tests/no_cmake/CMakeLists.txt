@@ -6,8 +6,8 @@
 
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang" AND NOT CMAKE_C_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC"
    AND NOT CMAKE_CROSSCOMPILING AND CMAKE_AR)
-    add_test(NAME naos.no_cmake.build
-        COMMAND "${CMAKE_COMMAND}"
+    naos_selftest_add_test(build
+        "${CMAKE_COMMAND}"
             -D "CC=${CMAKE_C_COMPILER}"
             -D "AR=${CMAKE_AR}"
             -D "NAOS_DIR=${PROJECT_SOURCE_DIR}"
@@ -15,5 +15,4 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang" AND NOT CMAKE_C_COMPILER_FRONTEND_VAR
             -D "EXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
             -P "${CMAKE_CURRENT_SOURCE_DIR}/NoCMake.cmake"
     )
-    set_tests_properties(naos.no_cmake.build PROPERTIES LABELS naos)
 endif()

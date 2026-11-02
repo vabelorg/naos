@@ -25,7 +25,7 @@ The self tests of Naos: what they check, how they compare outputs, and how to ad
 | `examples/` | The projects of `examples/`, and the outputs the documentation quotes from them | Their tests pass; outputs compared |
 | `misuse/` | Programs that must not compile, such as a teardown named in `NAOS_SET_SETUP` or a setup named in `NAOS_ADD_TEST` | The compiler refuses them and names the mistake |
 
-The helpers are in `tests/support/`: the functions of `NaosSelftest.cmake`, and `CheckOutput.cmake`, which runs one case.
+The helpers are in `tests/harness/`: the functions of `NaosSelftest.cmake`, and `RunCase.cmake`, which runs one case.
 
 `tests/package/` is not a self test: it is a project that uses the installed package with `find_package(Naos <version>)`. CI configures it on its own after installing each build ([building](building.md#installing)).
 

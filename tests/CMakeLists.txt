@@ -3,7 +3,7 @@
 #
 # Self tests of the Naos harness, one directory per subject. Each holds its programs and a
 # CMakeLists.txt registering its cases; a case checked against golden output keeps it in
-# <subject>/expected/<case>.txt. support/NaosSelftest.cmake has the helpers and tells how a case is
+# <subject>/expected/<case>.txt. harness/NaosSelftest.cmake has the helpers and tells how a case is
 # written; docs/development/testing.md tells how to add one.
 #
 # Tests that check themselves, one CTest test per Naos test:
@@ -31,7 +31,7 @@
 # calls of src/) are not here: they are scripts/CheckMarkdownLinks.cmake and
 # scripts/CheckPrintfCalls.cmake, run once by the lint job of CI.
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/support/NaosSelftest.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/harness/NaosSelftest.cmake)
 
 # The library gets the strict warnings of its self tests too.
 naos_selftest_strict(naos)

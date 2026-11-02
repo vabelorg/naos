@@ -25,7 +25,7 @@ Naos の自己テストについて、何を確かめるか、出力をどう照
 | `examples/` | `examples/` のプロジェクトと、文書がそこから引用する出力 | テストが通ること、出力の照合 |
 | `misuse/` | コンパイルできてはいけないプログラム（`NAOS_SET_SETUP` に teardown を、`NAOS_ADD_TEST` に setup を指定するなど） | コンパイラが拒否し、誤りの名前を示すこと |
 
-仕組みは `tests/support/` にあります（`NaosSelftest.cmake` の関数と、ケースを 1 つ実行する `CheckOutput.cmake`）。
+仕組みは `tests/harness/` にあります（`NaosSelftest.cmake` の関数と、ケースを 1 つ実行する `RunCase.cmake`）。
 
 `tests/package/` は自己テストではありません。インストールしたパッケージを `find_package(Naos <version>)` で使うプロジェクトで、CI がビルドごとにインストールした後、単独で configure します（[ビルド](building.md#インストールする)）。
 
