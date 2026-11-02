@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-02
+
 ### Changed
 
 - **BREAKING**: The package is `Naos` and its target `Naos::naos`, as the project is named: `find_package(Naos)`, `FetchContent_Declare(Naos ...)` and `target_link_libraries(... Naos::naos)`. The target `naos::naos` is no longer there, and the variables of `find_package()` are `Naos_VERSION` and `Naos_DIR` rather than `naos_VERSION` and `naos_DIR`. The package is installed as `<libdir>/cmake/Naos/NaosConfig.cmake`, which `find_package(naos)` does not find on a file system that tells the case of letters apart.
@@ -45,6 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `naos_add_executable()` to register each test with CTest, which runs each one in its own process, in parallel and with a time limit.
 - Installation with `FetchContent`, `add_subdirectory()`, `find_package()`, or the sources alone.
 
-[Unreleased]: https://github.com/vabelorg/naos/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/vabelorg/naos/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/vabelorg/naos/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/vabelorg/naos/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/vabelorg/naos/releases/tag/v0.1.0

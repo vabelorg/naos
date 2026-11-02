@@ -74,7 +74,7 @@ CMake では `FetchContent` がいちばん簡単です。
 include(FetchContent)
 FetchContent_Declare(Naos
     GIT_REPOSITORY https://github.com/vabelorg/naos.git
-    GIT_TAG v0.2.0
+    GIT_TAG v0.3.0
 )
 FetchContent_MakeAvailable(Naos)
 ```
@@ -106,7 +106,7 @@ cmake -S . -B build && cmake --build build && ctest --test-dir build
 
 ## 状態
 
-Naos は 1.0 より前です。マイナーバージョンが上がると互換が切れることがあり、`find_package(Naos 0.2)` は 0.2.x だけを受け付けます。バージョンごとの変更は[変更履歴](CHANGELOG.md)にあります（英語）。
+Naos は 1.0 より前です。マイナーバージョンが上がると互換が切れることがあり、`find_package(Naos 0.3)` は 0.3.x だけを受け付けます。バージョンごとの変更は[変更履歴](CHANGELOG.md)にあります（英語）。
 
 ## 参加する
 

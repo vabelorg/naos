@@ -43,7 +43,7 @@ Naos is downloaded at configure time. This is the simplest way, and the one the 
 include(FetchContent)
 FetchContent_Declare(Naos
     GIT_REPOSITORY https://github.com/vabelorg/naos.git
-    GIT_TAG v0.2.0
+    GIT_TAG v0.3.0
 )
 FetchContent_MakeAvailable(Naos)
 ```
@@ -73,7 +73,7 @@ Inside another project, unless asked, Naos builds as a static library, registers
 2. Then find it, with the prefix in `CMAKE_PREFIX_PATH` (`-DCMAKE_PREFIX_PATH=/opt/naos`):
 
    ```cmake
-   find_package(Naos 0.2 REQUIRED)
+   find_package(Naos 0.3 REQUIRED)
    ```
 
 Which versions it accepts is in the [CMake reference](../reference/cmake.md#package).
