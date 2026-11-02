@@ -4,7 +4,7 @@
 # Unit tests of the internal modules whose results depend only on their arguments (value, filter,
 # order), run by Naos itself, one CTest test each.
 #
-# The executable is built from the sources of the library rather than linked to naos::naos: a
+# The executable is built from the sources of the library rather than linked to Naos::naos: a
 # static Naos would also do, but a shared one exports only NAOS_API. Built this way the unit tests
 # need no NAOS_SHARED and no DLL.
 

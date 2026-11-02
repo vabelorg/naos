@@ -4,7 +4,7 @@
  *
  * Unit tests of the internal modules of Naos whose results depend only on their arguments, run by
  * Naos itself, one file per module. The executable is built from the sources of Naos rather than
- * linked to naos::naos, so it reaches the functions that a shared Naos keeps hidden.
+ * linked to Naos::naos, so it reaches the functions that a shared Naos keeps hidden.
  */
 
 #include <naos/naos.h>

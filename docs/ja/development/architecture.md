@@ -17,7 +17,7 @@ Naos 自体を保守・拡張する人向けに、ソースの置き方とモジ
 |---|---|
 | `include/naos/` | 公開ヘッダ。利用者には `naos/naos.h` だけを案内する |
 | `src/` | 実装と内部ヘッダ |
-| `cmake/` | 利用者向けにインストールする `Naos.cmake`（`naos_add_executable()` / `naos_discover_tests()`）と `NaosDiscover.cmake`（ビルド後にテストを列挙して CTest に登録するスクリプト）、`find_package(naos)` 用の config。Naos のビルドだけが使う `NaosVersion.cmake`（バージョンと、そこから決まる互換性・SOVERSION）と `NaosInstall.cmake`（インストール規則）はインストールしない |
+| `cmake/` | 利用者向けにインストールする `Naos.cmake`（`naos_add_executable()` / `naos_discover_tests()`）と `NaosDiscover.cmake`（ビルド後にテストを列挙して CTest に登録するスクリプト）、`find_package(Naos)` 用の config。Naos のビルドだけが使う `NaosVersion.cmake`（バージョンと、そこから決まる互換性・SOVERSION）と `NaosInstall.cmake`（インストール規則）はインストールしない |
 | `tests/` | 自己テスト。観点ごとのディレクトリに、プログラム、ケースを登録する `CMakeLists.txt`、期待する出力（`expected/`）を置く（[テスト](testing.md)） |
 | `examples/` | 文書が引用する完成したプロジェクト。自己テストでビルドして実行する |
 | `docs/` | 英語の文書と、`docs/ja/` にその日本語訳 |

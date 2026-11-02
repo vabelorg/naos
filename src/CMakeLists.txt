@@ -52,7 +52,7 @@ add_library(naos ${naos_library_type}
     text.c
     value.c
 )
-add_library(naos::naos ALIAS naos)
+add_library(Naos::naos ALIAS naos)
 
 target_include_directories(naos PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>

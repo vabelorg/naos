@@ -10,7 +10,7 @@
 #     [LABELS <label>...]
 #     [PROPERTIES <name> <value>...]
 #     [DISCOVERY_TIMEOUT <seconds>])  # limit for "<exe> --naos-list", default 60
-#   Creates a test executable linked to naos::naos and registers each of its tests with CTest.
+#   Creates a test executable linked to Naos::naos and registers each of its tests with CTest.
 #
 # naos_discover_tests(<target> [PREFIX ...] [LABELS ...] [PROPERTIES ...] [DISCOVERY_TIMEOUT ...])
 #   Registers the tests of an existing executable target that calls naos_init() and naos_run().
@@ -163,7 +163,7 @@ function(naos_add_executable target)
     endif()
 
     add_executable(${target} ${arg_SOURCES})
-    target_link_libraries(${target} PRIVATE naos::naos ${arg_LIBRARIES})
+    target_link_libraries(${target} PRIVATE Naos::naos ${arg_LIBRARIES})
 
     _naos_discover(naos_add_executable ${target}
         "${arg_PREFIX}" "${arg_LABELS}" "${arg_PROPERTIES}" "${arg_DISCOVERY_TIMEOUT}")

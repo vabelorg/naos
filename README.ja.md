@@ -69,14 +69,14 @@ CMake では `FetchContent` がいちばん簡単です。
 
 ```cmake
 include(FetchContent)
-FetchContent_Declare(naos
+FetchContent_Declare(Naos
     GIT_REPOSITORY https://github.com/vabelorg/naos.git
     GIT_TAG v0.2.0
 )
-FetchContent_MakeAvailable(naos)
+FetchContent_MakeAvailable(Naos)
 ```
 
-`add_subdirectory()` や `find_package(naos)` でも取り込めます。CMake を使わない場合は、`include/` をインクルードパスに、`src/` の `.c` ファイルをビルドに加えます。4 通りすべてを[インストール](docs/ja/getting-started/installation.md)にまとめています。
+`add_subdirectory()` や `find_package(Naos)` でも取り込めます。CMake を使わない場合は、`include/` をインクルードパスに、`src/` の `.c` ファイルをビルドに加えます。4 通りすべてを[インストール](docs/ja/getting-started/installation.md)にまとめています。
 
 ## クイックスタート
 
@@ -105,7 +105,7 @@ cmake -S . -B build && cmake --build build && ctest --test-dir build
 
 ## 状態
 
-Naos は 1.0 より前です。マイナーバージョンが上がると互換が切れることがあり、`find_package(naos 0.2)` は 0.2.x だけを受け付けます。バージョンごとの変更は[変更履歴](CHANGELOG.md)にあります（英語）。
+Naos は 1.0 より前です。マイナーバージョンが上がると互換が切れることがあり、`find_package(Naos 0.2)` は 0.2.x だけを受け付けます。バージョンごとの変更は[変更履歴](CHANGELOG.md)にあります（英語）。
 
 ## 参加する
 

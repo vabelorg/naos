@@ -78,7 +78,7 @@ static size_t add_saturated(size_t a, size_t b)
 
 - コマンドは小文字、インデントは空白 4 文字。
 - 利用者向けの関数は `naos_*`、内部用は `_naos_*`。
-- ファイル名は CMake 本体のモジュールにならってアッパーキャメルケースにする。`include()` で読み込むモジュールと、利用者向けにインストールするスクリプトは `Naos` で始める（`NaosVersion.cmake`、`NaosDiscover.cmake`）。Naos のビルド・テスト・ワークフローだけが `cmake -P` で実行するスクリプトは `Naos` を付けない（`PrepareRelease.cmake`、`CheckOutput.cmake`）。パッケージの設定ファイルだけは例外で、`find_package(naos)` が探す名前にする（`naos-config.cmake`）。
+- ファイル名は CMake 本体のモジュールにならって、パッケージの設定ファイル（`NaosConfig.cmake`）も含めアッパーキャメルケースにする。`include()` で読み込むモジュールと、利用者向けにインストールするスクリプトは `Naos` で始める（`NaosVersion.cmake`、`NaosDiscover.cmake`）。Naos のビルド・テスト・ワークフローだけが `cmake -P` で実行するスクリプトは `Naos` を付けない（`PrepareRelease.cmake`、`CheckOutput.cmake`）。
 - ファイルの先頭に著作権表示と、何のためのファイルで、どう使われるかのコメントを書く。
 
 ## サンプル

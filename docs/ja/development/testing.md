@@ -29,7 +29,7 @@ Naos の自己テストについて、何を確かめるか、出力をどう照
 
 仕組みは `tests/support/` にあります（`NaosSelftest.cmake` の関数と、ケースを 1 つ実行する `CheckOutput.cmake`）。
 
-`tests/package/` は自己テストではありません。インストールしたパッケージを `find_package(naos <version>)` で使うプロジェクトで、CI がビルドごとにインストールした後、単独で configure します（[ビルド](building.md#インストールする)）。
+`tests/package/` は自己テストではありません。インストールしたパッケージを `find_package(Naos <version>)` で使うプロジェクトで、CI がビルドごとにインストールした後、単独で configure します（[ビルド](building.md#インストールする)）。
 
 ## 出力を照合するケース
 

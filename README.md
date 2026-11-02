@@ -69,14 +69,14 @@ With CMake, `FetchContent` is the simplest way:
 
 ```cmake
 include(FetchContent)
-FetchContent_Declare(naos
+FetchContent_Declare(Naos
     GIT_REPOSITORY https://github.com/vabelorg/naos.git
     GIT_TAG v0.2.0
 )
-FetchContent_MakeAvailable(naos)
+FetchContent_MakeAvailable(Naos)
 ```
 
-`add_subdirectory()` and `find_package(naos)` work as well. Without CMake, add `include/` to the include path and the `.c` files of `src/` to your build. All four ways are in [Installation](docs/getting-started/installation.md).
+`add_subdirectory()` and `find_package(Naos)` work as well. Without CMake, add `include/` to the include path and the `.c` files of `src/` to your build. All four ways are in [Installation](docs/getting-started/installation.md).
 
 ## Quick start
 
@@ -103,7 +103,7 @@ The whole map is in [docs/](docs/README.md).
 
 ## Status
 
-Naos is before 1.0: a new minor version may break compatibility, and `find_package(naos 0.2)` accepts 0.2.x only. What changes in each version is in the [changelog](CHANGELOG.md).
+Naos is before 1.0: a new minor version may break compatibility, and `find_package(Naos 0.2)` accepts 0.2.x only. What changes in each version is in the [changelog](CHANGELOG.md).
 
 ## Contributing
 

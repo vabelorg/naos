@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **BREAKING**: The package is `Naos` and its target `Naos::naos`, as the project is named: `find_package(Naos)`, `FetchContent_Declare(Naos ...)` and `target_link_libraries(... Naos::naos)`. The target `naos::naos` is no longer there, and the variables of `find_package()` are `Naos_VERSION` and `Naos_DIR` rather than `naos_VERSION` and `naos_DIR`. The package is installed as `<libdir>/cmake/Naos/NaosConfig.cmake`, which `find_package(naos)` does not find on a file system that tells the case of letters apart.
+
 ## [0.2.0] - 2026-11-01
 
 ### Added

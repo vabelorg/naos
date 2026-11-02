@@ -6,7 +6,7 @@
 # a case is naos.<subject>.<case>, <subject> being the name of the directory.
 #
 # naos_selftest_program(<target> <source>...)
-#   An executable linked to naos::naos, built with the strict warnings of the self tests.
+#   An executable linked to Naos::naos, built with the strict warnings of the self tests.
 #
 # naos_selftest_strict(<target>...)
 #   Gives existing targets the strict warnings, when Naos is the top-level project: an enclosing
@@ -59,7 +59,7 @@ endfunction()
 
 function(naos_selftest_program target)
     add_executable(${target} ${ARGN})
-    target_link_libraries(${target} PRIVATE naos::naos)
+    target_link_libraries(${target} PRIVATE Naos::naos)
     naos_selftest_strict(${target})
 endfunction()
 

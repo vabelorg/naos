@@ -64,7 +64,7 @@ ctest --preset default -j8                        # in parallel
 cmake --install build/default --prefix /tmp/naos-install
 ```
 
-The layout installed is in the [CMake reference](../reference/cmake.md#package). A project can then use it with `find_package(naos)` and `-DCMAKE_PREFIX_PATH=/tmp/naos-install`. `tests/package/` is such a project; CI builds and tests it against each package installed.
+The layout installed is in the [CMake reference](../reference/cmake.md#package). A project can then use it with `find_package(Naos)` and `-DCMAKE_PREFIX_PATH=/tmp/naos-install`. `tests/package/` is such a project; CI builds and tests it against each package installed.
 
 ## Without CMake
 

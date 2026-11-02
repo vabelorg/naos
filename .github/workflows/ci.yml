@@ -59,7 +59,7 @@ jobs:
       - name: Test
         run: ctest --preset ${{ matrix.preset }}
 
-      # The package installed, used by a project with find_package(naos <version>): tests/package.
+      # The package installed, used by a project with find_package(Naos <version>): tests/package.
       - name: Test the installed package
         shell: bash
         run: |

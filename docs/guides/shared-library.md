@@ -14,7 +14,7 @@ cmake --install naos/build --config Release --prefix /opt/naos
 
 Inside another project (`add_subdirectory` or `FetchContent`), Naos is always a static library, whatever `BUILD_SHARED_LIBS` is.
 
-- Through `find_package(naos)`, CMake adds the definition that the headers need, `NAOS_SHARED`. Without CMake, define `NAOS_SHARED` yourself when compiling the tests.
+- Through `find_package(Naos)`, CMake adds the definition that the headers need, `NAOS_SHARED`. Without CMake, define `NAOS_SHARED` yourself when compiling the tests.
 - The public functions name no calling convention. Build Naos and the tests with the same default convention (no `/Gz` on 32-bit Windows, for example).
 
 ## Make the DLL findable at build time
@@ -25,7 +25,7 @@ To copy the DLL after the build, add the `POST_BUILD` command after `add_executa
 
 ```cmake
 add_executable(my_tests main.c parser_test.c)
-target_link_libraries(my_tests PRIVATE naos::naos)
+target_link_libraries(my_tests PRIVATE Naos::naos)
 if(WIN32)
     add_custom_command(TARGET my_tests POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_RUNTIME_DLLS:my_tests> $<TARGET_FILE_DIR:my_tests>

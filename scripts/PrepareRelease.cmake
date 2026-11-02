@@ -176,7 +176,7 @@ if(NOT kind STREQUAL "patch")
         naos_read_text(text "${file}")
         set(old_text "${text}")
         string(REGEX REPLACE "GIT_TAG v[0-9]+\\.[0-9]+\\.[0-9]+" "GIT_TAG v${VERSION}" text "${text}")
-        string(REPLACE "find_package(naos ${old_minor_version}" "find_package(naos ${new_minor_version}"
+        string(REPLACE "find_package(Naos ${old_minor_version}" "find_package(Naos ${new_minor_version}"
             text "${text}")
         string(REPLACE "${old_minor_version}.x" "${new_minor_version}.x" text "${text}")
         if(NOT text STREQUAL old_text)

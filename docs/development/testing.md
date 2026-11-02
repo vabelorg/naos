@@ -29,7 +29,7 @@ The self tests of Naos: what they check, how they compare outputs, and how to ad
 
 The helpers are in `tests/support/`: the functions of `NaosSelftest.cmake`, and `CheckOutput.cmake`, which runs one case.
 
-`tests/package/` is not a self test: it is a project that uses the installed package with `find_package(naos <version>)`. CI configures it on its own after installing each build ([building](building.md#installing)).
+`tests/package/` is not a self test: it is a project that uses the installed package with `find_package(Naos <version>)`. CI configures it on its own after installing each build ([building](building.md#installing)).
 
 ## Cases compared with an output
 

@@ -27,7 +27,7 @@
 #   sources/    the sources of src/: formatted output goes through src/format.h
 #   misuse/     programs that must not compile
 # Not a self test, but configured on its own by CI after installing Naos:
-#   package/    a project using the installed package with find_package(naos <version>)
+#   package/    a project using the installed package with find_package(Naos <version>)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/support/NaosSelftest.cmake)
 

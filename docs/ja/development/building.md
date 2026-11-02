@@ -64,7 +64,7 @@ ctest --preset default -j8                        # 並列
 cmake --install build/default --prefix /tmp/naos-install
 ```
 
-インストールされる配置は [CMake のリファレンス](../reference/cmake.md#パッケージ)にあります。プロジェクトからは `find_package(naos)` と `-DCMAKE_PREFIX_PATH=/tmp/naos-install` で使えます。`tests/package/` がそのようなプロジェクトで、CI はインストールしたパッケージごとにこれをビルドしてテストします。
+インストールされる配置は [CMake のリファレンス](../reference/cmake.md#パッケージ)にあります。プロジェクトからは `find_package(Naos)` と `-DCMAKE_PREFIX_PATH=/tmp/naos-install` で使えます。`tests/package/` がそのようなプロジェクトで、CI はインストールしたパッケージごとにこれをビルドしてテストします。
 
 ## CMake を使わない場合
 
