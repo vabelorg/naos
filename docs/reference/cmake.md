@@ -98,6 +98,7 @@ The installed files, under the install prefix:
 | `lib/` (`bin/` for a DLL) | The library |
 | `bin/` | The PDB of a DLL built with MSVC in Debug or RelWithDebInfo |
 | `lib/cmake/Naos/` | `NaosConfig.cmake`, `NaosConfigVersion.cmake`, `NaosTargets*.cmake`, `Naos.cmake`, `NaosDiscover.cmake` |
+| `lib/pkgconfig/naos.pc` | The flags for `pkg-config` and Meson, those of the library built ([other build systems](../getting-started/installation.md#other-build-systems)) |
 | `share/licenses/naos/LICENSE` | The license |
 
 The directories follow `GNUInstallDirs` (`CMAKE_INSTALL_LIBDIR` and so on).

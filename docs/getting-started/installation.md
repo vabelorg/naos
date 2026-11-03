@@ -80,7 +80,17 @@ Which versions it accepts is in the [CMake reference](../reference/cmake.md#pack
 
 ## Other build systems
 
-Build and install Naos with CMake once, as for an [installed package](#installed-package), then give the compiler the headers and the library under the install prefix:
+Build and install Naos with CMake once, as for an [installed package](#installed-package), then ask `pkg-config` for the flags. `cmake --install` puts `naos.pc` in `<libdir>/pkgconfig/`, with the flags of the library built: `-lnaosd` for a Debug build and `-DNAOS_SHARED` for a shared library.
+
+```sh
+export PKG_CONFIG_PATH=/opt/naos/lib/pkgconfig
+cc -std=c99 $(pkg-config --cflags naos) -c my_tests.c
+cc -o my_tests my_tests.o $(pkg-config --libs naos)
+```
+
+Meson finds it with `dependency('naos')`, given the same `PKG_CONFIG_PATH`. A static library may need the C math library on Unix, which `pkg-config --static --libs naos` adds (`-lm`). The paths of `naos.pc` are relative to where it is, so the installed tree can be moved.
+
+Without `pkg-config`, give the compiler the headers and the library under the install prefix:
 
 ```sh
 cc -std=c99 -I/opt/naos/include -c my_tests.c

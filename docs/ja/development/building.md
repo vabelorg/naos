@@ -69,7 +69,7 @@ ctest --preset default -j8                                     # 並列
 cmake --install build/default --prefix /tmp/naos-install
 ```
 
-インストールされる配置は [CMake のリファレンス](../reference/cmake.md#パッケージ)にあります。プロジェクトからは `find_package(Naos)` と `-DCMAKE_PREFIX_PATH=/tmp/naos-install` で使えます。`tests/consumer/` がそのようなプロジェクトです。`cmake -D PRESET=<preset> -P scripts/TestPackage.cmake` が、ビルドしたプリセットをインストールしてこのプロジェクトをテストします。CI も `sanitize` 以外のビルドごとにこれを実行します。
+インストールされる配置は [CMake のリファレンス](../reference/cmake.md#パッケージ)にあります。プロジェクトからは `find_package(Naos)` と `-DCMAKE_PREFIX_PATH=/tmp/naos-install` で使えます。`tests/consumer/` がそのようなプロジェクトです。`cmake -D PRESET=<preset> -P scripts/TestPackage.cmake` が、ビルドしたプリセットをインストールしてこのプロジェクトをテストします。CI も `sanitize` 以外のビルドごとにこれを実行します。`pkg-config` が見つかれば（MSVC を除く）、このスクリプトは続いて、インストールされた `naos.pc` のフラグを確かめ、そのフラグで `tests/consumer/consumer_test.c` を CMake を使わずにビルドして実行します。
 
 ## 継続的インテグレーション
 
