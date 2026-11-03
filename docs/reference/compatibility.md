@@ -6,15 +6,13 @@ What stays the same when you update Naos: what you write, run, build and read th
 
 The promises below hold from one version to the next:
 
-- Before 1.0, across patch versions: from 0.4.0 to any 0.4.x.
-- From 1.0 on, across minor and patch versions: from 1.2.0 to any 1.x.y.
-
-Before 1.0, a new minor version may break any of them ([version](version.md)). The changelog marks each such change `**BREAKING**` and says what to change in your tests or build.
+- Before 1.0: from `0.<minor>.<patch>` to any later version with the same minor version.
+- From 1.0 on: from `<major>.<minor>.<patch>` to any later version with the same major version.
 
 ## Principles
 
 - **Only what this page lists is promised.** A detail the reference describes but this page does not list may change in a later version.
-- **Naos may get stricter.** A test harness is there to find mistakes, so a later version may report one that an earlier version missed: a test that passed may then fail, or a suite be refused before any test runs. Such a change comes in a minor version, never in a patch version. The changelog says what Naos now reports and how to fix the test, and, where one exists, the option that brings back the earlier judgment, as `--naos-allow-no-assertions` does for a test that runs no assertion. The reverse, letting pass what used to fail, breaks compatibility.
+- **Naos may get stricter without a new major version.** A test harness is there to find mistakes, so a new minor version may report a mistake that earlier versions missed: a test that passed may then fail, or a suite be refused before any test runs. A patch version never does. Where it can, an option brings back the earlier judgment, as `--naos-allow-no-assertions` does for a test that runs no assertion. The reverse, letting pass what used to fail, breaks compatibility.
 - **Ask for what you need.** If your use relies on something this page does not promise, open an issue: a later version may promise it, or add a way that does.
 
 ## Writing tests
