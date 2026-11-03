@@ -17,17 +17,11 @@
     </xs:restriction>
   </xs:simpleType>
 
-  <xs:simpleType name="zero">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="0"/>
-    </xs:restriction>
-  </xs:simpleType>
-
   <xs:attributeGroup name="counts">
     <xs:attribute name="name" type="xs:string" use="required"/>
     <xs:attribute name="tests" type="xs:nonNegativeInteger" use="required"/>
     <xs:attribute name="failures" type="xs:nonNegativeInteger" use="required"/>
-    <xs:attribute name="errors" type="zero" use="required"/>
+    <xs:attribute name="errors" type="xs:nonNegativeInteger" use="required"/>
     <xs:attribute name="skipped" type="xs:nonNegativeInteger" use="required"/>
     <xs:attribute name="time" type="seconds" use="required"/>
   </xs:attributeGroup>
@@ -62,7 +56,10 @@
     </xs:complexType>
   </xs:element>
 
-  <!-- A passed test holds nothing, a failed one its failures, a skipped one one <skipped>. -->
+  <!--
+    A passed test holds nothing, a failed one its failures, a skipped one one <skipped>; the test
+    case of the placeholder, written until the run ends, one <error>.
+  -->
   <xs:element name="testcase">
     <xs:complexType>
       <xs:choice minOccurs="0">
@@ -79,6 +76,15 @@
         <xs:element name="skipped">
           <xs:complexType>
             <xs:attribute name="message" type="xs:string" use="required"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="error">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:string">
+                <xs:attribute name="message" type="xs:string" use="required"/>
+              </xs:extension>
+            </xs:simpleContent>
           </xs:complexType>
         </xs:element>
       </xs:choice>

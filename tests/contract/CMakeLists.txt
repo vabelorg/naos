@@ -100,6 +100,7 @@ contract_xml(expected_failures 1 FILE written SCHEMA "${schema}"
     ARGS --naos-output xml:{output} --naos-filter expecting.*)
 contract_xml(all_skipped 77 FILE written SCHEMA "${schema}"
     ARGS --naos-output xml:{output} --naos-filter skipping.*)
-contract_xml(left_empty_by_exit 3 FILE empty ARGS --naos-output xml:{output} --naos-filter crash.*)
+# A process that ends during the run leaves the placeholder, which reads as an error.
+contract_xml(left_unfinished_by_exit 3 FILE written SCHEMA "${schema}" ARGS --naos-output xml:{output} --naos-filter crash.*)
 contract_xml(not_written_by_list 0 FILE absent ARGS --naos-output xml:{output} --naos-list)
 contract_xml(not_written_by_help 0 FILE absent ARGS --naos-output xml:{output} --help)

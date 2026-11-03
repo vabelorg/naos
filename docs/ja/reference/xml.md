@@ -11,9 +11,9 @@ prog --naos-filter 'parser.*' --naos-output=xml:build/parser.xml
 
 ## ファイルを書くとき
 
-- ファイルは最初のテストを実行する前に開き、すでにあれば置き換えます。開けないときは `naos: cannot open the file of --naos-output: <path>` と出力し、テストを 1 つも実行せずに 2 で終了します。
-- 結果はテストの実行中はメモリに貯め、実行の終わりにファイル全体を書きます。`--naos-repeat` の最後の回の後、または `--naos-fail-fast` で止まった後です。書けないとき、またはそのためのメモリが確保できないときは、標準エラー出力にメッセージを出し、1 で終了します。
-- クラッシュや `exit()` で実行の途中にプロセスが終わると、ファイルは空のまま残ります。そのときは、標準出力の `RUN:` の行が実行中だったテストを示します（[トラブルシューティング](../guides/troubleshooting.md)）。
+- 最初のテストを実行する前に、ファイルをすでにあれば置き換え、エラーとして読まれる[プレースホルダー](#プレースホルダー)を書きます。開けないとき、またはプレースホルダーを書けないときは `naos: cannot open the file of --naos-output: <path>` と出力し、テストを 1 つも実行せずに 2 で終了します。
+- 結果はテストの実行中はメモリに貯め、実行の終わりにプレースホルダーに代えてファイル全体を書きます。`--naos-repeat` の最後の回の後、または `--naos-fail-fast` で止まった後です。書けないとき、またはそのためのメモリが確保できないときは、標準エラー出力にメッセージを出し、1 で終了します。ファイルにはプレースホルダーか、結果のうち書けた分が残ります。
+- クラッシュや `exit()`、時間制限で実行の途中にプロセスが終わると、プレースホルダーが残ります。ファイルを読むツールは、空のファイルや前の実行の結果ではなく、エラーを表示します。実行中だったテストは、標準出力の `RUN:` の行が示します（[トラブルシューティング](../guides/troubleshooting.md)）。
 - `--naos-list` と `--help` はテストを実行せず、ファイルも書きません。
 
 パスは作業ディレクトリからの相対パスです。CTest では、実行ファイルのテストがそれぞれ別のプロセスで同じ引数で動くので、どれも同じファイルに書くことになります。`--naos-output` は実行ファイルを直接実行するときに指定するか、CTest 自身のレポートを `--output-junit` で集めてください（[CTest と CI](../guides/ctest-and-ci.md#ci-で実行する)）。
@@ -38,7 +38,7 @@ prog --naos-filter 'parser.*' --naos-output=xml:build/parser.xml
 
 | 要素 | 書くとき | 属性 |
 |---|---|---|
-| `<testsuites>` | 1 回、全体を囲む | `name`: プログラムの名前。`argv[0]` からディレクトリと `.exe` を除いたもの。`tests`、`failures`、`skipped`: ファイル全体のテストケースの数。`errors`: 常に `0`。`time`: ファイル全体のテストケースの時間の合計 |
+| `<testsuites>` | 1 回、全体を囲む | `name`: プログラムの名前。`argv[0]` からディレクトリと `.exe` を除いたもの。`tests`、`failures`、`skipped`: ファイル全体のテストケースの数。`errors`: [プレースホルダー](#プレースホルダー)を除いて常に `0`。`time`: ファイル全体のテストケースの時間の合計 |
 | `<testsuite>` | 各回の各スイートごと。実行した順 | `name`: スイート。`tests`、`failures`、`skipped`、`errors`、`time`: `<testsuites>` と同じで、そのテストケースについてのもの |
 | `<properties>` | `--naos-repeat` が 2 以上か、`--naos-shuffle` のときの `<testsuite>` の中 | `<property name="iteration">`（1 から。`--naos-repeat` が 2 以上のとき）と `<property name="random_seed">`（`--naos-shuffle` のとき）を持つ |
 | `<testcase>` | 実行したテストごと | `classname`: スイート。`name`: テスト。`time`: テストの時間。`file`、`line`: 最初の失敗かスキップが起きた場所。どちらもないとき、またはテストが[アサーションを実行しなかった](control.md#アサーションを実行しないテスト)ために失敗したとき（場所がない）は省く |
@@ -57,6 +57,23 @@ prog --naos-filter 'parser.*' --naos-output=xml:build/parser.xml
 
 `<failure>` の中身は、標準出力が書くとおりの診断です。`error` の行、値を示す詳細の行、メモ、trace です（[出力](output.md)）。CI サービスはこれをそのまま表示するので、失敗は CI でも端末と同じように読めます。標準出力と同じく、人が読むためのものです。
 
+## プレースホルダー
+
+実行が終わるまで、ファイルは結果の代わりに `<error>` を持つテストケースを 1 つ持ちます。
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="<program>" tests="1" failures="0" errors="1" skipped="0" time="0.000">
+  <testsuite name="naos.run" tests="1" failures="0" errors="1" skipped="0" time="0.000">
+    <testcase classname="naos.run" name="finished" time="0.000">
+      <error message="the run ended before its results were written">...</error>
+    </testcase>
+  </testsuite>
+</testsuites>
+```
+
+JUnit XML のツールは `<error>` を最後まで実行できなかったテストとして数え、失敗と同じくレポートを失敗にします。スイート `naos.run` はドットを含み、C の識別子であるテストのスイート名にはなりえないので、テストのスイートと取り違えることはありません。どのテストを実行中だったかと、それまでに終わったテストの結果はファイルにはなく、標準出力にあります。あるテストがプロセスを終わらせても他のテストの結果を残すには、CTest で各テストを別のプロセスで実行してください（[CTest と CI](../guides/ctest-and-ci.md)）。
+
 ## テキスト
 
 ファイルは UTF-8 です。テキストはすべて XML 用にエスケープします（`&amp;`、`&lt;`、`&gt;`。属性では `&quot;` と `&apos;` も使い、改行とタブを `&#10;` と `&#9;` にします。復帰は常に `&#13;` です）。
@@ -69,11 +86,11 @@ prog --naos-filter 'parser.*' --naos-output=xml:build/parser.xml
 
 互換を保つのは、JUnit XML を読む一般的なツールが処理するものです。
 
-- 要素 `<testsuites>`、`<testsuite>`、`<testcase>`、`<failure>`、`<skipped>` と、その入れ子、どのテストケースと、どの `<failure>`・`<skipped>` を書くか（[要素](#要素)）。
+- 要素 `<testsuites>`、`<testsuite>`、`<testcase>`、`<failure>`、`<skipped>` と、その入れ子、どのテストケースと、どの `<failure>`・`<skipped>` を書くか（[要素](#要素)）。プレースホルダーと、その `<error>` と件数（[プレースホルダー](#プレースホルダー)）。
 - 上に書いたそれらの属性。`name`、`classname`、件数の `tests`・`failures`・`errors`・`skipped`、`time`、`file`、`line`、`type`、`message` と、それぞれが持つもの、そのテキストのエスケープ（[テキスト](#テキスト)）。
 - ファイルを書くときと終了コード（[ファイルを書くとき](#ファイルを書くとき)）。
 
-一般的なツールは表示するか読み飛ばすだけなので、次は互換を保ちません。標準出力に従う `<failure>` の中身、スイートの `<properties>`、ファイルのレイアウト（字下げ、要素の間の改行、属性の順）です。後のバージョンで、属性、要素、`xml` 以外の形式が増えることがあります。ツールは知らないものを読み飛ばしてください。
+一般的なツールは表示するか読み飛ばすだけなので、次は互換を保ちません。標準出力に従う `<failure>` の中身、プレースホルダーの `<error>` の中身と `message`、スイートの `<properties>`、ファイルのレイアウト（字下げ、要素の間の改行、属性の順）です。後のバージョンで、属性、要素、`xml` 以外の形式が増えることがあります。ツールは知らないものを読み飛ばしてください。
 
 ## 出力例
 
