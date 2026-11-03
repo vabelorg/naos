@@ -8,7 +8,7 @@ includedir=@naos_pc_includedir@
 libdir=@naos_pc_libdir@
 
 Name: Naos
-Description: A project-independent test harness for C
+Description: A test harness for C and C++ that needs only a C99 compiler
 URL: https://github.com/vabelorg/naos
 Version: @PROJECT_VERSION@
 Cflags: -I${includedir}@naos_pc_cflags@
