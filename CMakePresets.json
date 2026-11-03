@@ -1,105 +1,105 @@
 {
-    "version": 3,
-    "cmakeMinimumRequired": {
-        "major": 3,
-        "minor": 21,
-        "patch": 0
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Static library, Debug, with the self tests",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
     },
-    "configurePresets": [
-        {
-            "name": "default",
-            "displayName": "Static library, Debug, with the self tests",
-            "binaryDir": "${sourceDir}/build/${presetName}",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
-            }
-        },
-        {
-            "name": "shared",
-            "inherits": "default",
-            "displayName": "Shared library, Debug, with the self tests",
-            "cacheVariables": {
-                "BUILD_SHARED_LIBS": "ON"
-            }
-        },
-        {
-            "name": "release",
-            "inherits": "default",
-            "displayName": "Static library, Release (optimized), with the self tests",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        },
-        {
-            "name": "sanitize",
-            "inherits": "default",
-            "displayName": "Static library, Debug, with AddressSanitizer and UndefinedBehaviorSanitizer (GCC and Clang)",
-            "cacheVariables": {
-                "CMAKE_C_FLAGS": "-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer",
-                "CMAKE_CXX_FLAGS": "-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer",
-                "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=address,undefined",
-                "CMAKE_SHARED_LINKER_FLAGS": "-fsanitize=address,undefined"
-            }
-        }
-    ],
-    "buildPresets": [
-        {
-            "name": "default",
-            "configurePreset": "default",
-            "configuration": "Debug"
-        },
-        {
-            "name": "shared",
-            "configurePreset": "shared",
-            "configuration": "Debug"
-        },
-        {
-            "name": "release",
-            "configurePreset": "release",
-            "configuration": "Release"
-        },
-        {
-            "name": "sanitize",
-            "configurePreset": "sanitize",
-            "configuration": "Debug"
-        }
-    ],
-    "testPresets": [
-        {
-            "name": "default",
-            "configurePreset": "default",
-            "configuration": "Debug",
-            "output": {
-                "outputOnFailure": true
-            }
-        },
-        {
-            "name": "shared",
-            "configurePreset": "shared",
-            "configuration": "Debug",
-            "output": {
-                "outputOnFailure": true
-            }
-        },
-        {
-            "name": "release",
-            "configurePreset": "release",
-            "configuration": "Release",
-            "output": {
-                "outputOnFailure": true
-            }
-        },
-        {
-            "name": "sanitize",
-            "configurePreset": "sanitize",
-            "configuration": "Debug",
-            "output": {
-                "outputOnFailure": true
-            },
-            "environment": {
-                "ASAN_OPTIONS": "detect_leaks=1:abort_on_error=0:halt_on_error=1",
-                "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=1"
-            }
-        }
-    ]
+    {
+      "name": "shared",
+      "inherits": "default",
+      "displayName": "Shared library, Debug, with the self tests",
+      "cacheVariables": {
+        "BUILD_SHARED_LIBS": "ON"
+      }
+    },
+    {
+      "name": "release",
+      "inherits": "default",
+      "displayName": "Static library, Release (optimized), with the self tests",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "sanitize",
+      "inherits": "default",
+      "displayName": "Static library, Debug, with AddressSanitizer and UndefinedBehaviorSanitizer (GCC and Clang)",
+      "cacheVariables": {
+        "CMAKE_C_FLAGS": "-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer",
+        "CMAKE_CXX_FLAGS": "-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer",
+        "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=address,undefined",
+        "CMAKE_SHARED_LINKER_FLAGS": "-fsanitize=address,undefined"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default",
+      "configuration": "Debug"
+    },
+    {
+      "name": "shared",
+      "configurePreset": "shared",
+      "configuration": "Debug"
+    },
+    {
+      "name": "release",
+      "configurePreset": "release",
+      "configuration": "Release"
+    },
+    {
+      "name": "sanitize",
+      "configurePreset": "sanitize",
+      "configuration": "Debug"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "shared",
+      "configurePreset": "shared",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "release",
+      "configurePreset": "release",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "sanitize",
+      "configurePreset": "sanitize",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      },
+      "environment": {
+        "ASAN_OPTIONS": "detect_leaks=1:abort_on_error=0:halt_on_error=1",
+        "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=1"
+      }
+    }
+  ]
 }
