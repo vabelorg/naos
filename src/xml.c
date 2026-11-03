@@ -4,7 +4,8 @@
  *
  * The JUnit XML file of --naos-output xml:<path> (xml.h). The test cases are kept in memory while
  * the tests run, and the whole file is written when the run ends, so that the counts of each suite
- * come before its test cases; a process that ends during the run leaves the file empty.
+ * come before its test cases. Until then, the file holds a placeholder that reads as an error, so
+ * that a process that ends during the run leaves a file that fails rather than one that is empty.
  */
 
 /* fopen() is standard C; MSVC would warn that fopen_s() is safer. */
@@ -36,6 +37,7 @@ typedef struct naos_xml_suite
 } naos_xml_suite_t;
 
 static FILE *g_file = NULL;
+static const char *g_path = NULL;
 static const char *g_program = NULL;
 
 /* Memory ran out for the suites or the name of the program; each text keeps its own failed. */
@@ -344,15 +346,70 @@ static void release_all(void)
     g_suite_capacity = 0;
 }
 
-/* Binary, so that the lines end with LF on every platform. */
+/*
+ * Writes text to g_file and flushes it, so that it stays if the process ends; closes the file and
+ * returns 0 when it cannot.
+ */
+static int write_all(const naos_text_t *text)
+{
+    int written;
+
+    written = (text->failed == 0) && (fwrite(text->data, 1, text->length, g_file) == text->length) && (fflush(g_file) == 0);
+    if (fclose(g_file) != 0)
+    {
+        written = 0;
+    }
+
+    g_file = NULL;
+
+    return written;
+}
+
+/*
+ * The file until the run ends: one test case with an <error>, which the end of the run replaces.
+ * Its suite, naos.run, cannot be the name of a suite of the tests, which is a C identifier.
+ */
+static void add_placeholder(naos_text_t *text, const char *program)
+{
+    naos_text_add(text, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<testsuites name=\"");
+    add_program_name(text, program);
+    naos_text_add(text,
+        "\" tests=\"1\" failures=\"0\" errors=\"1\" skipped=\"0\" time=\"0.000\">\n"
+        "  <testsuite name=\"naos.run\" tests=\"1\" failures=\"0\" errors=\"1\" skipped=\"0\" time=\"0.000\">\n"
+        "    <testcase classname=\"naos.run\" name=\"finished\" time=\"0.000\">\n"
+        "      <error message=\"the run ended before its results were written\">"
+        "The process ended during the run, such as by a crash, by exit() or by a time limit, "
+        "or the results could not be written. The last RUN: line of standard output names the test that was running."
+        "</error>\n"
+        "    </testcase>\n"
+        "  </testsuite>\n"
+        "</testsuites>\n");
+}
+
+/* Binary, so that the lines end with LF on every platform. Opens the file and writes the placeholder. */
 static int begin(const char *program, const char *path)
 {
-    g_file = fopen(path, "wb");
+    naos_text_t placeholder = NAOS_TEXT_EMPTY;
+    int written;
+
+    g_path = path;
     g_program = program;
-    g_out_of_memory = 0;
     g_suite_open = 0;
 
-    return g_file != NULL;
+    g_file = fopen(path, "wb");
+    if (g_file == NULL)
+    {
+        return 0;
+    }
+
+    add_placeholder(&placeholder, program);
+    written = write_all(&placeholder);
+    naos_text_release(&placeholder);
+
+    /* A lack of memory for the name in the placeholder leaves it out there only, not in the results. */
+    g_out_of_memory = 0;
+
+    return written;
 }
 
 static void round_begin(const naos_round_t *round)
@@ -474,7 +531,7 @@ static void round_end(const naos_round_t *round, const naos_tally_t *tally, size
     g_suite_open = 0;
 }
 
-/* Puts the whole file together and writes it at once, then closes it. */
+/* Puts the whole file together and writes it at once in place of the placeholder. */
 static int end(long failed_rounds, long repeat, long rounds_not_run)
 {
     naos_text_t document = NAOS_TEXT_EMPTY;
@@ -505,18 +562,17 @@ static int end(long failed_rounds, long repeat, long rounds_not_run)
     }
     naos_text_add(&document, "</testsuites>\n");
 
+    /* The placeholder stays when the results are not all in memory, or the file cannot be opened again. */
     written = 0;
     if ((g_out_of_memory == 0) && (g_cases.failed == 0) && (g_location.failed == 0) && (g_failures.failed == 0) && (g_skip.failed == 0) && (document.failed == 0))
     {
-        written = (fwrite(document.data, 1, document.length, g_file) == document.length) && (fflush(g_file) == 0);
+        g_file = fopen(g_path, "wb");
+        if (g_file != NULL)
+        {
+            written = write_all(&document);
+        }
     }
 
-    if (fclose(g_file) != 0)
-    {
-        written = 0;
-    }
-
-    g_file = NULL;
     naos_text_release(&document);
     release_all();
 

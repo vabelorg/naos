@@ -11,9 +11,9 @@ prog --naos-filter 'parser.*' --naos-output=xml:build/parser.xml
 
 ## When the file is written
 
-- The file is opened before the first test runs, and replaced if it exists. When it cannot be opened, the executable prints `naos: cannot open the file of --naos-output: <path>` and exits with 2 without running any test.
-- The results are kept in memory while the tests run, and the whole file is written when the run ends, after the last iteration of `--naos-repeat` or after a stop by `--naos-fail-fast`. When it cannot be written, or memory runs out for it, the executable prints a message on standard error and exits with 1.
-- A process that ends during the run, by a crash or by `exit()`, leaves the file empty. The `RUN:` line on standard output then names the test that was running ([troubleshooting](../guides/troubleshooting.md)).
+- Before the first test runs, the file is replaced if it exists, and holds a [placeholder](#placeholder) that reads as an error. When it cannot be opened or the placeholder cannot be written, the executable prints `naos: cannot open the file of --naos-output: <path>` and exits with 2 without running any test.
+- The results are kept in memory while the tests run, and the whole file is written in place of the placeholder when the run ends, after the last iteration of `--naos-repeat` or after a stop by `--naos-fail-fast`. When it cannot be written, or memory runs out for it, the executable prints a message on standard error and exits with 1; the file then holds the placeholder, or what could be written of the results.
+- A process that ends during the run, by a crash, by `exit()` or by a time limit, leaves the placeholder, so that a tool reading the file shows an error rather than an empty file or the results of an earlier run. The `RUN:` line on standard output then names the test that was running ([troubleshooting](../guides/troubleshooting.md)).
 - `--naos-list` and `--help` run no test, and write no file.
 
 The path is relative to the working directory. Under CTest, every test of an executable runs in a process of its own with the same arguments, so they would all write the same file: give `--naos-output` when running the executable directly, or collect CTest's own report with `--output-junit` ([CTest and CI](../guides/ctest-and-ci.md#in-ci)).
@@ -38,7 +38,7 @@ The path is relative to the working directory. Under CTest, every test of an exe
 
 | Element | Written | Attributes |
 |---|---|---|
-| `<testsuites>` | Once, around everything | `name`: the name of the program, `argv[0]` without its directory and without `.exe`. `tests`, `failures`, `skipped`: the test cases of the whole file. `errors`: always `0`. `time`: the sum of the times of the test cases of the whole file |
+| `<testsuites>` | Once, around everything | `name`: the name of the program, `argv[0]` without its directory and without `.exe`. `tests`, `failures`, `skipped`: the test cases of the whole file. `errors`: always `0`, except in the [placeholder](#placeholder). `time`: the sum of the times of the test cases of the whole file |
 | `<testsuite>` | For each suite, in each iteration, in the order run | `name`: the suite. `tests`, `failures`, `skipped`, `errors`, `time`: as for `<testsuites>`, for its test cases |
 | `<properties>` | In a `<testsuite>`, when `--naos-repeat` is 2 or more, or with `--naos-shuffle` | Holds `<property name="iteration">` (from 1, with `--naos-repeat` 2 or more) and `<property name="random_seed">` (with `--naos-shuffle`) |
 | `<testcase>` | For each test run | `classname`: the suite. `name`: the test. `time`: the time of the test. `file`, `line`: where its first failure or skip happened, left out when there is none, or when the test failed for [running no assertion](control.md#a-test-that-runs-no-assertion), which has no location |
@@ -57,6 +57,23 @@ The time of a test case is the time its result line shows on standard output: se
 
 The text of a `<failure>` is the diagnostic as standard output writes it: the `error` line, its detail lines with the values, the note and the traces ([output](output.md)). CI services show it as it is, so that a failure reads the same in CI as in a terminal. It is written for people, as standard output is.
 
+## Placeholder
+
+Until the run ends, the file holds one test case with an `<error>`, in place of the results:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="<program>" tests="1" failures="0" errors="1" skipped="0" time="0.000">
+  <testsuite name="naos.run" tests="1" failures="0" errors="1" skipped="0" time="0.000">
+    <testcase classname="naos.run" name="finished" time="0.000">
+      <error message="the run ended before its results were written">...</error>
+    </testcase>
+  </testsuite>
+</testsuites>
+```
+
+The tools of JUnit XML count an `<error>` as a test that could not complete, and fail the report as for a failure. The suite `naos.run` holds a dot, which the name of a suite of the tests, a C identifier, cannot hold, so it is never taken for one. The file tells neither which test was running nor the results of the tests that had ended: standard output has them. To keep the results of the other tests when one ends the process, run each test in a process of its own under CTest ([CTest and CI](../guides/ctest-and-ci.md)).
+
 ## Text
 
 The file is UTF-8. Every text is escaped for XML (`&amp;`, `&lt;`, `&gt;`, and `&quot;` and `&apos;` in attributes; line breaks and tabs in attributes as `&#10;` and `&#9;`; carriage returns as `&#13;`).
@@ -69,11 +86,11 @@ The values of strings are written as on standard output ([value formats](output.
 
 Kept compatible is what the common tools that read JUnit XML process:
 
-- The elements `<testsuites>`, `<testsuite>`, `<testcase>`, `<failure>` and `<skipped>`, how they nest, and which test cases and which `<failure>` and `<skipped>` elements are written ([elements](#elements)).
+- The elements `<testsuites>`, `<testsuite>`, `<testcase>`, `<failure>` and `<skipped>`, how they nest, and which test cases and which `<failure>` and `<skipped>` elements are written ([elements](#elements)); the placeholder, with its `<error>` and its counts ([placeholder](#placeholder)).
 - Their attributes stated above: `name`, `classname`, the counts `tests`, `failures`, `errors` and `skipped`, `time`, `file`, `line`, `type` and `message`, with what they hold and how their text is escaped ([text](#text)).
 - When the file is written, and the exit codes ([when the file is written](#when-the-file-is-written)).
 
-Not kept compatible, since the common tools only show it or leave it out: the text of `<failure>`, which follows standard output, the `<properties>` of a suite, and the layout of the file (indentation, line breaks between elements, the order of attributes). A later version may add attributes, elements and formats besides `xml`; a tool should skip what it does not know.
+Not kept compatible, since the common tools only show it or leave it out: the text of `<failure>` and of the `<error>` of the placeholder, the `message` of that `<error>`, which follows standard output, the `<properties>` of a suite, and the layout of the file (indentation, line breaks between elements, the order of attributes). A later version may add attributes, elements and formats besides `xml`; a tool should skip what it does not know.
 
 ## Example
 

@@ -28,3 +28,9 @@ report_case(fail_fast --naos-fail-fast --naos-filter results.*)
 # When the file is written is a contract (contract/); the message of a file that cannot be opened is
 # written for people.
 naos_expect(cannot_open ${exe} ARGS --naos-output xml:{output} OUTPUT_FILE no_such_directory/out.xml)
+
+# unfinished
+# A process that ends during the run leaves the placeholder, which reads as an error.
+
+naos_selftest_program(naos_selftest_unfinished unfinished.c)
+naos_expect(unfinished naos_selftest_unfinished ARGS --naos-output xml:{output} OUTPUT_FILE unfinished.xml)

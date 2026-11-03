@@ -1,0 +1,14 @@
+args: --naos-output xml:{output}
+exit code: 3
+--- stdout
+RUN: ending.exits
+--- stderr
+--- output
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="naos_selftest_unfinished" tests="1" failures="0" errors="1" skipped="0" time="N.NNN">
+  <testsuite name="naos.run" tests="1" failures="0" errors="1" skipped="0" time="N.NNN">
+    <testcase classname="naos.run" name="finished" time="N.NNN">
+      <error message="the run ended before its results were written">The process ended during the run, such as by a crash, by exit() or by a time limit, or the results could not be written. The last RUN: line of standard output names the test that was running.</error>
+    </testcase>
+  </testsuite>
+</testsuites>
