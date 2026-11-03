@@ -160,13 +160,7 @@ A failure or a skip is printed in this order, then standard output is flushed:
 
 ## What is kept compatible
 
-Of standard output, only this is kept compatible ([version](version.md)), since tools cannot do without it; the [JUnit XML](xml.md#compatibility) file has its own rules:
-
-- The start of a diagnostic line: the [location](#diagnostic-lines) in its form, or `naos: ` for a failure without a location, then the kind, `error`, `skip` or `note`, and `: `, as editors read them ([open failures in your editor](../guides/ctest-and-ci.md#open-failures-in-your-editor)). The text after it may change.
-- The names printed by `--naos-list`, one per line ([command line](command-line.md#options)), which the CMake functions of Naos read to register the tests with CTest.
-- The [exit codes](command-line.md#exit-codes).
-
-Everything else on this page, such as the flow lines, the detail lines, the order and the summary, may change in any version. The changelog says when it does.
+Of standard output, only the start of a diagnostic line is kept compatible: the [location](#diagnostic-lines) in its form, or `naos: ` for a failure without a location, then the kind, `error`, `skip` or `note`, and `: `, as editors read them ([open failures in your editor](../guides/ctest-and-ci.md#open-failures-in-your-editor)). The rest of this page, such as the flow lines, the detail lines, the text of a diagnostic, the order and the summary, may change in any version; the changelog says when it does. [Compatibility](compatibility.md) lists everything kept compatible, the names of `--naos-list` and the exit codes among them.
 
 ## Example
 

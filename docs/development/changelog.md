@@ -21,11 +21,13 @@ Under each version, use these sections, in this order, and only the ones that ha
 | `Fixed` | Bug fixes: what was wrong and how it showed |
 | `Security` | Fixes of vulnerabilities (see [SECURITY.md](../SECURITY.md)) |
 
-A change that breaks compatibility goes in `Changed` or `Removed`, starts with `**BREAKING**:`, and says what a user has to change in their tests or build:
+A change to what [compatibility](../reference/compatibility.md) promises goes in `Changed` or `Removed`, starts with `**BREAKING**:`, and says what a user has to change in their tests or build:
 
 ```markdown
 - **BREAKING**: `--naos-foo` is renamed `--naos-bar`. Change the option in scripts and in `naos_discover_tests()` calls.
 ```
+
+A change that only makes Naos stricter, reporting a mistake it used to miss, is not `**BREAKING**` ([principles](../reference/compatibility.md#principles)). It goes in `Changed`, so that it needs a minor version, and says what Naos now reports, how to fix the test, and the option that brings back the earlier judgment, if there is one.
 
 ## During development
 

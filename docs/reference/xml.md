@@ -2,7 +2,7 @@
 
 With `--naos-output xml:<path>`, an executable built with Naos also writes the results of its run to the file `<path>` as JUnit XML, which CI services and test report tools read. The human-readable output on standard output does not change.
 
-This file is the output meant for tools. What the common tools that read JUnit XML process (the tests, their results and counts, the message and the location of each failure) is kept compatible ([version](version.md)); the rest is written for people ([compatibility](#compatibility)). A tool that reads the results should read this file, not standard output ([output](output.md)).
+This file is the output meant for tools. What the common tools that read JUnit XML process (the tests, their results and counts, and the location of each failure) is kept compatible ([version](version.md)); the rest is written for people ([compatibility](#compatibility)). A tool that reads the results should read this file, not standard output ([output](output.md)).
 
 ```
 prog --naos-output xml:results.xml
@@ -84,13 +84,9 @@ The values of strings are written as on standard output ([value formats](output.
 
 ## Compatibility
 
-Kept compatible is what the common tools that read JUnit XML process:
+What tools that read JUnit XML process is kept compatible: when the file is written, the elements and how they nest, which test cases and which `<failure>` and `<skipped>` elements are written, and the attributes `name`, `classname`, `tests`, `failures`, `errors`, `skipped`, `time`, `file`, `line` and `type`; and the `<error>` of the [placeholder](#placeholder), left by a run that ends before its results are written ([compatibility](compatibility.md#reading-the-results)).
 
-- The elements `<testsuites>`, `<testsuite>`, `<testcase>`, `<failure>` and `<skipped>`, how they nest, and which test cases and which `<failure>` and `<skipped>` elements are written ([elements](#elements)); the placeholder, with its `<error>` and its counts ([placeholder](#placeholder)).
-- Their attributes stated above: `name`, `classname`, the counts `tests`, `failures`, `errors` and `skipped`, `time`, `file`, `line`, `type` and `message`, with what they hold and how their text is escaped ([text](#text)).
-- When the file is written, and the exit codes ([when the file is written](#when-the-file-is-written)).
-
-Not kept compatible, since the common tools only show it or leave it out: the text of `<failure>` and of the `<error>` of the placeholder, the `message` of that `<error>`, which follows standard output, the `<properties>` of a suite, and the layout of the file (indentation, line breaks between elements, the order of attributes). A later version may add attributes, elements and formats besides `xml`; a tool should skip what it does not know.
+Not kept compatible, since the tools only show it or leave it out: the text of `<failure>`, which follows standard output, and the text of its `message`; the name of the test case of the placeholder and the text of its `<error>`; the `<properties>` of a suite; and the layout of the file (indentation, line breaks between elements, the order of attributes). A later version may add attributes, elements and formats besides `xml`; a tool should skip what it does not know.
 
 ## Example
 
