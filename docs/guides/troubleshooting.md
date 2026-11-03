@@ -72,9 +72,9 @@ Listing the tests after the build failed. The message tells why:
 - The time limit was reached: raise `DISCOVERY_TIMEOUT`, for example under an emulator ([CMake](../reference/cmake.md#naos_discover_tests)).
 - The shared library was not found. On Windows, this shows as `Exit code 0xc0000135` with no output. Put the DLL next to the executable or on the `PATH` before the listing runs ([shared library](shared-library.md#make-the-dll-findable-at-build-time)).
 
-**`find_package(Naos 0.3)` does not accept the installed version**
+**`find_package(Naos 0.4)` does not accept the installed version**
 
-Before 1.0, it accepts 0.3.x only. Install the minor version the project asks for, or update the project.
+Before 1.0, it accepts 0.4.x only. Install the minor version the project asks for, or update the project.
 
 **Tests added by a command-line argument are not in CTest**
 
