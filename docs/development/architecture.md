@@ -8,7 +8,7 @@ These decide what goes into Naos, before any feature:
 
 - **Easy to adopt, first**: building needs nothing but a C compiler. No library to install or link, and no compiler extension. A feature that would cost either stays out.
 - **One output for people, one for tools**: standard output is for people, and changes between versions. Tools read the JUnit XML file of `--naos-output`. Only what the common tools process is kept compatible ([JUnit XML](../reference/xml.md#compatibility)). In standard output, only the start of a diagnostic line, the names of `--naos-list` and the exit codes are ([output](../reference/output.md#what-is-kept-compatible)).
-- **A documented public API**: only what the [reference](../reference/README.md) documents is kept compatible.
+- **A documented public API**: the [reference](../reference/README.md) states every rule of the current version, and [compatibility](../reference/compatibility.md) lists what later versions keep. What it does not list may change.
 - **A narrow scope**: process isolation, parallel runs and time limits are left to the caller (CTest, scripts, CI). Naos writes one report format, and adds others when they are needed.
 
 ## Directories

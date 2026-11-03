@@ -4,11 +4,11 @@ Where each kind of change goes, and what must change with it. Every change to th
 
 ## Add or change an output line
 
-The form of every line of standard output is written in `human.c`, and only there; which lines a run writes is decided there too. These lines are for people and may change to read better. What [is kept compatible](../reference/output.md#what-is-kept-compatible) does not change: the start of a diagnostic line, the names of `--naos-list` and the exit codes.
+The form of every line of standard output is written in `human.c`, and only there; which lines a run writes is decided there too. These lines are for people and may change to read better. What [is kept compatible](../reference/compatibility.md) does not change: the start of a diagnostic line, the names of `--naos-list` and the exit codes.
 
 1. Update [output](../reference/output.md).
 2. Rewrite the expected outputs of the self tests with `NAOS_UPDATE_EXPECTED=1` and check the diff ([testing](testing.md#adding-a-case)).
-3. Add an entry to the changelog under `Changed`. A change to what is kept compatible starts with `**BREAKING**:`.
+3. Add an entry to the changelog under `Changed`. A change to what is kept compatible starts with `**BREAKING**:` ([changelog](changelog.md#sections)).
 
 The cases of `tests/contract/` are not changed by the rewrite. They fail when the change touches what is kept compatible. Change them only to add such an entry.
 

@@ -21,11 +21,13 @@
 | `Fixed` | 不具合の修正。何が誤っていて、どう現れたか |
 | `Security` | 脆弱性の修正（[SECURITY.md](../SECURITY.md) を参照） |
 
-互換を壊す変更は `Changed` か `Removed` に入れ、`**BREAKING**:` で始め、利用者がテストやビルドの何を直せばよいかを書きます。
+[互換性](../reference/compatibility.md)が約束するものを変える変更は `Changed` か `Removed` に入れ、`**BREAKING**:` で始め、利用者がテストやビルドの何を直せばよいかを書きます。
 
 ```markdown
 - **BREAKING**: `--naos-foo` is renamed `--naos-bar`. Change the option in scripts and in `naos_discover_tests()` calls.
 ```
+
+Naos を厳しくするだけの変更（見逃していた誤りを報告するようにする変更）は `**BREAKING**` にしません（[原則](../reference/compatibility.md#原則)）。`Changed` に入れてマイナーバージョンが必要になるようにし、Naos が新しく何を報告するか、テストをどう直すか、前の判定に戻すオプションがあればそのオプションを書きます。
 
 ## 開発中
 
