@@ -57,6 +57,15 @@ jobs:
         if: runner.os == 'Linux'
         run: command -v xmllint || { sudo apt-get update && sudo apt-get install -y libxml2-utils; }
 
+      # scripts/TestPackage.cmake builds a program with the flags of naos.pc where pkg-config is
+      # found; MSVC has no use for it.
+      - name: Install pkg-config
+        if: runner.os != 'Windows'
+        run: |
+          command -v pkg-config || {
+            if [ "$RUNNER_OS" = Linux ]; then sudo apt-get update && sudo apt-get install -y pkgconf; else brew install pkgconf; fi
+          }
+
       - name: Install CMake ${{ matrix.cmake }}
         if: matrix.cmake
         run: |
@@ -121,6 +130,7 @@ jobs:
             gcc:p
             cmake:p
             ninja:p
+            pkgconf:p
 
       - name: Configure
         run: cmake --preset ${{ matrix.preset }}

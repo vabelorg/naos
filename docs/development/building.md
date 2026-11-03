@@ -69,7 +69,7 @@ The checks that need no build, such as the links of the documentation, are not s
 cmake --install build/default --prefix /tmp/naos-install
 ```
 
-The layout installed is in the [CMake reference](../reference/cmake.md#package). A project can then use it with `find_package(Naos)` and `-DCMAKE_PREFIX_PATH=/tmp/naos-install`. `tests/consumer/` is such a project; `cmake -D PRESET=<preset> -P scripts/TestPackage.cmake` installs a preset built and tests the project against it, as CI does for each build but `sanitize`.
+The layout installed is in the [CMake reference](../reference/cmake.md#package). A project can then use it with `find_package(Naos)` and `-DCMAKE_PREFIX_PATH=/tmp/naos-install`. `tests/consumer/` is such a project; `cmake -D PRESET=<preset> -P scripts/TestPackage.cmake` installs a preset built and tests the project against it, as CI does for each build but `sanitize`. Where `pkg-config` is found, but with MSVC, the script then checks the flags of the `naos.pc` installed and builds and runs `tests/consumer/consumer_test.c` with them, without CMake.
 
 ## Continuous integration
 

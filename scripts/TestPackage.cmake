@@ -2,16 +2,18 @@
 # SPDX-License-Identifier: MIT
 #
 # Tests the package that a build of Naos installs: installs the build, then configures, builds and
-# tests tests/consumer/, which finds it with find_package(Naos <version>). CI runs it after the self
-# tests of each build; run it from the root of Naos, after building a preset:
+# tests tests/consumer/, which finds it with find_package(Naos <version>), then builds and runs
+# tests/consumer/consumer_test.c again with the flags of naos.pc from pkg-config, where it is found.
+# CI runs it after the self tests of each build; run it from the root of Naos, after building a preset:
 #
 #   cmake -D PRESET=default -P scripts/TestPackage.cmake
 #
 # -D PRESET=<name>   the preset built, whose build directory is build/<name>
 # -D CONFIG=<name>   the configuration built (optional): Debug, or Release for the preset release
 #
-# The package goes to build/<name>-install and the project to build/<name>-consumer. The compiler is
-# the one of CC and the generator the one of CMAKE_GENERATOR, as for any configure.
+# The package goes to build/<name>-install, the project to build/<name>-consumer and the program
+# built with pkg-config to build/<name>-pkgconfig. The compiler is the one of CC and the generator
+# the one of CMAKE_GENERATOR, as for any configure; the program is built by the compiler of the build.
 #
 # The warnings for the authors of a project (CMake Warning (dev)) are errors in the configure of the
 # project, since such a warning from the installed package would show in every project using it.
@@ -77,3 +79,90 @@ run("Building tests/consumer"
     "${CMAKE_COMMAND}" --build "${consumer}" --config "${CONFIG}")
 run("Testing tests/consumer"
     "${CMAKE_CTEST_COMMAND}" --test-dir "${consumer}" -C "${CONFIG}" --output-on-failure)
+
+# The same package through pkg-config, as a project with another build system uses it
+# (docs/getting-started/installation.md#other-build-systems): <libdir>/pkgconfig/naos.pc is
+# generated, so its flags are checked against the build, then tests/consumer/consumer_test.c is built
+# with them by the compiler of the build, without CMake, and run. Skipped where pkg-config is not
+# found, and with MSVC, whose cl takes no -L or -l.
+function(cache_value name variable)
+    file(STRINGS "${build}/CMakeCache.txt" line REGEX "^${name}:[A-Z]+=")
+    string(REGEX REPLACE "^${name}:[A-Z]+=" "" value "${line}")
+    set(${variable} "${value}" PARENT_SCOPE)
+endfunction()
+
+# Runs pkg-config with the arguments given, setting <variable> to its output.
+function(pkg_config variable)
+    execute_process(COMMAND "${pkg_config}" ${ARGN} naos
+        RESULT_VARIABLE code OUTPUT_VARIABLE output ERROR_VARIABLE output OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if(NOT code EQUAL 0)
+        message(FATAL_ERROR "pkg-config ${ARGN} naos failed (${code}):\n${output}")
+    endif()
+    set(${variable} "${output}" PARENT_SCOPE)
+endfunction()
+
+find_program(pkg_config NAMES pkgconf pkg-config)
+cache_value(CMAKE_C_COMPILER cc)
+cache_value(CMAKE_C_COMPILER_ID cc_id)
+if(NOT pkg_config)
+    message(STATUS "Testing naos.pc: skipped, pkg-config is not found")
+    return()
+endif()
+if(cc_id STREQUAL "MSVC")
+    message(STATUS "Testing naos.pc: skipped with MSVC")
+    return()
+endif()
+
+cache_value(CMAKE_INSTALL_LIBDIR libdir)
+cache_value(CMAKE_INSTALL_BINDIR bindir)
+cache_value(BUILD_SHARED_LIBS shared)
+include("${root}/cmake/NaosVersion.cmake")
+naos_read_version("${root}/include/naos/version.h")
+set(pkgconfig "${root}/build/${PRESET}-pkgconfig")
+file(REMOVE_RECURSE "${pkgconfig}")
+file(MAKE_DIRECTORY "${pkgconfig}")
+set(ENV{PKG_CONFIG_PATH} "${prefix}/${libdir}/pkgconfig")
+
+message(STATUS "Testing naos.pc with ${pkg_config}")
+pkg_config(version --modversion)
+pkg_config(cflags --cflags)
+pkg_config(libs --libs)
+pkg_config(static_libs --static --libs)
+if(NOT version STREQUAL naos_version)
+    message(FATAL_ERROR "naos.pc has the version ${version}, not ${naos_version}")
+endif()
+if(CONFIG STREQUAL "Debug")
+    set(library naosd)
+else()
+    set(library naos)
+endif()
+if(NOT libs MATCHES "(^| )-l${library}( |$)")
+    message(FATAL_ERROR "naos.pc links '${libs}', without -l${library} for ${CONFIG}")
+endif()
+if(shared AND NOT cflags MATCHES "(^| )-DNAOS_SHARED( |$)")
+    message(FATAL_ERROR "naos.pc gives '${cflags}', without -DNAOS_SHARED for the shared library")
+elseif(NOT shared AND cflags MATCHES "NAOS_SHARED")
+    message(FATAL_ERROR "naos.pc gives '${cflags}', with NAOS_SHARED for the static library")
+endif()
+if(NOT shared AND CMAKE_HOST_UNIX AND NOT static_libs MATCHES "(^| )-lm( |$)")
+    message(FATAL_ERROR "naos.pc links '${static_libs}' with --static, without -lm")
+endif()
+
+separate_arguments(cflags UNIX_COMMAND "${cflags}")
+separate_arguments(libs UNIX_COMMAND "${libs}")
+set(program "${pkgconfig}/consumer_tests")
+if(CMAKE_HOST_WIN32)
+    string(APPEND program ".exe")
+endif()
+run("Building tests/consumer/consumer_test.c with the flags of pkg-config"
+    "${cc}" -std=c99 ${cflags} "-DEXPECTED_VERSION=\"${naos_version}\""
+    "${root}/tests/consumer/consumer_test.c" ${libs} -o "${program}")
+# The shared library is found where it is installed.
+if(CMAKE_HOST_WIN32)
+    set(ENV{PATH} "${prefix}/${bindir};$ENV{PATH}")
+elseif(CMAKE_HOST_APPLE)
+    set(ENV{DYLD_LIBRARY_PATH} "${prefix}/${libdir}")
+else()
+    set(ENV{LD_LIBRARY_PATH} "${prefix}/${libdir}")
+endif()
+run("Running the tests built with the flags of pkg-config" "${program}")

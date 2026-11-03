@@ -24,7 +24,7 @@ The first directory of `tests/` is the **layer**, which says who judges its case
 `tests/consumer/` is not a layer: it is a project using Naos, which gets Naos in two ways:
 
 - `build/subproject/` adds it with `add_subdirectory()`
-- `scripts/TestPackage.cmake` adds it with `find_package(Naos <version>)` after installing a build ([building](building.md#installing))
+- `scripts/TestPackage.cmake` adds it with `find_package(Naos <version>)` after installing a build, then builds `consumer_test.c` again with the flags of `pkg-config` alone, without CMake ([building](building.md#installing))
 
 The helpers are in `tests/harness/`:
 

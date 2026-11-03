@@ -9,6 +9,7 @@
 #   <libdir>/cmake/Naos/NaosConfig.cmake        imports Naos::naos and includes Naos.cmake
 #   <libdir>/cmake/Naos/NaosConfigVersion.cmake accepts the versions naos_compatibility allows
 #   <libdir>/cmake/Naos/Naos.cmake, NaosDiscover.cmake
+# and, for a project with another build system, <libdir>/pkgconfig/naos.pc (from cmake/naos.pc.in).
 
 include_guard(GLOBAL)
 
@@ -50,3 +51,39 @@ install(FILES
     "${PROJECT_SOURCE_DIR}/cmake/NaosDiscover.cmake"
     DESTINATION "${naos_config_dir}"
 )
+
+# naos.pc, for pkg-config and Meson. Its flags follow the library built: -lnaosd for Debug
+# (DEBUG_POSTFIX, through $<TARGET_FILE_BASE_NAME>, since $<TARGET_LINKER_FILE_BASE_NAME> needs
+# CMake 3.27), -DNAOS_SHARED for a shared library, and libm for a static library on Unix, which C
+# does not promise to leave out. The paths are relative to ${pcfiledir}, so the installed tree can
+# move; a directory given as an absolute path stays absolute.
+set(naos_pc_dir "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+if(IS_ABSOLUTE "${CMAKE_INSTALL_LIBDIR}")
+    set(naos_pc_prefix "${CMAKE_INSTALL_PREFIX}")
+else()
+    file(RELATIVE_PATH naos_pc_up "/naos/${naos_pc_dir}" "/naos")
+    string(REGEX REPLACE "/$" "" naos_pc_up "${naos_pc_up}")
+    set(naos_pc_prefix "\${pcfiledir}/${naos_pc_up}")
+endif()
+foreach(naos_pc_kind IN ITEMS INCLUDEDIR LIBDIR)
+    string(TOLOWER "${naos_pc_kind}" naos_pc_name)
+    if(IS_ABSOLUTE "${CMAKE_INSTALL_${naos_pc_kind}}")
+        set(naos_pc_${naos_pc_name} "${CMAKE_INSTALL_${naos_pc_kind}}")
+    else()
+        set(naos_pc_${naos_pc_name} "\${prefix}/${CMAKE_INSTALL_${naos_pc_kind}}")
+    endif()
+endforeach()
+set(naos_pc_cflags "")
+set(naos_pc_libs_private "")
+if(naos_type STREQUAL "SHARED_LIBRARY")
+    set(naos_pc_cflags " -DNAOS_SHARED")
+elseif(UNIX)
+    set(naos_pc_libs_private "Libs.private: -lm")
+endif()
+configure_file("${PROJECT_SOURCE_DIR}/cmake/naos.pc.in" "${PROJECT_BINARY_DIR}/naos.pc.in" @ONLY)
+# One file for each configuration of a multi-config generator; cmake --install --config picks it.
+file(GENERATE
+    OUTPUT "${PROJECT_BINARY_DIR}/pkgconfig/$<CONFIG>/naos.pc"
+    INPUT "${PROJECT_BINARY_DIR}/naos.pc.in"
+)
+install(FILES "${PROJECT_BINARY_DIR}/pkgconfig/$<CONFIG>/naos.pc" DESTINATION "${naos_pc_dir}")

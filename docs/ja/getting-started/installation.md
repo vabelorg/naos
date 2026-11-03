@@ -80,7 +80,17 @@ add_subdirectory(third_party/naos)
 
 ## ほかのビルドシステム
 
-[インストール済みのパッケージ](#インストール済みのパッケージ)と同じように、CMake で Naos を一度ビルドしてインストールします。そのうえで、インストール先のヘッダとライブラリをコンパイラに渡します。
+[インストール済みのパッケージ](#インストール済みのパッケージ)と同じように、CMake で Naos を一度ビルドしてインストールします。そのうえで、フラグを `pkg-config` で得ます。`cmake --install` は `<libdir>/pkgconfig/` に `naos.pc` を入れます。そのフラグはビルドしたライブラリに合わせてあり、Debug ビルドでは `-lnaosd`、共有ライブラリでは `-DNAOS_SHARED` が付きます。
+
+```sh
+export PKG_CONFIG_PATH=/opt/naos/lib/pkgconfig
+cc -std=c99 $(pkg-config --cflags naos) -c my_tests.c
+cc -o my_tests my_tests.o $(pkg-config --libs naos)
+```
+
+Meson は、同じ `PKG_CONFIG_PATH` で `dependency('naos')` から見つけます。Unix の静的ライブラリには C の数学ライブラリが要ることがあり、`pkg-config --static --libs naos` がそれを加えます（`-lm`）。`naos.pc` のパスはそれ自身の場所からの相対なので、インストールしたツリーは移動できます。
+
+`pkg-config` がなければ、インストール先のヘッダとライブラリをコンパイラに渡します。
 
 ```sh
 cc -std=c99 -I/opt/naos/include -c my_tests.c

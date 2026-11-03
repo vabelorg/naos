@@ -98,6 +98,7 @@ find_package(Naos 0.3 REQUIRED)
 | `lib/`（DLL は `bin/`） | ライブラリ |
 | `bin/` | MSVC の Debug または RelWithDebInfo でビルドした DLL の PDB |
 | `lib/cmake/Naos/` | `NaosConfig.cmake`、`NaosConfigVersion.cmake`、`NaosTargets*.cmake`、`Naos.cmake`、`NaosDiscover.cmake` |
+| `lib/pkgconfig/naos.pc` | `pkg-config` と Meson のためのフラグ。ビルドしたライブラリに合わせたもの（[ほかのビルドシステム](../getting-started/installation.md#ほかのビルドシステム)） |
 | `share/licenses/naos/LICENSE` | ライセンス |
 
 ディレクトリは `GNUInstallDirs`（`CMAKE_INSTALL_LIBDIR` など）に従います。

@@ -24,7 +24,7 @@ Naos はテストハーネスなので、自己テストの多くは Naos 自身
 `tests/consumer/` は層ではありません。Naos を使うプロジェクトで、Naos を次の 2 とおりで加えます。
 
 - `build/subproject/` が `add_subdirectory()` で加える
-- `scripts/TestPackage.cmake` が、ビルドをインストールしたあと `find_package(Naos <version>)` で加える（[ビルド](building.md#インストールする)）
+- `scripts/TestPackage.cmake` が、ビルドをインストールしたあと `find_package(Naos <version>)` で加える。続いて `consumer_test.c` を、CMake を使わずに `pkg-config` のフラグだけでビルドし直す（[ビルド](building.md#インストールする)）
 
 テストの仕組みは `tests/harness/` にあります。
 
