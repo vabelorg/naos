@@ -61,10 +61,5 @@ The options of Naos still work, anywhere among the arguments:
 - `--help` stays in `argv`, so the program can add its own help after that of Naos.
 - The example checks, before adding the suites, that the library loaded is the version the tests were built with ([shared library](shared-library.md#check-the-version-loaded)).
 - CTest registers only the tests listed when the executable runs without arguments. Suites added by an argument are run by starting the executable directly.
-- A suite added by an argument is not listed without one, so `naos_add_executable()` would report it as never added. Name it in `IGNORE_SUITES` ([registration check](../reference/cmake.md#registration-check)):
-
-  ```cmake
-  naos_add_executable(custom_main_tests SOURCES main.c quick_test.c slow_test.c IGNORE_SUITES slow)
-  ```
 
 The rules are in [custom main()](../reference/tests.md#custom-main).

@@ -38,18 +38,6 @@ naos_add_executable(my_tests SOURCES main.c parser_test.c writer_test.c LIBRARIE
 - Suite names must be unique within an executable (a duplicate is a link error).
 - When a suite gets large, split it into suites with a common prefix, such as `parser_object` and `parser_array`: `--naos-filter 'parser_*'` then selects them all.
 
-## Catch a test or a suite never added
-
-A test is written twice: `NAOS_TEST` defines it and `NAOS_ADD_TEST` adds it to its suite. A suite is too: `NAOS_SUITE`, then `NAOS_ADD_SUITE`. When the second half is missing, the test never runs, and the run still passes.
-
-`naos_add_executable()` and `naos_discover_tests()` make both a build error, with every compiler ([registration check](../reference/cmake.md#registration-check)). After the link, they compare the tests the executable lists with those its sources define, and name the line of each test or suite not added:
-
-```
-left_out_test.c:15: error: test left_out is defined but never added, so it never runs: add it with NAOS_ADD_TEST(left_out) to a suite of this file
-```
-
-Add what is missing, or remove what is no longer needed. A suite left out on purpose, such as one that a [custom main()](custom-main.md) adds only on an argument, goes in `IGNORE_SUITES`. Without the CMake functions, [a script](../reference/cmake.md#without-the-cmake-functions) runs the same check.
-
 ## Choose the assertion
 
 Each type of value has its assertions: integers, unsigned integers, doubles, strings, memory and pointers ([assertions](../reference/assertions.md)). Use the one that fits: when it fails, it prints both values in a form that fits the type.

@@ -27,15 +27,7 @@ GCC, Clang and MSVC know that `NAOS_FAIL` does not return; other compilers may w
 
 **A test never runs**
 
-It is listed in no suite, or its suite is not registered in `main()`. Check with `--naos-list`. The CMake functions report both at build time ([catch a test or a suite never added](writing-tests.md#catch-a-test-or-a-suite-never-added)).
-
-**`error: test <name> is defined but never added`**
-
-The build failed after the link: no suite of the file lists the test `<name>`. Add it with `NAOS_ADD_TEST(<name>)` to a suite of that file, or remove it ([registration check](../reference/cmake.md#registration-check)).
-
-**`error: suite <name> is defined but never added`**
-
-The build failed after the link: a suite is defined in the sources and `main()` does not add it. Add `NAOS_ADD_SUITE(<name>)` to `NAOS_MAIN` (and `NAOS_DECLARE_SUITE(<name>);` above it when the suite is in another file). When it is left out on purpose, name it in `IGNORE_SUITES` ([registration check](../reference/cmake.md#registration-check)).
+It is listed in no suite, or its suite is not registered in `main()`. Check with `--naos-list`. The compiler's unused-function warning points at tests that no suite lists.
 
 **`naos: error: no assertion ran`**
 
@@ -45,7 +37,7 @@ For a suite written before Naos 0.4, `--naos-allow-no-assertions`, or `ALLOW_NO_
 
 **Exit code 2, with a message on standard error**
 
-A usage error: an unknown `--naos-*` option, a value that is missing or out of range, a filter that matches no test, or a mistake in the suites (a name used twice, setup given twice, a suite with no test). Every mistake is reported before any test runs ([exit codes](../reference/command-line.md#exit-codes)).
+A usage error: an unknown `--naos-*` option, a value that is missing or out of range, a filter that matches no test, or a mistake in the suites (a name used twice, setup given twice). Every mistake is reported before any test runs ([exit codes](../reference/command-line.md#exit-codes)).
 
 **Exit code 77**
 

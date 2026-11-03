@@ -61,10 +61,5 @@ Naos のオプションも、引数のどこに置いてもそのまま使えま
 - `--help` は `argv` に残るので、Naos のヘルプの後にプログラム自身のヘルプを出せます。
 - この例では、スイートを足す前に、読み込んだライブラリがテストをビルドしたときと同じバージョンかを確かめています（[共有ライブラリ](shared-library.md#読み込んだバージョンを確かめる)）。
 - CTest に登録されるのは、引数なしで実行した場合に列挙されるテストだけです。引数で足すスイートは、実行ファイルを直接実行して使います。
-- 引数で足すスイートは引数なしでは列挙されないので、`naos_add_executable()` は追加し忘れとして報告します。`IGNORE_SUITES` に書きます（[登録漏れの確認](../reference/cmake.md#登録漏れの確認)）。
-
-  ```cmake
-  naos_add_executable(custom_main_tests SOURCES main.c quick_test.c slow_test.c IGNORE_SUITES slow)
-  ```
 
 規則は[独自の main()](../reference/tests.md#独自の-main) にあります。

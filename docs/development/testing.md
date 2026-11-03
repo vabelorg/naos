@@ -18,7 +18,7 @@ The first directory of `tests/` is the **layer**, which says who judges its case
 | `api/` | Naos itself | The public API, used as a project uses it, in C and C++. One file per public header |
 | `unit/` | Naos itself | The internal modules, one file per module: those whose results depend only on their arguments (`value`, `filter`, `shuffle`, `text`, and `plan`, whose order the seed of each round decides), and the writers driven through their events (the JUnit XML file of `xml`, the diagnostics of `human`) |
 | `behavior/` | Golden files ([below](#cases-compared-with-an-output)) | Everything the [reference](../reference/README.md) states about running tests, one directory per page: `tests/`, `assertions/`, `control/`, `command-line/`, `output/`, `xml/` |
-| `build/` | The compiler and CMake | Programs that must not compile (`misuse/`), the messages of test discovery and its check of the tests and suites (`discovery/`), the [CMake functions](../reference/cmake.md#functions) (`functions/`), and Naos added with `add_subdirectory()` (`subproject/`) |
+| `build/` | The compiler and CMake | Programs that must not compile (`misuse/`), the messages of test discovery (`discovery/`), the [CMake functions](../reference/cmake.md#functions) (`functions/`), and Naos added with `add_subdirectory()` (`subproject/`) |
 | `examples/` | Both | The projects of `examples/`, and the outputs the documentation quotes ([below](#examples-and-documentation)) |
 
 `tests/consumer/` is not a layer: it is a project using Naos, which gets Naos in two ways:
@@ -112,7 +112,7 @@ A test that prints bytes beyond ASCII on standard output gives `FILE_ONLY` as we
 
 A case of `build/functions/` or `build/subproject/` configures, builds and tests a project of its own, with the generator, the compiler and the configuration of the build of Naos (`naos_selftest_add_project_case()` and `NestedProject.cmake`).
 
-- `functions/`: checks each mistake in the arguments of the CMake functions with a configure alone, how the tests are registered with `Registration.cmake`, and how a test or a suite never added fails the build with `Unregistered.cmake`.
+- `functions/`: checks each mistake in the arguments of the CMake functions with a configure alone, and how the tests are registered with `Registration.cmake`.
 - `subproject/`: builds `tests/consumer/` with Naos added by `add_subdirectory()`, whose configure fails when Naos does not keep to itself.
 
 These cases take seconds each, which the label `slow` lets `-LE slow` leave out.

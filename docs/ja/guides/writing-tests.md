@@ -38,18 +38,6 @@ naos_add_executable(my_tests SOURCES main.c parser_test.c writer_test.c LIBRARIE
 - スイートの名前は、1 つの実行ファイルの中で重複しないようにします（重複するとリンクエラーになります）。
 - スイートが大きくなったら、`parser_object`、`parser_array` のように名前の先頭をそろえたスイートに分けます。`--naos-filter 'parser_*'` でまとめて指定できます。
 
-## 追加し忘れたテストやスイートに気付く
-
-テストは 2 か所に書きます。`NAOS_TEST` で定義し、`NAOS_ADD_TEST` でスイートに追加します。スイートも同じで、`NAOS_SUITE` の後に `NAOS_ADD_SUITE` です。後半が抜けると、そのテストは一度も実行されず、それでも実行は成功します。
-
-`naos_add_executable()` と `naos_discover_tests()` は、どのコンパイラでも、どちらもビルドエラーにします（[登録漏れの確認](../reference/cmake.md#登録漏れの確認)）。リンクの後に、実行ファイルが列挙したテストとソースで定義しているテストを比べ、追加していないテストやスイートの行を示します。
-
-```
-left_out_test.c:15: error: test left_out is defined but never added, so it never runs: add it with NAOS_ADD_TEST(left_out) to a suite of this file
-```
-
-抜けているほうを書き足すか、要らなくなったものを消します。[独自の main()](custom-main.md) が引数でだけ追加するスイートのように、わざと外しているスイートは `IGNORE_SUITES` に書きます。CMake の関数を使わないときは、[スクリプト](../reference/cmake.md#cmake-の関数を使わないとき)で同じ確認ができます。
-
 ## アサーションを選ぶ
 
 アサーションは、整数、符号なし整数、double、文字列、メモリ、ポインタと、値の型ごとに用意されています（[アサーション](../reference/assertions.md)）。型に合ったものを使うと、失敗したときに両辺の値が型に合った形で表示されます。

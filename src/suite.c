@@ -214,8 +214,8 @@ static int build_suites(naos_builder_t *builder, const naos_suite_func_t *suites
         else if (builder->test_calls == 0)
         {
             /*
-             * A suite with no test would never show in --naos-list, which CTest discovery and its
-             * check of the suites rely on; it is most likely unfinished, too.
+             * A suite with no test would never show in --naos-list, so CTest would register nothing
+             * for it and it would pass unnoticed; it is most likely unfinished, too.
              */
             builder_error(builder, "suite %s has no test", display_name(builder->current->name));
         }

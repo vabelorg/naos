@@ -17,7 +17,7 @@ Naos 自体を保守・拡張する人向けに、ソースの置き方とモジ
 |---|---|
 | `include/` | 公開ヘッダ。利用者には `naos/naos.h` だけを案内する |
 | `src/` | 実装と内部ヘッダ |
-| `cmake/` | 利用者向けにインストールする `Naos.cmake`（`naos_add_executable()` / `naos_discover_tests()`）と `NaosDiscover.cmake`（ビルド後にテストを列挙して CTest に登録するスクリプト）、`NaosCheckRegistration.cmake`（定義したテストとスイートがすべて追加されているかの確認。`NaosDiscover.cmake` が読み込むほか、単独でも実行できる）、`find_package(Naos)` 用の config。Naos のビルドだけが使う `NaosVersion.cmake`（バージョンと、そこから決まる互換性・SOVERSION）と `NaosInstall.cmake`（インストール規則）はインストールしない |
+| `cmake/` | 利用者向けにインストールする `Naos.cmake`（`naos_add_executable()` / `naos_discover_tests()`）と `NaosDiscover.cmake`（ビルド後にテストを列挙して CTest に登録するスクリプト）、`find_package(Naos)` 用の config。Naos のビルドだけが使う `NaosVersion.cmake`（バージョンと、そこから決まる互換性・SOVERSION）と `NaosInstall.cmake`（インストール規則）はインストールしない |
 | `tests/` | 自己テスト。判定するものごとの層（`contract/`、`api/`、`unit/`、`behavior/`、`build/`、`examples/`）に、プログラム、ケースを登録する `CMakeLists.txt`、期待する出力（`expected/`）を置く。Naos を使うプロジェクト `consumer/` と、仕組み（`harness/`）もある（[テスト](testing.md)） |
 | `examples/` | 文書が引用する完成したプロジェクト。自己テストでビルドして実行する |
 | `docs/` | 英語の文書と、`docs/ja/` にその日本語訳 |
@@ -108,7 +108,6 @@ flowchart TB
 - **書式付きの出力**: `src/` の書式付きの出力はすべて `format.h` を通ります。`format.h` は C ライブラリのうち C99 に従う関数を選びます（MinGW では `__mingw_` の関数）。`naos/export.h` の `NAOS_PRINTF_FORMAT` は Naos の printf 形式の関数を同じ書式で宣言するので、コンパイラのチェックと Naos の出力が一致します。
 - **状態**: 共有する可変状態は各モジュールの `static` 変数（`g_` 接頭辞）に閉じ、`extern` 変数にはしません。例外は `naos_init` 以後読むだけのオプションで、`naos_options_get()` で読みます。
 - **列挙**: `naos_add_executable()` は、ビルド後に `NaosDiscover.cmake` を実行する `POST_BUILD` のコマンドを足します。このスクリプトは `<exe> --naos-list` を実行し、出力の 1 行を 1 件のテストとして登録する CTest のファイルを書きます。パラメータはファイル経由で渡すので、リストをエスケープする必要はありません。
-- **登録漏れの確認**: `NaosDiscover.cmake` は CTest のファイルを書く前に、列挙したテストと、ターゲットのソースのテキストにある `NAOS_TEST` と `NAOS_SUITE` の定義を比べます（`NaosCheckRegistration.cmake`）。コンパイラには頼りません。スイートの関数は外部リンケージで、使われなくてもどのコンパイラも報告せず、使われない `static` のテスト関数も MSVC はどのビルドでも報告するとは限らないためです。追加したスイートが必ず列挙に出るよう、テストのないスイートはスイートの誤りにしています。
 - **列挙の失敗**: 列挙に失敗したときは、テストが 0 件のまま黙って進めず、ビルドを失敗させて原因と対処をメッセージに出します（[トラブルシューティング](../guides/troubleshooting.md#cmake-と-ctest)）。
 - **バージョン**: バージョンの源は `include/naos/version.h` だけです。`NaosVersion.cmake` がそれを読み、`project(VERSION)`、パッケージの互換性、`SOVERSION` を決めます。
 

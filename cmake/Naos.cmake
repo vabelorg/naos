@@ -10,13 +10,11 @@
 #     [LABELS <label>...]
 #     [PROPERTIES <name> <value>...]
 #     [DISCOVERY_TIMEOUT <seconds>]   # limit for "<exe> --naos-list", default 60
-#     [ALLOW_NO_ASSERTIONS]           # run each test with --naos-allow-no-assertions
-#     [IGNORE_SUITES <name>...]       # suites defined in the sources but not added, on purpose
-#     [NO_REGISTRATION_CHECK])        # do not check that the tests and suites defined are added
+#     [ALLOW_NO_ASSERTIONS])          # run each test with --naos-allow-no-assertions
 #   Creates a test executable linked to Naos::naos and registers each of its tests with CTest.
 #
 # naos_discover_tests(<target> [PREFIX ...] [LABELS ...] [PROPERTIES ...] [DISCOVERY_TIMEOUT ...]
-#     [ALLOW_NO_ASSERTIONS] [IGNORE_SUITES ...] [NO_REGISTRATION_CHECK])
+#     [ALLOW_NO_ASSERTIONS])
 #   Registers the tests of an existing executable target that calls naos_init() and naos_run().
 #   The target must be made in the same directory, and registered only once.
 #
@@ -24,12 +22,7 @@
 # needs no reconfigure. Every test becomes one CTest test running
 # "<exe> --naos-filter <suite>.<test>", with SKIP_RETURN_CODE 77; with ALLOW_NO_ASSERTIONS,
 # "<exe> --naos-filter <suite>.<test> --naos-allow-no-assertions". Until the executable is built,
-# or when discovery fails, CTest has one failing test in their place, <prefix>NOT_BUILT, with the
-# same labels.
-#
-# Discovery also fails when a test or a suite defined in the sources of the target (NAOS_TEST,
-# NAOS_SUITE) is not among those listed, unless NO_REGISTRATION_CHECK is given; IGNORE_SUITES names
-# suites left out on purpose (NaosCheckRegistration.cmake).
+# CTest has one failing test in their place, <prefix>NOT_BUILT, with the same labels.
 #
 # The functions whose names start with _naos_ are internal.
 
@@ -52,8 +45,7 @@ endfunction()
 # Sets out to the content of the parameter file read by NaosDiscover.cmake. Every keyword is
 # required and takes one value, a list as one argument; the values may hold generator expressions.
 function(_naos_discovery_params out)
-    set(keywords TARGET EXECUTABLE EMULATOR PREFIX LABELS PROPERTIES DISCOVERY_TIMEOUT ARGS OUTPUT
-        SOURCES SOURCE_DIR IGNORE_SUITES)
+    set(keywords TARGET EXECUTABLE EMULATOR PREFIX LABELS PROPERTIES DISCOVERY_TIMEOUT ARGS OUTPUT)
     cmake_parse_arguments(PARSE_ARGV 1 arg "" "${keywords}" "")
     set(content "")
     foreach(keyword IN LISTS keywords)
@@ -64,7 +56,7 @@ function(_naos_discovery_params out)
 endfunction()
 
 # Fails the configure step when the arguments of caller (the public function) are wrong.
-function(_naos_check_discovery_args caller target timeout properties ignore_suites)
+function(_naos_check_discovery_args caller target timeout properties)
     if(NOT TARGET ${target})
         message(FATAL_ERROR "${caller}: no target named '${target}'")
     endif()
@@ -86,16 +78,11 @@ function(_naos_check_discovery_args caller target timeout properties ignore_suit
     if(odd)
         message(FATAL_ERROR "${caller}: PROPERTIES must be pairs of <name> <value>: '${properties}'")
     endif()
-    foreach(suite IN LISTS ignore_suites)
-        if(NOT suite MATCHES "^[A-Za-z0-9_]+$")
-            message(FATAL_ERROR "${caller}: IGNORE_SUITES takes suite names (only letters, digits and '_'): '${suite}'")
-        endif()
-    endforeach()
 endfunction()
 
 # Registers the tests of target, for caller. The arguments are those of naos_discover_tests(),
 # empty or false when not given.
-function(_naos_discover caller target prefix labels properties timeout allow_no_assertions ignore_suites no_check)
+function(_naos_discover caller target prefix labels properties timeout allow_no_assertions)
     if(prefix STREQUAL "")
         set(prefix "${target}.")
     endif()
@@ -107,7 +94,7 @@ function(_naos_discover caller target prefix labels properties timeout allow_no_
     else()
         set(args "")
     endif()
-    _naos_check_discovery_args(${caller} ${target} "${timeout}" "${properties}" "${ignore_suites}")
+    _naos_check_discovery_args(${caller} ${target} "${timeout}" "${properties}")
     set_property(TARGET ${target} PROPERTY _NAOS_DISCOVERED TRUE)
 
     get_property(multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
@@ -122,14 +109,6 @@ function(_naos_discover caller target prefix labels properties timeout allow_no_
     set(tests_file "${file_base}_tests${config_suffix}.cmake")
     set(include_file "${file_base}_include.cmake")
 
-    # The sources whose tests and suites are checked, as the build sees them; none without the check.
-    if(no_check)
-        set(sources "")
-    else()
-        set(sources "$<TARGET_PROPERTY:${target},SOURCES>")
-    endif()
-    get_property(source_dir TARGET ${target} PROPERTY SOURCE_DIR)
-
     # Parameters go through a generated file so that lists survive without command-line escaping.
     get_property(emulator TARGET ${target} PROPERTY CROSSCOMPILING_EMULATOR)
     _naos_discovery_params(params
@@ -142,9 +121,6 @@ function(_naos_discover caller target prefix labels properties timeout allow_no_
         DISCOVERY_TIMEOUT "${timeout}"
         ARGS "${args}"
         OUTPUT "${tests_file}"
-        SOURCES "${sources}"
-        SOURCE_DIR "${source_dir}"
-        IGNORE_SUITES "${ignore_suites}"
     )
     file(GENERATE OUTPUT "${params_file}" CONTENT "${params}")
     # A change to the arguments rewrites the parameter file, which then links the executable again,
@@ -184,21 +160,18 @@ function(_naos_discover caller target prefix labels properties timeout allow_no_
 endfunction()
 
 function(naos_discover_tests target)
-    cmake_parse_arguments(PARSE_ARGV 1 arg "ALLOW_NO_ASSERTIONS;NO_REGISTRATION_CHECK" "PREFIX;DISCOVERY_TIMEOUT"
-        "LABELS;PROPERTIES;IGNORE_SUITES")
+    cmake_parse_arguments(PARSE_ARGV 1 arg "ALLOW_NO_ASSERTIONS" "PREFIX;DISCOVERY_TIMEOUT" "LABELS;PROPERTIES")
     if(arg_UNPARSED_ARGUMENTS)
         message(FATAL_ERROR "naos_discover_tests: unknown arguments: ${arg_UNPARSED_ARGUMENTS}")
     endif()
 
     _naos_discover(naos_discover_tests ${target}
-        "${arg_PREFIX}" "${arg_LABELS}" "${arg_PROPERTIES}" "${arg_DISCOVERY_TIMEOUT}" "${arg_ALLOW_NO_ASSERTIONS}"
-        "${arg_IGNORE_SUITES}" "${arg_NO_REGISTRATION_CHECK}")
+        "${arg_PREFIX}" "${arg_LABELS}" "${arg_PROPERTIES}" "${arg_DISCOVERY_TIMEOUT}" "${arg_ALLOW_NO_ASSERTIONS}")
 endfunction()
 
 function(naos_add_executable target)
     # The keywords of naos_discover_tests(), and SOURCES and LIBRARIES.
-    cmake_parse_arguments(PARSE_ARGV 1 arg "ALLOW_NO_ASSERTIONS;NO_REGISTRATION_CHECK" "PREFIX;DISCOVERY_TIMEOUT"
-        "SOURCES;LIBRARIES;LABELS;PROPERTIES;IGNORE_SUITES")
+    cmake_parse_arguments(PARSE_ARGV 1 arg "ALLOW_NO_ASSERTIONS" "PREFIX;DISCOVERY_TIMEOUT" "SOURCES;LIBRARIES;LABELS;PROPERTIES")
     if(arg_UNPARSED_ARGUMENTS)
         message(FATAL_ERROR "naos_add_executable: unknown arguments: ${arg_UNPARSED_ARGUMENTS}")
     endif()
@@ -210,8 +183,7 @@ function(naos_add_executable target)
     target_link_libraries(${target} PRIVATE Naos::naos ${arg_LIBRARIES})
 
     _naos_discover(naos_add_executable ${target}
-        "${arg_PREFIX}" "${arg_LABELS}" "${arg_PROPERTIES}" "${arg_DISCOVERY_TIMEOUT}" "${arg_ALLOW_NO_ASSERTIONS}"
-        "${arg_IGNORE_SUITES}" "${arg_NO_REGISTRATION_CHECK}")
+        "${arg_PREFIX}" "${arg_LABELS}" "${arg_PROPERTIES}" "${arg_DISCOVERY_TIMEOUT}" "${arg_ALLOW_NO_ASSERTIONS}")
 endfunction()
 
 cmake_policy(POP)

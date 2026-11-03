@@ -8,7 +8,7 @@
 # found by find_package(Naos):
 #   <libdir>/cmake/Naos/NaosConfig.cmake        imports Naos::naos and includes Naos.cmake
 #   <libdir>/cmake/Naos/NaosConfigVersion.cmake accepts the versions naos_compatibility allows
-#   <libdir>/cmake/Naos/Naos.cmake, NaosDiscover.cmake, NaosCheckRegistration.cmake
+#   <libdir>/cmake/Naos/Naos.cmake, NaosDiscover.cmake
 
 include_guard(GLOBAL)
 
@@ -48,6 +48,5 @@ install(FILES
     "${PROJECT_BINARY_DIR}/NaosConfigVersion.cmake"
     "${PROJECT_SOURCE_DIR}/cmake/Naos.cmake"
     "${PROJECT_SOURCE_DIR}/cmake/NaosDiscover.cmake"
-    "${PROJECT_SOURCE_DIR}/cmake/NaosCheckRegistration.cmake"
     DESTINATION "${naos_config_dir}"
 )
