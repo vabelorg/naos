@@ -77,7 +77,7 @@ NAOS_MAIN(
 - A suite is defined within one file. A file may define several. Test functions are `static`, so different files can use the same test names.
 - Two suites of the same name in one executable are a link error.
 - `#ifdef` cannot go between the arguments (undefined behavior in C99). Put the tests that depend on the platform in a suite of their own and wrap the whole suite in `#ifdef`.
-- Naos reports the following mistakes on standard error before running any test, all of them at once, and exits with code 2: a name that is empty or holds a character other than a letter, a digit or `_` (names written through the macros are always valid), a test listed twice in one suite, a test expected to fail with an empty or `NULL` reason, and a suite registered twice.
+- Naos reports the following mistakes on standard error before running any test, all of them at once, and exits with code 2: a name that is empty or holds a character other than a letter, a digit or `_` (names written through the macros are always valid), a test listed twice in one suite, a test expected to fail with an empty or `NULL` reason, a suite with no test (`suite <name> has no test`), and a suite registered twice.
 
 ## Setup and teardown
 

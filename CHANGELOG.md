@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **BREAKING**: A suite with no test is a mistake in the suites, reported with `naos: suite <name> has no test` before any test runs, with exit code 2: it never showed in `--naos-list`, so CTest registered nothing for it. Add a test to it, or remove it ([#7](https://github.com/vabelorg/naos/issues/7)).
 - **BREAKING**: A test that runs no assertion fails, with `naos: error: no assertion ran`, so that a test that checks nothing no longer reads as a pass: an empty or unfinished test, a loop over a table with no case, an early `return` before the assertions. Every `NAOS_CHECK_*` and `NAOS_REQUIRE_*` that runs counts, whether it passes or fails, as do `NAOS_PASS`, `NAOS_FAIL` and `NAOS_SKIP`, in setup, the body, teardown and the helpers they call; notes, traces and printing do not. Add an assertion to such a test, or end it with `NAOS_PASS()` when its check is that the code runs; to keep a suite passing while you do, run it with `--naos-allow-no-assertions`, or register it with `ALLOW_NO_ASSERTIONS` ([#26](https://github.com/vabelorg/naos/issues/26)).
 - A diagnostic line without a location, that of a test that ran no assertion, starts with `naos: ` in place of `<file>:<line>: `, and its test case in the JUnit XML file has no `file` and `line` ([#26](https://github.com/vabelorg/naos/issues/26)).
 
