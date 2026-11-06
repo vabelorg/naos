@@ -14,8 +14,9 @@
  *
  * src/ includes <stdio.h> through this header only, so that the poison below reaches every file
  * that could call printf: with GCC and Clang, a direct call is a compile error, while the names
- * used in the macros above, defined before the poison, stay usable. MSVC has no poison; the
- * builds of CI with GCC and Clang catch the call.
+ * used in the macros above, defined before the poison, stay usable. A name the C library defines
+ * as a macro (macOS does for sprintf, snprintf and their v forms) cannot be poisoned and is left
+ * out, as is MSVC, which has no poison: the builds of CI on Linux and MinGW catch those calls.
  */
 
 #ifndef NAOS_FORMAT_H
@@ -38,7 +39,30 @@
 #endif
 
 #if defined(__GNUC__)
-#pragma GCC poison printf fprintf vprintf vfprintf sprintf vsprintf snprintf vsnprintf
+#if !defined(printf)
+#pragma GCC poison printf
+#endif
+#if !defined(fprintf)
+#pragma GCC poison fprintf
+#endif
+#if !defined(vprintf)
+#pragma GCC poison vprintf
+#endif
+#if !defined(vfprintf)
+#pragma GCC poison vfprintf
+#endif
+#if !defined(sprintf)
+#pragma GCC poison sprintf
+#endif
+#if !defined(vsprintf)
+#pragma GCC poison vsprintf
+#endif
+#if !defined(snprintf)
+#pragma GCC poison snprintf
+#endif
+#if !defined(vsnprintf)
+#pragma GCC poison vsnprintf
+#endif
 #endif
 
 #endif

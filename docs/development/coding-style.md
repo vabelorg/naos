@@ -65,7 +65,7 @@ A blank line between groups, each group in alphabetical order. Public headers ar
 
 ## Formatted output
 
-`src/` calls the formatted output functions through `format.h`: `naos_printf`, `naos_fprintf`, `naos_vfprintf`, `naos_snprintf` and `naos_vsnprintf`, never `printf` and the others directly. They format as C99 does on every platform, which the default functions of MinGW do not (`%zu`, `%jd`, the exponent of `%e`). Functions without a format (`puts`, `fputs`, `fputc`) are called directly. `format.h` is how `src/` includes `<stdio.h>`, never directly, and it poisons the direct names for GCC and Clang: a direct call does not compile.
+`src/` calls the formatted output functions through `format.h`: `naos_printf`, `naos_fprintf`, `naos_vfprintf`, `naos_snprintf` and `naos_vsnprintf`, never `printf` and the others directly. They format as C99 does on every platform, which the default functions of MinGW do not (`%zu`, `%jd`, the exponent of `%e`). Functions without a format (`puts`, `fputs`, `fputc`) are called directly. `format.h` is how `src/` includes `<stdio.h>`, never directly, and it poisons the direct names for GCC and Clang: a direct call does not compile. A name the C library defines as a macro, as macOS does for `snprintf`, is left out; the builds of CI on Linux and MinGW catch it.
 
 ## Comments
 
