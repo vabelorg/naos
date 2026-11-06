@@ -1,5 +1,5 @@
 # Prepares a release, run by hand from the Actions tab: sets the version and closes the changelog
-# with scripts/PrepareRelease.cmake, and opens the pull request "Release <version>".
+# with scripts/prepare_release.py, and opens the pull request "Release <version>".
 # Merging it tags the release and publishes it (release.yml). See docs/development/release.md.
 #
 # Needs the secret RELEASE_TOKEN, a token that can push and open pull requests: CI does not run on
@@ -64,9 +64,8 @@ jobs:
 
       - name: Prepare the release
         run: |
-          cmake -D ROOT=. -D VERSION="$VERSION" -P scripts/PrepareRelease.cmake
-          cmake -D ROOT=. -D VERSION="$VERSION" -D OUTPUT="$RUNNER_TEMP/notes.md" \
-            -P scripts/ReleaseNotes.cmake
+          python3 scripts/prepare_release.py "$VERSION"
+          python3 scripts/release_notes.py "$VERSION" "$RUNNER_TEMP/notes.md"
 
       - name: Summary
         run: |

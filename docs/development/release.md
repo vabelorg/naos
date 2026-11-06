@@ -35,11 +35,11 @@ For 1.0, the workflow warns that the text on compatibility in the README files a
 
 ## By hand
 
-The workflows run two CMake scripts that also work locally, from the root of Naos:
+The workflows run two Python scripts that also work locally, from the root of Naos:
 
 ```sh
-cmake -D ROOT=. -D VERSION=0.1.0 -P scripts/PrepareRelease.cmake
-cmake -D ROOT=. -D VERSION=0.1.0 -D OUTPUT=notes.md -P scripts/ReleaseNotes.cmake
+python3 scripts/prepare_release.py 0.1.0
+python3 scripts/release_notes.py 0.1.0 notes.md
 ```
 
 The first changes the files as in step 3, the second writes the notes of the release. Then commit as `Release <version>`, tag, push and create the GitHub release from the tag with these notes:

@@ -57,8 +57,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cmake -D ROOT=. -D VERSION="$VERSION" -D OUTPUT="$RUNNER_TEMP/notes.md" \
-            -P scripts/ReleaseNotes.cmake
+          python3 scripts/release_notes.py "$VERSION" "$RUNNER_TEMP/notes.md"
           gh release create "v$VERSION" --verify-tag --title "Naos $VERSION" \
             --notes-file "$RUNNER_TEMP/notes.md"
 

@@ -23,8 +23,8 @@
 #   consumer/
 #
 # The checks that read the sources and need no build (the links of the Markdown files, the printf
-# calls of src/) are not here: they are scripts/CheckMarkdownLinks.cmake and
-# scripts/CheckPrintfCalls.cmake, run once by the lint job of CI.
+# calls of src/) are not here: they are scripts/check_markdown_links.py and
+# scripts/check_printf_calls.py, run once by the lint job of CI.
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/harness/NaosSelftest.cmake)
 

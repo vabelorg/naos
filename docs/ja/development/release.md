@@ -35,11 +35,11 @@ Naos のバージョンをリリースする手順です。リリースは `main
 
 ## 手作業で行う
 
-ワークフローが実行する 2 つの CMake スクリプトは、手元でも Naos のルートで実行できます。
+ワークフローが実行する 2 つの Python スクリプトは、手元でも Naos のルートで実行できます。
 
 ```sh
-cmake -D ROOT=. -D VERSION=0.1.0 -P scripts/PrepareRelease.cmake
-cmake -D ROOT=. -D VERSION=0.1.0 -D OUTPUT=notes.md -P scripts/ReleaseNotes.cmake
+python3 scripts/prepare_release.py 0.1.0
+python3 scripts/release_notes.py 0.1.0 notes.md
 ```
 
 1 つ目は手順 3 のとおりにファイルを書き換え、2 つ目はリリースノートを書き出します。その後、`Release <version>` としてコミットし、タグを付けて push し、そのノートでタグから GitHub のリリースを作ります。

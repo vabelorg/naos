@@ -35,7 +35,7 @@ Naos を厳しくするだけの変更（見逃していた誤りを報告する
 
 ## リリースのとき
 
-[リリース](release.md)のワークフローが、`scripts/PrepareRelease.cmake` と `ReleaseNotes.cmake` で次を行います。
+[リリース](release.md)のワークフローが、`scripts/prepare_release.py` と `release_notes.py` で次を行います。
 
 1. `## [Unreleased]` を `## [<version>] - <YYYY-MM-DD>` に変え、その上に空の `## [Unreleased]` を足す。
 2. ファイルの末尾のリンクを更新する。`[Unreleased]` は新しいタグと `HEAD` を比べ、`[<version>]` はそのリリースを指す。

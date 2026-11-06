@@ -8,6 +8,7 @@ How to build Naos from its sources and run its self tests. To use Naos in a proj
 - CMake 3.21 or later
 - A C++ compiler, for the C++ self tests and example (optional: they are left out without one)
 - Git
+- Python 3.8 or later, for the scripts of lint and release ([lint](testing.md#lint), [releasing](release.md))
 
 ## With the presets
 
@@ -77,6 +78,6 @@ The layout installed is in the [CMake reference](../reference/cmake.md#package).
 
 | Job | Runs |
 |---|---|
-| `lint` | `cmake -D ROOT=. -P scripts/Lint.cmake` ([lint](testing.md#lint)) |
+| `lint` | `python3 scripts/lint.py` ([lint](testing.md#lint)) |
 | `test` | Configure, build and `ctest` with a preset, then `cmake -D PRESET=<preset> -P scripts/TestPackage.cmake` ([installing](#installing)), but with `sanitize`. GCC on Linux with `default`, `shared`, `release` and `sanitize`, and with `default` and CMake 3.21, the oldest CMake supported; Clang on Linux with `default` and `release`; Clang on macOS with `default` and `shared`; MSVC with `default`, `shared` and `release` |
 | `mingw` | The same with GCC of MinGW-w64 in MSYS2: UCRT64 with `default` and `shared`, MINGW64 with `default`. MINGW64 is there for the old C library of Windows, msvcrt, whose printf does not follow C99 ([coding style](coding-style.md#formatted-output)) |
