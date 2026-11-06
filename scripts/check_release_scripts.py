@@ -141,30 +141,5 @@ class ReleaseScripts(unittest.TestCase):
         self.assert_file("include/naos/version.h", version_header(0, 2, 0))
 
 
-class VersionReading(unittest.TestCase):
-    def test_same_as_cmake(self):
-        """prepare_release.py reads include/naos/version.h as naos_read_version() of
-        cmake/NaosVersion.cmake does for the build: both give the version of the sources."""
-        sys.dont_write_bytecode = True
-        sys.path.insert(0, str(SCRIPTS))
-        try:
-            import prepare_release
-        finally:
-            sys.path.pop(0)
-        root = SCRIPTS.parent
-        header = root / "include/naos/version.h"
-        script = (
-            'include("{}")\nnaos_read_version("{}")\nmessage(NOTICE "${{naos_version}}")\n'
-        ).format((root / "cmake/NaosVersion.cmake").as_posix(), header.as_posix())
-        with tempfile.TemporaryDirectory() as directory:
-            path = Path(directory) / "ReadVersion.cmake"
-            path.write_text(script, encoding="utf-8")
-            result = subprocess.run(["cmake", "-P", str(path)], stdout=subprocess.PIPE,
-                                    stderr=subprocess.STDOUT, universal_newlines=True)
-        self.assertEqual(result.returncode, 0, result.stdout)
-        self.assertEqual(result.stdout.strip(),
-                         "{}.{}.{}".format(*prepare_release.read_version(header)))
-
-
 if __name__ == "__main__":
     unittest.main()

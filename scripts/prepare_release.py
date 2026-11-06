@@ -19,8 +19,11 @@ changes the files only, commits nothing:
 import argparse
 import datetime
 import re
+import subprocess
 import sys
 from pathlib import Path
+
+NAOS_VERSION_CMAKE = Path(__file__).resolve().parent.parent / "cmake/NaosVersion.cmake"
 
 # The pages naming the tag fetched by FetchContent or the minor version asked of find_package(),
 # besides the examples. The pages of docs/development/ are left alone: their versions are examples.
@@ -47,20 +50,14 @@ def write_text(path, text):
 
 
 def read_version(header):
-    """Returns (major, minor, patch) from include/naos/version.h, read as naos_read_version() of
-    cmake/NaosVersion.cmake reads it for the build."""
-    lines = read_text(header).split("\n")
-    version = []
-    for component in ("MAJOR", "MINOR", "PATCH"):
-        value = None
-        for line in lines:
-            match = re.fullmatch(r"#define NAOS_VERSION_{} ([0-9]+)".format(component), line)
-            if match:
-                value = int(match.group(1))
-        if value is None or value >= 256:
-            fail("{}: NAOS_VERSION_{} is missing or not < 256".format(header, component))
-        version.append(value)
-    return tuple(version)
+    """Returns (major, minor, patch) from include/naos/version.h, read by naos_read_version() of
+    cmake/NaosVersion.cmake, as the build reads it."""
+    result = subprocess.run(
+        ["cmake", "-D", "HEADER=" + str(header), "-P", str(NAOS_VERSION_CMAKE)],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+    if result.returncode != 0:
+        fail("cannot read the version of {}:\n{}".format(header, result.stderr.strip()))
+    return tuple(int(part) for part in result.stdout.strip().split("."))
 
 
 def parse_version(text):
