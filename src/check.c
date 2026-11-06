@@ -191,24 +191,6 @@ static int fail_with_strings(const char *left, const char *right, int show_diffe
     return 0;
 }
 
-/* Records a failure of NULL or NOT_NULL: the pointer is a value only when it is not NULL. */
-static int fail_with_pointer(const void *ptr, const char *expr, const char *file, int line)
-{
-    char value_text[NAOS_VALUE_SIZE];
-
-    naos_diagnostic_begin(NAOS_DIAGNOSTIC_ERROR, file, line, expr);
-
-    if (ptr != NULL)
-    {
-        naos_snprintf(value_text, sizeof(value_text), "%p", ptr);
-        naos_diagnostic_add("value", value_text);
-    }
-
-    naos_diagnostic_end();
-
-    return 0;
-}
-
 int naos_check(int cond, const char *expr, const char *file, int line)
 {
     if (cond != 0)
@@ -352,24 +334,4 @@ int naos_check_ptr_eq(const void *left, const void *right, const char *expr, con
     format_pointer(right_text, sizeof(right_text), right);
 
     return fail_with_values(left_text, right_text, expr, file, line);
-}
-
-int naos_check_null(const void *ptr, const char *expr, const char *file, int line)
-{
-    if (ptr == NULL)
-    {
-        return passed();
-    }
-
-    return fail_with_pointer(ptr, expr, file, line);
-}
-
-int naos_check_not_null(const void *ptr, const char *expr, const char *file, int line)
-{
-    if (ptr != NULL)
-    {
-        return passed();
-    }
-
-    return fail_with_pointer(ptr, expr, file, line);
 }

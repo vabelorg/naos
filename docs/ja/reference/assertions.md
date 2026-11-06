@@ -147,7 +147,7 @@ NAOS_CHECK_NULL(ptr)        NAOS_REQUIRE_NULL(ptr)
 NAOS_CHECK_NOT_NULL(ptr)    NAOS_REQUIRE_NOT_NULL(ptr)
 ```
 
-`*_NULL` は `ptr` が NULL ポインタなら、`*_NOT_NULL` はそうでなければ成功です。`*_NULL` は失敗したときのポインタを `value` として `%p` で出力し、`*_NOT_NULL` は値を出力しません（失敗したときは必ず NULL なので）。
+`*_NULL` は `ptr` が NULL ポインタなら、`*_NOT_NULL` はそうでなければ成功です。`ptr` には関数ポインタを含むどのポインタも渡せ、まだ書き込んでいない領域を指していても構いません。`NULL` との比較はマクロを使った場所で行い、Naos には結果だけが渡ります。値は出力しません。
 
 結果を使う前の確認には、`NAOS_REQUIRE_NOT_NULL` がよく使われます。
 

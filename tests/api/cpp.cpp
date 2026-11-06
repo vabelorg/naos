@@ -20,6 +20,11 @@ namespace
 std::vector<int> values;
 int setup_calls = 0;
 const std::string text("abc");
+
+int callback(int value)
+{
+    return value + 1;
+}
 } // namespace
 
 NAOS_SETUP(setup)
@@ -53,6 +58,8 @@ NAOS_TEST(assertions)
 {
     const char *none = nullptr;
     int value = 0;
+    int (*set)(int) = callback;
+    int (*no_callback)(int) = nullptr;
 
     NAOS_CHECK_TRUE(text.size() == 3);
     NAOS_REQUIRE_TRUE(!values.empty());
@@ -80,6 +87,9 @@ NAOS_TEST(assertions)
     NAOS_CHECK_NULL(none);
     NAOS_CHECK_NOT_NULL(&value);
     NAOS_REQUIRE_NOT_NULL(std::strchr(text.c_str(), 'b'));
+    NAOS_CHECK_NOT_NULL(set);
+    NAOS_CHECK_NULL(no_callback);
+    NAOS_REQUIRE_NOT_NULL(&callback);
     NAOS_CHECK_STR_EQ(NAOS_VERSION_STRING, naos_version_string());
     NAOS_CHECK_UINT_EQ(NAOS_VERSION_NUMBER, naos_version_number());
 }

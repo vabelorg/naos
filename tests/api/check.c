@@ -10,6 +10,8 @@
 #include <math.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
 /* The boolean assertions are NAOS_CHECK_TRUE and the like; the old names must stay removed. */
 #if defined(NAOS_CHECK) || defined(NAOS_REQUIRE)
@@ -143,6 +145,44 @@ NAOS_TEST(null)
     NAOS_REQUIRE_NOT_NULL(&value);
 }
 
+/*
+ * A block checked before anything is written to it: GCC took the pointer passed to a function for a
+ * read of the block, -Wmaybe-uninitialized (#39). The release preset builds with optimization, where
+ * GCC reports it.
+ */
+NAOS_TEST(null_unwritten_block)
+{
+    char *block;
+
+    block = malloc(16);
+    NAOS_REQUIRE_NOT_NULL(block);
+    memset(block, 'a', 16);
+    NAOS_CHECK_INT_EQ('a', block[15]);
+    free(block);
+}
+
+typedef int (*callback_fn)(int);
+
+static int callback(int value)
+{
+    return value + 1;
+}
+
+/* Function pointers: converting them to void * is not ISO C, -Wpedantic (#40). */
+NAOS_TEST(null_function_pointer)
+{
+    callback_fn set;
+    callback_fn none;
+
+    set = callback;
+    none = NULL;
+    NAOS_CHECK_NOT_NULL(set);
+    NAOS_CHECK_NULL(none);
+    NAOS_REQUIRE_NOT_NULL(callback);
+    NAOS_REQUIRE_NULL(none);
+    NAOS_CHECK_INT_EQ(2, set(1));
+}
+
 NAOS_TEST(ptr_eq)
 {
     static const int values[2] = { 1, 2 };
@@ -182,6 +222,8 @@ NAOS_SUITE(check,
     NAOS_ADD_TEST(mem_eq),
     NAOS_ADD_TEST(ptr_eq),
     NAOS_ADD_TEST(null),
+    NAOS_ADD_TEST(null_unwritten_block),
+    NAOS_ADD_TEST(null_function_pointer),
     NAOS_ADD_TEST(passing_helper_returns),
     NAOS_ADD_TEST(pass_alone)
 )

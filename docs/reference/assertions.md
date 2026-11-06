@@ -147,7 +147,7 @@ NAOS_CHECK_NULL(ptr)        NAOS_REQUIRE_NULL(ptr)
 NAOS_CHECK_NOT_NULL(ptr)    NAOS_REQUIRE_NOT_NULL(ptr)
 ```
 
-`*_NULL` passes when `ptr` is a null pointer, `*_NOT_NULL` when it is not. On failure, `*_NULL` prints the pointer as `value` with `%p`; `*_NOT_NULL` prints no value (it is always NULL when it fails).
+`*_NULL` passes when `ptr` is a null pointer, `*_NOT_NULL` when it is not. `ptr` may be any pointer, a function pointer included, and may point to memory not yet written: it is compared with `NULL` where the macro is used, and only the result reaches Naos. No value is printed.
 
 `NAOS_REQUIRE_NOT_NULL` is the usual check before using a result:
 
