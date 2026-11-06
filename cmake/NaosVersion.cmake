@@ -1,10 +1,7 @@
 # Copyright (c) 2026 The Naos Authors
 # SPDX-License-Identifier: MIT
 #
-# Used by the build of Naos only; not installed. Also run as a script by scripts/release.py,
-# so that the version is read one way only:
-#
-#   cmake -D HEADER=<header> -P cmake/NaosVersion.cmake   prints MAJOR.MINOR.PATCH
+# Used by the build of Naos only; not installed.
 #
 # naos_read_version(<header>)
 #   Reads the version from <header> (include/naos/version.h, its only home) and sets, in the scope
@@ -44,8 +41,3 @@ function(naos_read_version header)
     set(naos_compatibility "${compatibility}" PARENT_SCOPE)
     set(naos_soversion "${soversion}" PARENT_SCOPE)
 endfunction()
-
-if(CMAKE_SCRIPT_MODE_FILE STREQUAL CMAKE_CURRENT_LIST_FILE)
-    naos_read_version("${HEADER}")
-    execute_process(COMMAND "${CMAKE_COMMAND}" -E echo "${naos_version}")
-endif()

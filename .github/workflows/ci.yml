@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Lint
-        run: python3 scripts/check_markdown_links.py
+        run: cmake -P scripts/CheckMarkdownLinks.cmake
 
   # default and shared: the static and the shared library, everywhere. release: optimized, where the
   # compilers optimize differently (GCC, Clang, MSVC). sanitize: AddressSanitizer and

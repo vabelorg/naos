@@ -38,5 +38,5 @@ Naos の文書の構成と書き方です。ページを足したり変えたり
 ## リンク
 
 - ページ間のリンクは相対パスにする（`../reference/cmake.md#オプション`）。GitHub でも、手元の複製でも動くようにするため。
-- 節へのリンクは、GitHub が見出しに付ける id を使う。小文字にし、句読点を除き、空白を `-` にしたもの。見出しを変えるとそこへのリンクが切れるので、`scripts/check_markdown_links.py` で見つける（[lint](testing.md#lint)）。
+- 節へのリンクは、GitHub が見出しに付ける id を使う。小文字にし、句読点を除き、空白を `-` にしたもの。見出しを変えるとそこへのリンクが切れるので、`scripts/CheckMarkdownLinks.cmake` で見つける（[lint](testing.md#lint)）。
 - 文書を指すコードのコメントや CMake のファイルは、英語のページを指す。

@@ -35,11 +35,11 @@ For 1.0, the workflow warns that the text on compatibility in the README files a
 
 ## By hand
 
-The workflows run a Python script that also works locally:
+The workflows run two CMake scripts that also work locally, from any directory:
 
 ```sh
-python3 scripts/release.py prepare 0.1.0
-python3 scripts/release.py notes 0.1.0 notes.md
+cmake -D VERSION=0.1.0 -P scripts/PrepareRelease.cmake
+cmake -D VERSION=0.1.0 -D OUTPUT=notes.md -P scripts/ReleaseNotes.cmake
 ```
 
 The first changes the files as in step 3, the second writes the notes of the release. Then commit as `Release <version>`, tag, push and create the GitHub release from the tag with these notes:

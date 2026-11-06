@@ -78,18 +78,8 @@ static size_t add_saturated(size_t a, size_t b)
 
 - コマンドは小文字、インデントは空白 4 文字。
 - 利用者向けの関数は `naos_*`、内部用は `_naos_*`。
-- ファイル名は CMake 本体のモジュールにならって、パッケージの設定ファイル（`NaosConfig.cmake`）も含めアッパーキャメルケースにする。`include()` で読み込むモジュールと、利用者向けにインストールするスクリプトは `Naos` で始める（`NaosVersion.cmake`、`NaosDiscover.cmake`）。Naos のビルド・テスト・ワークフローだけが `cmake -P` で実行するスクリプトは `Naos` を付けない（`TestPackage.cmake`、`RunCase.cmake`）。
+- ファイル名は CMake 本体のモジュールにならって、パッケージの設定ファイル（`NaosConfig.cmake`）も含めアッパーキャメルケースにする。`include()` で読み込むモジュールと、利用者向けにインストールするスクリプトは `Naos` で始める（`NaosVersion.cmake`、`NaosDiscover.cmake`）。Naos のビルド・テスト・ワークフローだけが `cmake -P` で実行するスクリプトは `Naos` を付けない（`PrepareRelease.cmake`、`RunCase.cmake`）。
 - ファイルの先頭に著作権表示と、何のためのファイルで、どう使われるかのコメントを書く。
-
-## Python
-
-`scripts/` のうち、Naos をビルド・テストせず、そのファイルを読んで変えるもの（リンクの検査とリリース）は Python で書く。CMake を動かすもの（`TestPackage.cmake`）は CMake スクリプトのままにする。
-
-- Python 3.8 以上と、その標準ライブラリだけを使う。何もインストールしなくて済むようにするため。
-- ファイル名と関数名はスネークケース、インデントは空白 4 文字。
-- ファイルの先頭に著作権表示と、何のためのファイルで、どう実行するかの docstring を書く。
-- スクリプトは Naos のルートを自分のパスから求め、どのディレクトリからでも実行できるようにする。
-- ファイルは、どのプラットフォームでも UTF-8、改行 LF で読み書きする。
 
 ## サンプル
 

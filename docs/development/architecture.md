@@ -21,7 +21,7 @@ These decide what goes into Naos, before any feature:
 | `tests/` | The self tests, in layers by who judges them (`contract/`, `api/`, `unit/`, `behavior/`, `build/`, `examples/`), each with its programs, the `CMakeLists.txt` registering its cases and the expected outputs (`expected/`); `consumer/`, a project using Naos; and their helpers (`harness/`). See [testing](testing.md) |
 | `examples/` | Complete projects quoted by the documentation, built and run by the self tests |
 | `docs/` | The documentation in English, and its Japanese translation in `docs/ja/` |
-| `scripts/` | Scripts for maintaining Naos, not used by its build: `release.py` prepares a release and writes its notes, see [releasing](release.md); `check_markdown_links.py` checks the links of the documentation, see [lint](testing.md#lint); `TestPackage.cmake` tests the package a build installs, see [building](building.md#installing) |
+| `scripts/` | Scripts for maintaining Naos, not used by its build: `PrepareRelease.cmake` and `ReleaseNotes.cmake` prepare a release and write its notes, see [releasing](release.md); `CheckMarkdownLinks.cmake` checks the links of the documentation, see [lint](testing.md#lint); `TestPackage.cmake` tests the package a build installs, see [building](building.md#installing) |
 | `.github/` | The workflows (CI and the release) and the templates of issues and pull requests |
 
 ## Modules
@@ -109,6 +109,6 @@ flowchart TB
 - **State**: shared mutable state lives in `static` variables of each module (`g_` prefix), never in `extern` variables. The one exception is the options, read only after `naos_init`, through `naos_options_get()`.
 - **Discovery**: `naos_add_executable()` adds a `POST_BUILD` command that runs `NaosDiscover.cmake` after each build. The script runs `<exe> --naos-list` and writes a CTest file that registers each line of the output as one test. Parameters go through a file, so nothing needs escaping.
 - **Discovery failure**: when listing fails, the build fails, with the cause and what to do in its message, instead of going on with no test ([troubleshooting](../guides/troubleshooting.md#cmake-and-ctest)).
-- **Version**: `include/naos/version.h` is the only source of the version. `NaosVersion.cmake` reads it and derives `project(VERSION)`, the package compatibility and the `SOVERSION`; `scripts/release.py` reads it through `NaosVersion.cmake` too.
+- **Version**: `include/naos/version.h` is the only source of the version. `NaosVersion.cmake` reads it and derives `project(VERSION)`, the package compatibility and the `SOVERSION`.
 
 [Extending](extending.md) tells where each kind of change goes.

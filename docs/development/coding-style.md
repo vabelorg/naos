@@ -78,18 +78,8 @@ A blank line between groups, each group in alphabetical order. Public headers ar
 
 - Lowercase commands, four spaces of indentation.
 - Functions for users are `naos_*`; internal ones are `_naos_*`.
-- Files are in UpperCamelCase, as the modules of CMake are, the package configuration included (`NaosConfig.cmake`): a module read with `include()` starts with `Naos` (`NaosVersion.cmake`), and so does a script installed for users (`NaosDiscover.cmake`); the scripts run with `cmake -P` by the build, the tests and the workflows of Naos only do not (`TestPackage.cmake`, `RunCase.cmake`).
+- Files are in UpperCamelCase, as the modules of CMake are, the package configuration included (`NaosConfig.cmake`): a module read with `include()` starts with `Naos` (`NaosVersion.cmake`), and so does a script installed for users (`NaosDiscover.cmake`); the scripts run with `cmake -P` by the build, the tests and the workflows of Naos only do not (`PrepareRelease.cmake`, `RunCase.cmake`).
 - A file starts with the copyright notice and a comment on what it is for and how it is used.
-
-## Python
-
-The scripts of `scripts/` that do not build or test Naos, but read and change its files (the link check and the release), are in Python; those that drive CMake (`TestPackage.cmake`) stay CMake scripts.
-
-- Python 3.8 or later and its standard library only, so that nothing has to be installed.
-- Files and functions in snake_case, four spaces of indentation.
-- A file starts with the copyright notice and a docstring on what it is for and how it is run.
-- A script finds the root of Naos from its own path, and runs from any directory.
-- Files are read and written as UTF-8 with LF line endings, on every platform.
 
 ## Examples
 

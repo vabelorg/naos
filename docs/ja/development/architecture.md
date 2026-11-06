@@ -21,7 +21,7 @@ Naos 自体を保守・拡張する人向けに、ソースの置き方とモジ
 | `tests/` | 自己テスト。判定するものごとの層（`contract/`、`api/`、`unit/`、`behavior/`、`build/`、`examples/`）に、プログラム、ケースを登録する `CMakeLists.txt`、期待する出力（`expected/`）を置く。Naos を使うプロジェクト `consumer/` と、仕組み（`harness/`）もある（[テスト](testing.md)） |
 | `examples/` | 文書が引用する完成したプロジェクト。自己テストでビルドして実行する |
 | `docs/` | 英語の文書と、`docs/ja/` にその日本語訳 |
-| `scripts/` | Naos の保守に使うスクリプト。ビルドでは使わない。`release.py` は、リリースの準備とリリースノートの書き出しをする（[リリース](release.md)）。`check_markdown_links.py` は文書のリンクを検査する（[lint](testing.md#lint)）。`TestPackage.cmake` はビルドがインストールするパッケージをテストする（[ビルド](building.md#インストールする)） |
+| `scripts/` | Naos の保守に使うスクリプト。ビルドでは使わない。`PrepareRelease.cmake` と `ReleaseNotes.cmake` は、リリースの準備とリリースノートの書き出しをする（[リリース](release.md)）。`CheckMarkdownLinks.cmake` は文書のリンクを検査する（[lint](testing.md#lint)）。`TestPackage.cmake` はビルドがインストールするパッケージをテストする（[ビルド](building.md#インストールする)） |
 | `.github/` | ワークフロー（CI とリリース）と、Issue・プルリクエストのテンプレート |
 
 ## モジュール
@@ -109,6 +109,6 @@ flowchart TB
 - **状態**: 共有する可変状態は各モジュールの `static` 変数（`g_` 接頭辞）に閉じ、`extern` 変数にはしません。例外は `naos_init` 以後読むだけのオプションで、`naos_options_get()` で読みます。
 - **列挙**: `naos_add_executable()` は、ビルド後に `NaosDiscover.cmake` を実行する `POST_BUILD` のコマンドを足します。このスクリプトは `<exe> --naos-list` を実行し、出力の 1 行を 1 件のテストとして登録する CTest のファイルを書きます。パラメータはファイル経由で渡すので、リストをエスケープする必要はありません。
 - **列挙の失敗**: 列挙に失敗したときは、テストが 0 件のまま黙って進めず、ビルドを失敗させて原因と対処をメッセージに出します（[トラブルシューティング](../guides/troubleshooting.md#cmake-と-ctest)）。
-- **バージョン**: バージョンの源は `include/naos/version.h` だけです。`NaosVersion.cmake` がそれを読み、`project(VERSION)`、パッケージの互換性、`SOVERSION` を決めます。`scripts/release.py` も `NaosVersion.cmake` を通して読みます。
+- **バージョン**: バージョンの源は `include/naos/version.h` だけです。`NaosVersion.cmake` がそれを読み、`project(VERSION)`、パッケージの互換性、`SOVERSION` を決めます。
 
 変更の種類ごとの置き場所は[拡張](extending.md)にあります。

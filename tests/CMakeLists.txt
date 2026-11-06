@@ -23,7 +23,7 @@
 #   consumer/
 #
 # The check of the links of the Markdown files needs no build and is not here: it is
-# scripts/check_markdown_links.py, run once by the lint job of CI.
+# scripts/CheckMarkdownLinks.cmake, run once by the lint job of CI.
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/harness/NaosSelftest.cmake)
 
