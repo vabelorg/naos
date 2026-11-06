@@ -8,8 +8,7 @@
 #ifndef NAOS_OPTIONS_H
 #define NAOS_OPTIONS_H
 
-#include <stdio.h>
-
+#include "format.h"
 #include "report.h"
 
 /* Command line, set by naos_options_parse() and only read afterwards. */

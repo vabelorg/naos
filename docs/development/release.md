@@ -18,7 +18,7 @@ The entries under `[Unreleased]` in `CHANGELOG.md` decide which versions are all
    - sets the version in `include/naos/version.h`, its only home: CMake derives the rest from it;
    - for a new minor or major version, updates the tag used by `FetchContent` (`GIT_TAG v…`) and the minor version named in `find_package(Naos 0.0)` in the README files, the documentation and the examples;
    - closes the changelog: renames `[Unreleased]` to the version and its date, and updates the links at the end of `CHANGELOG.md`.
-4. CI runs on the pull request: lint, which tests the release scripts too, the self tests with every preset and platform, and a project that uses the installed package with `find_package(Naos <version>)` (`tests/consumer/`, with `scripts/TestPackage.cmake`). Review the changes and merge.
+4. CI runs on the pull request: lint, the self tests with every preset and platform, and a project that uses the installed package with `find_package(Naos <version>)` (`tests/consumer/`, with `scripts/TestPackage.cmake`). Review the changes and merge.
 5. Merging runs **Release**: it tags the merge commit `v<version>`, creates the GitHub release with the section of this version in `CHANGELOG.md` as its notes, and deletes the branch.
 
 For 1.0, the workflow warns that the text on compatibility in the README files and the documentation must change by hand (from the same minor version to the same major version): push the fix to the pull request before merging.
@@ -35,11 +35,11 @@ For 1.0, the workflow warns that the text on compatibility in the README files a
 
 ## By hand
 
-The workflows run two Python scripts that also work locally, from the root of Naos:
+The workflows run a Python script that also works locally:
 
 ```sh
-python3 scripts/prepare_release.py 0.1.0
-python3 scripts/release_notes.py 0.1.0 notes.md
+python3 scripts/release.py prepare 0.1.0
+python3 scripts/release.py notes 0.1.0 notes.md
 ```
 
 The first changes the files as in step 3, the second writes the notes of the release. Then commit as `Release <version>`, tag, push and create the GitHub release from the tag with these notes:

@@ -56,7 +56,7 @@ ctest --preset default -R '^naos\.behavior\.xml\.'
 
 | いつ | 実行するもの | 目的 |
 |---|---|---|
-| ビルドの前 | `python3 scripts/lint.py`（[lint](#lint)） | ソースだけでわかることを数秒で |
+| ビルドの前 | `python3 scripts/check_markdown_links.py`（[lint](#lint)） | ソースだけでわかることを数秒で |
 | Naos を変えている間 | `ctest --preset default`、またはその 1 つの層 | 何も壊していないことを数秒で |
 | 変更を送る前 | プリセット `default` と `shared`。`src/` の変更には `release` と `sanitize` も（[ビルド](building.md#プリセットを使う)） | ライブラリの種類、最適化、サニタイザが見つけるもの |
 | プルリクエストごと | CI: lint、すべてのプラットフォームのすべてのプリセット、インストールしたパッケージ（[ビルド](building.md#継続的インテグレーション)） | プラットフォーム、コンパイラ、対応するいちばん古い CMake が見つけるもの |
@@ -159,16 +159,10 @@ golden のケースは次のように足します。
 
 ビルドが要らずソースを読むだけの検査は、自己テストではなく `scripts/` のスクリプトです。自己テストにすると、ビルド全体を待つことになり、CI のプリセットとコンパイラごとに、同じ結果のために何度も実行されてしまうからです。
 
-`scripts/lint.py` がそれらをすべて実行し、失敗したものを挙げます。CI の `lint` ジョブはこのスクリプトです。Naos のルートで実行します。
+1 つだけあります。`scripts/check_markdown_links.py` は、Markdown のファイルの相対リンクがすべて存在するファイルを指し、`#anchor` がそのファイルの見出しを指すことを確かめます。CI の `lint` ジョブはこのスクリプトです。どのディレクトリからでも実行でき、Python 3.8 以上と、その標準ライブラリだけを使います（[必要なもの](building.md#必要なもの)）。
 
 ```sh
-python3 scripts/lint.py
+python3 scripts/check_markdown_links.py
 ```
 
-| スクリプト | 確かめること |
-|---|---|
-| `check_markdown_links.py` | Markdown のファイルの相対リンクがすべて存在するファイルを指し、`#anchor` がそのファイルの見出しを指すこと |
-| `check_printf_calls.py` | `src/` のソースが書式付きの出力関数を `format.h` を通して呼ぶこと（[コーディングスタイル](coding-style.md#書式付きの出力)） |
-| `check_release_scripts.py` | `prepare_release.py` と `release_notes.py` を、それらが変えるファイルの小さな写しで実行し、バージョンの種類ごとに変えるもの、拒むバージョンを確かめる（[リリース](release.md)） |
-
-どのスクリプトも、どのディレクトリからでも単独で実行できます。Python 3.8 以上と、その標準ライブラリだけを使います（[必要なもの](building.md#必要なもの)）。
+ソースだけでわかるもう 1 つの規則、`src/` の出力は `format.h` を通して書式化すること、はそのヘッダがコンパイル時に強制します（[コーディングスタイル](coding-style.md#書式付きの出力)）。

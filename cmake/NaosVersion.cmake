@@ -1,7 +1,7 @@
 # Copyright (c) 2026 The Naos Authors
 # SPDX-License-Identifier: MIT
 #
-# Used by the build of Naos only; not installed. Also run as a script by scripts/prepare_release.py,
+# Used by the build of Naos only; not installed. Also run as a script by scripts/release.py,
 # so that the version is read one way only:
 #
 #   cmake -D HEADER=<header> -P cmake/NaosVersion.cmake   prints MAJOR.MINOR.PATCH

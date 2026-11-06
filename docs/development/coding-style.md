@@ -65,7 +65,7 @@ A blank line between groups, each group in alphabetical order. Public headers ar
 
 ## Formatted output
 
-`src/` calls the formatted output functions through `format.h`: `naos_printf`, `naos_fprintf`, `naos_vfprintf`, `naos_snprintf` and `naos_vsnprintf`, never `printf` and the others directly. They format as C99 does on every platform, which the default functions of MinGW do not (`%zu`, `%jd`, the exponent of `%e`). Functions without a format (`puts`, `fputs`, `fputc`) are called directly. `scripts/check_printf_calls.py` checks it ([lint](testing.md#lint)).
+`src/` calls the formatted output functions through `format.h`: `naos_printf`, `naos_fprintf`, `naos_vfprintf`, `naos_snprintf` and `naos_vsnprintf`, never `printf` and the others directly. They format as C99 does on every platform, which the default functions of MinGW do not (`%zu`, `%jd`, the exponent of `%e`). Functions without a format (`puts`, `fputs`, `fputc`) are called directly. `format.h` is how `src/` includes `<stdio.h>`, never directly, and it poisons the direct names for GCC and Clang: a direct call does not compile.
 
 ## Comments
 
@@ -83,7 +83,7 @@ A blank line between groups, each group in alphabetical order. Public headers ar
 
 ## Python
 
-The scripts of `scripts/` that do not build or test Naos, but read and change its files (the lint and the release), are in Python; those that drive CMake (`TestPackage.cmake`) stay CMake scripts.
+The scripts of `scripts/` that do not build or test Naos, but read and change its files (the link check and the release), are in Python; those that drive CMake (`TestPackage.cmake`) stay CMake scripts.
 
 - Python 3.8 or later and its standard library only, so that nothing has to be installed.
 - Files and functions in snake_case, four spaces of indentation.

@@ -5,7 +5,7 @@
 
 Every linked file must exist and every #anchor must name a heading (as GitHub makes its id) or an
 <a id="..."> of the file linked. Links with a scheme (https:, mailto:) are not checked. Needs no
-build: run by scripts/lint.py, and by hand with  python3 scripts/check_markdown_links.py
+build: the lint job of CI, and by hand:  python3 scripts/check_markdown_links.py
 """
 
 import os

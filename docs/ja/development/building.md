@@ -78,6 +78,6 @@ cmake --install build/default --prefix /tmp/naos-install
 
 | ジョブ | 実行するもの |
 |---|---|
-| `lint` | `python3 scripts/lint.py`（[lint](testing.md#lint)） |
+| `lint` | `python3 scripts/check_markdown_links.py`（[lint](testing.md#lint)） |
 | `test` | プリセットで configure、ビルド、`ctest`。続いて `sanitize` 以外では `cmake -D PRESET=<preset> -P scripts/TestPackage.cmake`（[インストールする](#インストールする)）。Linux の GCC で `default`、`shared`、`release`、`sanitize`、および `default` を対応するいちばん古い CMake 3.21 で。Linux の Clang で `default` と `release`。macOS の Clang で `default` と `shared`。MSVC で `default`、`shared`、`release` |
 | `mingw` | 同じことを MSYS2 の MinGW-w64 の GCC で。UCRT64 で `default` と `shared`、MINGW64 で `default`。MINGW64 は、printf が C99 に従わない Windows の古い C ライブラリ msvcrt のためにある（[コーディングスタイル](coding-style.md#書式付きの出力)） |

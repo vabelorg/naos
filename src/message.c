@@ -7,7 +7,6 @@
 
 #include "message.h"
 
-#include <stdio.h>
 
 #include "format.h"
 

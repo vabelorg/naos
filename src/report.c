@@ -7,8 +7,7 @@
 
 #include "report.h"
 
-#include <stdio.h>
-
+#include "format.h"
 #include "human.h"
 #include "message.h"
 #include "xml.h"

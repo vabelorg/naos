@@ -9,7 +9,7 @@
 ## Checklist
 
 - [ ] Self tests pass with the `default` and `shared` presets (and `release` and `sanitize` for a change to `src/`)
-- [ ] `python3 scripts/lint.py` passes
+- [ ] `python3 scripts/check_markdown_links.py` passes
 - [ ] Behavior changes come with a self test
 - [ ] `CHANGELOG.md` has an entry under Unreleased for any change users can see
 - [ ] The reference is updated for any change to the API, the output or the CMake functions

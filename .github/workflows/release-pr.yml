@@ -1,5 +1,5 @@
 # Prepares a release, run by hand from the Actions tab: sets the version and closes the changelog
-# with scripts/prepare_release.py, and opens the pull request "Release <version>".
+# with scripts/release.py, and opens the pull request "Release <version>".
 # Merging it tags the release and publishes it (release.yml). See docs/development/release.md.
 #
 # Needs the secret RELEASE_TOKEN, a token that can push and open pull requests: CI does not run on
@@ -64,8 +64,8 @@ jobs:
 
       - name: Prepare the release
         run: |
-          python3 scripts/prepare_release.py "$VERSION"
-          python3 scripts/release_notes.py "$VERSION" "$RUNNER_TEMP/notes.md"
+          python3 scripts/release.py prepare "$VERSION"
+          python3 scripts/release.py notes "$VERSION" "$RUNNER_TEMP/notes.md"
 
       - name: Summary
         run: |

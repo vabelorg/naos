@@ -56,7 +56,7 @@ Until a failure is shown to be judged a failure, CTest runs none of the tests th
 
 | When | Runs | For |
 |---|---|---|
-| Before any build | `python3 scripts/lint.py` ([lint](#lint)) | What the sources alone tell, in seconds |
+| Before any build | `python3 scripts/check_markdown_links.py` ([lint](#lint)) | What the sources alone tell, in seconds |
 | While changing Naos | `ctest --preset default`, or a layer of it | Nothing broken, in a few seconds |
 | Before sending a change | The presets `default` and `shared`; `release` and `sanitize` for a change to `src/` ([building](building.md#with-the-presets)) | What the type of the library, the optimizer or the sanitizers find |
 | Every pull request | CI: lint, then every preset on every platform, and the package installed ([building](building.md#continuous-integration)) | What the platform, the compiler or the oldest CMake supported finds |
@@ -159,16 +159,10 @@ The links of the documentation are checked by a [lint](#lint) script, not by a s
 
 Checks that read the sources and need no build are scripts of `scripts/`, not self tests: they would otherwise wait for the whole build, and run again with every preset and compiler of CI for the same result.
 
-`scripts/lint.py` runs them all and names each that fails; the `lint` job of CI is that script. Run it from the root of Naos:
+There is one: `scripts/check_markdown_links.py` checks that every relative link of the Markdown files leads to a file that exists, and every `#anchor` to a heading of that file. The `lint` job of CI is that script; it runs from any directory, and needs Python 3.8 or later and its standard library only ([requirements](building.md#requirements)):
 
 ```sh
-python3 scripts/lint.py
+python3 scripts/check_markdown_links.py
 ```
 
-| Script | Checks |
-|---|---|
-| `check_markdown_links.py` | Every relative link of the Markdown files leads to a file that exists, and every `#anchor` to a heading of that file |
-| `check_printf_calls.py` | The sources of `src/` call the formatted output functions through `format.h` ([coding style](coding-style.md#formatted-output)) |
-| `check_release_scripts.py` | `prepare_release.py` and `release_notes.py`, run on a small copy of the files they change: what they change for each kind of version, and the versions they refuse ([releasing](release.md)) |
-
-Each script also runs alone, from any directory. They need Python 3.8 or later and its standard library only ([requirements](building.md#requirements)).
+The other rule the sources alone could tell, that `src/` formats its output through `format.h`, is enforced by that header at compile time ([coding style](coding-style.md#formatted-output)).

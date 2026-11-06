@@ -9,7 +9,6 @@
 #include "human.h"
 
 #include <stdarg.h>
-#include <stdio.h>
 #include <string.h>
 
 #include <naos/export.h>

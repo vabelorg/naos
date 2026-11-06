@@ -11,6 +11,11 @@
  * exponent of %e with three digits. The __mingw_ functions of mingw-w64 follow C99. Its <stdio.h>
  * declares them whatever __USE_MINGW_ANSI_STDIO is, so the result does not depend on how Naos is
  * built. This is the only place that depends on the C library.
+ *
+ * src/ includes <stdio.h> through this header only, so that the poison below reaches every file
+ * that could call printf: with GCC and Clang, a direct call is a compile error, while the names
+ * used in the macros above, defined before the poison, stay usable. MSVC has no poison; the
+ * builds of CI with GCC and Clang catch the call.
  */
 
 #ifndef NAOS_FORMAT_H
@@ -30,6 +35,10 @@
 #define naos_vfprintf vfprintf
 #define naos_snprintf snprintf
 #define naos_vsnprintf vsnprintf
+#endif
+
+#if defined(__GNUC__)
+#pragma GCC poison printf fprintf vprintf vfprintf sprintf vsprintf snprintf vsnprintf
 #endif
 
 #endif
