@@ -1,0 +1,8 @@
+args: --naos-filter pointer.null
+exit code: 1
+--- stdout
+RUN: pointer.null
+pointer.c:LINE: error: &value == NULL
+FAIL: pointer.null (1 failure, N ms)
+SUMMARY: 0 passed, 1 failed, 0 skipped (N ms)
+--- stderr

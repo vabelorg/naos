@@ -117,9 +117,8 @@ GCC 形式の `error` の行は、VS Code の `$gcc` など GCC の診断を読�
 | `*_STR_EQ`（どちらも `NULL` でない） | `left`、`right`、`first difference` |
 | `*_STR_EQ`（片方が `NULL`）、`*_STR_NE` | `left`、`right` |
 | `*_PTR_EQ` | `left`、`right`（`%p`、または `(null)`） |
-| `*_NULL` | `value`（`%p`） |
 | `*_MEM_EQ` | `left size`、`right size`、続けて `first difference` か `invalid` |
-| `*_TRUE`、`*_FALSE`、`*_NOT_NULL` | なし |
+| `*_TRUE`、`*_FALSE`、`*_NULL`、`*_NOT_NULL` | なし |
 | アサーションを実行しなかったテスト | `hint` |
 | 失敗するはずなのに成功したテスト | `reason`（文字列） |
 

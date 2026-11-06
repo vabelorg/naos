@@ -117,9 +117,8 @@ A detail line is two spaces, a label, a colon, one space and the value. `left` a
 | `*_STR_EQ` (neither `NULL`) | `left`, `right`, `first difference` |
 | `*_STR_EQ` (one `NULL`), `*_STR_NE` | `left`, `right` |
 | `*_PTR_EQ` | `left`, `right` (`%p`, or `(null)`) |
-| `*_NULL` | `value` (`%p`) |
 | `*_MEM_EQ` | `left size`, `right size`, then `first difference` or `invalid` |
-| `*_TRUE`, `*_FALSE`, `*_NOT_NULL` | none |
+| `*_TRUE`, `*_FALSE`, `*_NULL`, `*_NOT_NULL` | none |
 | A test that ran no assertion | `hint` |
 | A test expected to fail that passed | `reason` (a string) |
 

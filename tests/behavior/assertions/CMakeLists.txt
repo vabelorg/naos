@@ -23,7 +23,7 @@ naos_expect_tests(${exe}
     string.eq string.eq_null string.ne string.ne_null string.escapes string.non_ascii
     string.trailing_space string.left_ends string.long_value
     memory.byte memory.right_shorter memory.left_shorter memory.null_with_size
-    pointer.not_null
+    pointer.null pointer.not_null
     comparison.unknown
 )
 
@@ -34,5 +34,3 @@ naos_expect_match(pointer.eq ${exe} EXIT_CODE 1 ARGS --naos-filter pointer.eq
     EXPECT "pointer\\.c${at}error: &values\\[0\\] == &values\\[1\\].  left:  [0-9A-Za-z]+.  right: [0-9A-Za-z]+.FAIL: ")
 naos_expect_match(pointer.eq_null ${exe} EXIT_CODE 1 ARGS --naos-filter pointer.eq_null
     EXPECT "pointer\\.c${at}error: NULL == &value.  left:  \\(null\\).  right: [0-9A-Za-z]+.FAIL: ")
-naos_expect_match(pointer.null ${exe} EXIT_CODE 1 ARGS --naos-filter pointer.null
-    EXPECT "pointer\\.c${at}error: &value == NULL.  value: [0-9A-Za-z]+.FAIL: ")

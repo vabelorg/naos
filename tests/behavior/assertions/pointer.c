@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  *
  * NAOS_*_PTR_EQ, NAOS_*_NULL and NAOS_*_NOT_NULL. The values of pointers depend on the platform, so
- * the cases with one are matched by regexes.
+ * the cases of PTR_EQ are matched by regexes; NULL and NOT_NULL write no value.
  */
 
 #include <naos/naos.h>
@@ -25,6 +25,7 @@ NAOS_TEST(eq_null)
     NAOS_REQUIRE_PTR_EQ(NULL, &value);
 }
 
+/* A failed NULL writes no value either: the pointer says little, and changes from run to run. */
 NAOS_TEST(null)
 {
     int value;

@@ -116,11 +116,16 @@ typedef enum naos_cmp
 
 /* Object pointers, compared as const void *. */
 #define NAOS_CHECK_PTR_EQ(a, b) NAOS_CHECK_(naos_check_ptr_eq((a), (b), #a " == " #b, __FILE__, __LINE__))
-#define NAOS_CHECK_NULL(ptr) NAOS_CHECK_(naos_check_null((ptr), #ptr " == NULL", __FILE__, __LINE__))
-#define NAOS_CHECK_NOT_NULL(ptr) NAOS_CHECK_(naos_check_not_null((ptr), #ptr " != NULL", __FILE__, __LINE__))
 #define NAOS_REQUIRE_PTR_EQ(a, b) NAOS_REQUIRE_(naos_check_ptr_eq((a), (b), #a " == " #b, __FILE__, __LINE__))
-#define NAOS_REQUIRE_NULL(ptr) NAOS_REQUIRE_(naos_check_null((ptr), #ptr " == NULL", __FILE__, __LINE__))
-#define NAOS_REQUIRE_NOT_NULL(ptr) NAOS_REQUIRE_(naos_check_not_null((ptr), #ptr " != NULL", __FILE__, __LINE__))
+
+/*
+ * Any pointer, function pointers included, compared with NULL in the macro: only the result reaches
+ * Naos, so the pointer may point to memory not yet written. They print no value.
+ */
+#define NAOS_CHECK_NULL(ptr) NAOS_CHECK_(naos_check(((ptr) == NULL), #ptr " == NULL", __FILE__, __LINE__))
+#define NAOS_CHECK_NOT_NULL(ptr) NAOS_CHECK_(naos_check(((ptr) != NULL), #ptr " != NULL", __FILE__, __LINE__))
+#define NAOS_REQUIRE_NULL(ptr) NAOS_REQUIRE_(naos_check(((ptr) == NULL), #ptr " == NULL", __FILE__, __LINE__))
+#define NAOS_REQUIRE_NOT_NULL(ptr) NAOS_REQUIRE_(naos_check(((ptr) != NULL), #ptr " != NULL", __FILE__, __LINE__))
 
 /*
  * An assertion that always passes, for a test whose check is that the code runs, such as one that
@@ -142,8 +147,6 @@ NAOS_API int naos_check_double_near(double left, double right, double tol, const
 NAOS_API int naos_check_str(naos_cmp_t cmp, const char *left, const char *right, const char *expr, const char *file, int line);
 NAOS_API int naos_check_mem_eq(const void *left, size_t left_size, const void *right, size_t right_size, const char *expr, const char *file, int line);
 NAOS_API int naos_check_ptr_eq(const void *left, const void *right, const char *expr, const char *file, int line);
-NAOS_API int naos_check_null(const void *ptr, const char *expr, const char *file, int line);
-NAOS_API int naos_check_not_null(const void *ptr, const char *expr, const char *file, int line);
 NAOS_API void naos_pass(void);
 
 NAOS_END_DECLS

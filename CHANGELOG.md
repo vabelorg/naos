@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- A failed `NAOS_CHECK_NULL` / `NAOS_REQUIRE_NULL` no longer prints the pointer as `value`, as `*_NOT_NULL` already did not: `*_NULL` and `*_NOT_NULL` compare the pointer with `NULL` where the macro is used, and pass only the result to Naos.
+
+### Removed
+
+- `naos_check_null()` and `naos_check_not_null()`, which the macros no longer call. They were there for the macros alone, not for use in tests ([compatibility](docs/reference/compatibility.md#shared-library)).
+
+### Fixed
+
+- `NAOS_CHECK_NOT_NULL` / `NAOS_REQUIRE_NOT_NULL` on memory not yet written, such as a block right after `malloc()`, no longer makes GCC warn `may be used uninitialized` (`-Wmaybe-uninitialized`), which stopped a build with `-Werror` ([#39](https://github.com/vabelorg/naos/issues/39)).
+- `*_NULL` and `*_NOT_NULL` take a function pointer without the warning of `-Wpedantic` on converting it to `void *`: they take any pointer ([#40](https://github.com/vabelorg/naos/issues/40)).
+
 ## [0.4.0] - 2026-11-03
 
 ### Added
