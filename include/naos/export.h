@@ -36,9 +36,9 @@
  * C library, which do not include %zu and others, so the check uses those of GNU (C99) there.
  */
 #if defined(__MINGW32__) && (defined(__GNUC__) || defined(__clang__))
-#define NAOS_PRINTF_FORMAT(format_index, first_arg_index) __attribute__((format(gnu_printf, format_index, first_arg_index)))
+#define NAOS_PRINTF_FORMAT(format_index, first_arg_index) __attribute__((format(__gnu_printf__, format_index, first_arg_index)))
 #elif defined(__GNUC__) || defined(__clang__)
-#define NAOS_PRINTF_FORMAT(format_index, first_arg_index) __attribute__((format(printf, format_index, first_arg_index)))
+#define NAOS_PRINTF_FORMAT(format_index, first_arg_index) __attribute__((format(__printf__, format_index, first_arg_index)))
 #else
 #define NAOS_PRINTF_FORMAT(format_index, first_arg_index)
 #endif

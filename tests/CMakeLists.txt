@@ -22,9 +22,8 @@
 # and scripts/TestPackage.cmake with find_package(Naos <version>) after installing a build:
 #   consumer/
 #
-# The checks that read the sources and need no build (the links of the Markdown files, the printf
-# calls of src/) are not here: they are scripts/CheckMarkdownLinks.cmake and
-# scripts/CheckPrintfCalls.cmake, run once by the lint job of CI.
+# The check of the links of the Markdown files needs no build and is not here: it is
+# scripts/CheckMarkdownLinks.cmake, run once by the lint job of CI.
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/harness/NaosSelftest.cmake)
 

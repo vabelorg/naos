@@ -56,7 +56,7 @@ Until a failure is shown to be judged a failure, CTest runs none of the tests th
 
 | When | Runs | For |
 |---|---|---|
-| Before any build | `cmake -D ROOT=. -P scripts/Lint.cmake` ([lint](#lint)) | What the sources alone tell, in seconds |
+| Before any build | `cmake -P scripts/CheckMarkdownLinks.cmake` ([lint](#lint)) | What the sources alone tell, in seconds |
 | While changing Naos | `ctest --preset default`, or a layer of it | Nothing broken, in a few seconds |
 | Before sending a change | The presets `default` and `shared`; `release` and `sanitize` for a change to `src/` ([building](building.md#with-the-presets)) | What the type of the library, the optimizer or the sanitizers find |
 | Every pull request | CI: lint, then every preset on every platform, and the package installed ([building](building.md#continuous-integration)) | What the platform, the compiler or the oldest CMake supported finds |
@@ -159,16 +159,10 @@ The links of the documentation are checked by a [lint](#lint) script, not by a s
 
 Checks that read the sources and need no build are scripts of `scripts/`, not self tests: they would otherwise wait for the whole build, and run again with every preset and compiler of CI for the same result.
 
-`scripts/Lint.cmake` runs them all and names each that fails; the `lint` job of CI is that script. Run it from the root of Naos:
+There is one: `scripts/CheckMarkdownLinks.cmake` checks that every relative link of the Markdown files leads to a file that exists, and every `#anchor` to a heading of that file. The `lint` job of CI is that script; it runs from any directory:
 
 ```sh
-cmake -D ROOT=. -P scripts/Lint.cmake
+cmake -P scripts/CheckMarkdownLinks.cmake
 ```
 
-| Script | Checks |
-|---|---|
-| `CheckMarkdownLinks.cmake` | Every relative link of the Markdown files leads to a file that exists, and every `#anchor` to a heading of that file |
-| `CheckPrintfCalls.cmake` | The sources of `src/` call the formatted output functions through `format.h` ([coding style](coding-style.md#formatted-output)) |
-| `CheckReleaseScripts.cmake` | `PrepareRelease.cmake` and `ReleaseNotes.cmake`, run on a small copy of the files they change: what they change for each kind of version, and the versions they refuse ([releasing](release.md)) |
-
-Each script also runs alone, with the same `-D ROOT=.`.
+The other rule the sources alone could tell, that `src/` formats its output through `format.h`, is enforced by that header at compile time ([coding style](coding-style.md#formatted-output)).

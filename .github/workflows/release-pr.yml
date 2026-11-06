@@ -64,9 +64,8 @@ jobs:
 
       - name: Prepare the release
         run: |
-          cmake -D ROOT=. -D VERSION="$VERSION" -P scripts/PrepareRelease.cmake
-          cmake -D ROOT=. -D VERSION="$VERSION" -D OUTPUT="$RUNNER_TEMP/notes.md" \
-            -P scripts/ReleaseNotes.cmake
+          cmake -D VERSION="$VERSION" -P scripts/PrepareRelease.cmake
+          cmake -D VERSION="$VERSION" -D OUTPUT="$RUNNER_TEMP/notes.md" -P scripts/ReleaseNotes.cmake
 
       - name: Summary
         run: |

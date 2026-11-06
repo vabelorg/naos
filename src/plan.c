@@ -7,7 +7,6 @@
 
 #include "plan.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 
 #include <naos/exit.h>

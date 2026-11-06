@@ -2,19 +2,21 @@
 # SPDX-License-Identifier: MIT
 #
 # Writes the notes of a release: the section of its version in CHANGELOG.md, without the heading.
-# Used by .github/workflows/release-pr.yml and release.yml.
+# Used by .github/workflows/release-pr.yml and release.yml:
 #
-# -D ROOT=<path>       root of Naos
+#   cmake -D VERSION=<x.y.z> -D OUTPUT=<file> -P scripts/ReleaseNotes.cmake
+#
 # -D VERSION=<x.y.z>   the version released
 # -D OUTPUT=<file>     the file to write
 
 cmake_minimum_required(VERSION 3.21)
 
-foreach(var IN ITEMS ROOT VERSION OUTPUT)
+foreach(var IN ITEMS VERSION OUTPUT)
     if(NOT DEFINED ${var})
         message(FATAL_ERROR "ReleaseNotes.cmake: -D ${var}=... is required")
     endif()
 endforeach()
+get_filename_component(ROOT "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
 
 file(READ "${ROOT}/CHANGELOG.md" log)
 string(REPLACE "\r" "" log "${log}")

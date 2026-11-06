@@ -35,7 +35,7 @@ Every self test should pass before you change anything. [Building](development/b
 3. Add or update the self tests: every behavior change comes with a test that fails without it.
 4. Update the documentation in the same change: the reference for any change to the API, the output or the CMake functions. The English pages are updated in the same change; the Japanese translation (`docs/ja/`) may follow in a later pull request ([documentation style](development/docs-style.md#languages)).
 5. Add an entry under `[Unreleased]` in `CHANGELOG.md` for any change users can see ([changelog](development/changelog.md)).
-6. Run the self tests with the presets `default` and `shared`, and `release` and `sanitize` for a change to `src/` ([building](development/building.md#with-the-presets)); and the checks that need no build, `cmake -D ROOT=. -P scripts/Lint.cmake`.
+6. Run the self tests with the presets `default` and `shared`, and `release` and `sanitize` for a change to `src/` ([building](development/building.md#with-the-presets)); and the check of the links of the documentation, `cmake -P scripts/CheckMarkdownLinks.cmake`.
 
 ## Commits and pull requests
 

@@ -5,9 +5,10 @@
 # entries of [Unreleased] in CHANGELOG.md allow the version, sets it in include/naos/version.h,
 # updates the tag and the version named in the documentation and the examples for a new minor or
 # major version, and closes the changelog. Run by .github/workflows/release-pr.yml; changes the
-# files only, commits nothing.
+# files only, commits nothing:
 #
-# -D ROOT=<path>            root of Naos
+#   cmake -D VERSION=<x.y.z> -P scripts/PrepareRelease.cmake
+#
 # -D VERSION=<x.y.z>        the version to release
 # -D REPO_URL=<url>         optional, the repository the changelog links to; by default the one
 #                           README.md fetches with FetchContent
@@ -15,31 +16,24 @@
 
 cmake_minimum_required(VERSION 3.21)
 
-foreach(var IN ITEMS ROOT VERSION)
-    if(NOT DEFINED ${var})
-        message(FATAL_ERROR "PrepareRelease.cmake: -D ${var}=... is required")
-    endif()
-endforeach()
+if(NOT DEFINED VERSION)
+    message(FATAL_ERROR "PrepareRelease.cmake: -D VERSION=<x.y.z> is required")
+endif()
+get_filename_component(ROOT "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
 
 include("${ROOT}/cmake/NaosVersion.cmake")
 
 set(version_header "${ROOT}/include/naos/version.h")
 set(changelog "${ROOT}/CHANGELOG.md")
 
-# Files naming the tag fetched by FetchContent or the minor version asked of find_package(). The
-# pages of docs/development/ are left alone: their versions are examples.
+# The files naming the tag fetched by FetchContent or the minor version asked of find_package():
+# wherever users read them. The pages of docs/development/ are left alone: their versions are examples.
+file(GLOB readmes "${ROOT}/README*.md")
 file(GLOB example_lists "${ROOT}/examples/*/CMakeLists.txt")
-set(versioned_files
-    "${ROOT}/README.md"
-    "${ROOT}/README.ja.md"
-    ${example_lists}
-)
-foreach(lang IN ITEMS "" "ja/")
-    foreach(page IN ITEMS getting-started/installation getting-started/quickstart reference/cmake
-            guides/troubleshooting)
-        list(APPEND versioned_files "${ROOT}/docs/${lang}${page}.md")
-    endforeach()
-endforeach()
+file(GLOB_RECURSE pages "${ROOT}/docs/*.md")
+list(FILTER pages EXCLUDE REGEX "/development/")
+set(versioned_files ${readmes} ${example_lists} ${pages})
+list(SORT versioned_files)
 
 # Sets out to the content of file with LF line endings.
 function(naos_read_text out file)

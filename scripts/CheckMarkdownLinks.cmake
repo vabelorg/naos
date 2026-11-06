@@ -3,18 +3,12 @@
 #
 # Checks the relative links of the Markdown files of Naos: every linked file must exist and every
 # #anchor must name a heading (as GitHub makes its id) or an <a id="..."> of the file linked.
-# Links with a scheme (https:, mailto:) are not checked. Needs no build: run by the lint job of CI,
-# and by hand with  cmake -D ROOT=. -P scripts/CheckMarkdownLinks.cmake
-#
-# -D ROOT=<path>   root of Naos
+# Links with a scheme (https:, mailto:) are not checked. Needs no build: the lint job of CI, and by
+# hand, from any directory:  cmake -P scripts/CheckMarkdownLinks.cmake
 
 cmake_minimum_required(VERSION 3.21)
 
-if(NOT DEFINED ROOT)
-    message(FATAL_ERROR "CheckMarkdownLinks.cmake: -D ROOT=<path> is required")
-endif()
-# A relative ROOT, such as ".", is taken from the current directory.
-get_filename_component(ROOT "${ROOT}" ABSOLUTE)
+get_filename_component(ROOT "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
 
 file(GLOB top_files LIST_DIRECTORIES false "${ROOT}/*.md")
 file(GLOB_RECURSE nested_files LIST_DIRECTORIES false

@@ -21,7 +21,7 @@ These decide what goes into Naos, before any feature:
 | `tests/` | The self tests, in layers by who judges them (`contract/`, `api/`, `unit/`, `behavior/`, `build/`, `examples/`), each with its programs, the `CMakeLists.txt` registering its cases and the expected outputs (`expected/`); `consumer/`, a project using Naos; and their helpers (`harness/`). See [testing](testing.md) |
 | `examples/` | Complete projects quoted by the documentation, built and run by the self tests |
 | `docs/` | The documentation in English, and its Japanese translation in `docs/ja/` |
-| `scripts/` | Scripts for maintaining Naos, not used by its build: `PrepareRelease.cmake` and `ReleaseNotes.cmake` prepare a release and write its notes, see [releasing](release.md); `Lint.cmake` runs the checks that need no build (`CheckMarkdownLinks.cmake`, `CheckPrintfCalls.cmake`, `CheckReleaseScripts.cmake`), see [lint](testing.md#lint); `TestPackage.cmake` tests the package a build installs, see [building](building.md#installing) |
+| `scripts/` | Scripts for maintaining Naos, not used by its build: `PrepareRelease.cmake` and `ReleaseNotes.cmake` prepare a release and write its notes, see [releasing](release.md); `CheckMarkdownLinks.cmake` checks the links of the documentation, see [lint](testing.md#lint); `TestPackage.cmake` tests the package a build installs, see [building](building.md#installing) |
 | `.github/` | The workflows (CI and the release) and the templates of issues and pull requests |
 
 ## Modules
