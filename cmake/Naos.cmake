@@ -22,7 +22,9 @@
 # needs no reconfigure. Every test becomes one CTest test running
 # "<exe> --naos-filter <suite>.<test>", with SKIP_RETURN_CODE 77; with ALLOW_NO_ASSERTIONS,
 # "<exe> --naos-filter <suite>.<test> --naos-allow-no-assertions". Until the executable is built,
-# CTest has one failing test in their place, <prefix>NOT_BUILT, with the same labels.
+# CTest has one failing test in their place, <prefix>NOT_BUILT, with the same labels. A change to
+# the arguments takes effect at the next build, through a target <target>_naos_tests that each
+# function adds.
 #
 # The functions whose names start with _naos_ are internal.
 
@@ -123,20 +125,63 @@ function(_naos_discover caller target prefix labels properties timeout allow_no_
         OUTPUT "${tests_file}"
     )
     file(GENERATE OUTPUT "${params_file}" CONTENT "${params}")
-    # A change to the arguments rewrites the parameter file, which then links the executable again,
-    # and so lists its tests again: without it, the tests kept their old names, labels and
-    # properties until the executable changed. file(GENERATE) leaves an unchanged file as it is.
-    # Only the Ninja and Makefile generators honor LINK_DEPENDS; with a multi-config one, the path
-    # holds $<CONFIG>, which LINK_DEPENDS is not known to expand from CMake 3.21 on, so it is left out.
-    if(NOT multi_config)
-        set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS "${params_file}")
+
+    # A change to the arguments must list the tests again, or they keep their old names, labels
+    # and properties until the executable changes. The arguments change only at the configure, so
+    # they are compared here, by content, with those of the previous configure: when they differ,
+    # the CTest files go, and the rule below writes them again at the next build because they are
+    # missing. Nothing compares times, which the make of macOS keeps to the second, and it works
+    # the same with every generator. The content compared still holds the generator expressions.
+    set(stored_file "${file_base}_params.stored")
+    set(stored "")
+    if(EXISTS "${stored_file}")
+        file(READ "${stored_file}" stored)
+    endif()
+    if(NOT stored STREQUAL params)
+        if(multi_config)
+            set(tests_files "")
+            foreach(config IN LISTS CMAKE_CONFIGURATION_TYPES)
+                list(APPEND tests_files "${file_base}_tests-${config}.cmake")
+            endforeach()
+        else()
+            set(tests_files "${tests_file}")
+        endif()
+        file(REMOVE ${tests_files})
+        file(WRITE "${stored_file}" "${params}")
     endif()
 
+    set(discover_command "${CMAKE_COMMAND}" -D "NAOS_PARAMS=${params_file}"
+        -P "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/NaosDiscover.cmake")
+    set(discover_comment "Discovering Naos tests in ${target}")
+
+    # Lists the tests after each link, so that building the executable alone, with --target, lists
+    # its tests too.
     add_custom_command(TARGET ${target} POST_BUILD
-        COMMAND "${CMAKE_COMMAND}" -D "NAOS_PARAMS=${params_file}" -P "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/NaosDiscover.cmake"
-        COMMENT "Discovering Naos tests in ${target}"
+        COMMAND ${discover_command}
+        COMMENT "${discover_comment}"
         VERBATIM
     )
+    # Writes the CTest file when it is missing: after the configure removed it above, or after a
+    # clean. The rule has no DEPENDS, so it runs only then. A target-level dependency alone orders
+    # it after the link; a file-level one, from DEPENDS ${target}, would run it after each link
+    # too, like the POST_BUILD command, and would compare times again. Ninja decides what is
+    # missing when the build starts, so on a build that links the executable and lacks the file it
+    # lists the tests twice, once for each command, which is harmless. The target carries the
+    # EXCLUDE_FROM_ALL of the executable, so that it does not pull an excluded one into all.
+    add_custom_command(OUTPUT "${tests_file}"
+        COMMAND ${discover_command}
+        COMMENT "${discover_comment}"
+        VERBATIM
+    )
+    set(discovery_target "${target}_naos_tests")
+    get_target_property(excluded ${target} EXCLUDE_FROM_ALL)
+    if(excluded)
+        add_custom_target(${discovery_target} DEPENDS "${tests_file}")
+    else()
+        add_custom_target(${discovery_target} ALL DEPENDS "${tests_file}")
+    endif()
+    add_dependencies(${discovery_target} ${target})
+    set_property(TARGET ${discovery_target} PROPERTY FOLDER "Naos")
 
     # Read by CTest, which picks the file of the configuration it runs.
     if(multi_config)

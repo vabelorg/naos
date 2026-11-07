@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- A change to the arguments of `naos_add_executable()` and `naos_discover_tests()` (`PREFIX`, `LABELS`, `PROPERTIES`, `DISCOVERY_TIMEOUT`, `ALLOW_NO_ASSERTIONS`) takes effect at the next build with every generator, Visual Studio, Xcode and Ninja Multi-Config included, where the tests kept their old registration until the executable was built again; and it no longer links the executable again. The configure compares the arguments with those of the previous configure and removes the CTest file when they differ, and a new target, `<target>_naos_tests`, writes it at the next build. Between the configure and that build, `<prefix>NOT_BUILT` stands in for the tests, and building the executable alone with `--target` does not apply the change ([CMake](docs/reference/cmake.md#discovery), [#22](https://github.com/vabelorg/naos/issues/22)).
 - A failed `NAOS_CHECK_NULL` / `NAOS_REQUIRE_NULL` no longer prints the pointer as `value`, as `*_NOT_NULL` already did not: `*_NULL` and `*_NOT_NULL` compare the pointer with `NULL` where the macro is used, and pass only the result to Naos.
 
 ### Removed

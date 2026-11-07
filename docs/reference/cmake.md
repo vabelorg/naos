@@ -64,9 +64,7 @@ Registers each test of an executable made with `add_executable()`, which must ca
 The tests are listed after each build of the executable, by running it with `--naos-list`. Adding or removing a test needs no new configure.
 
 - Until the executable is built, CTest has a single failing test in place of its tests, `<prefix>NOT_BUILT`. It carries the `LABELS` too, so that `ctest -L` does not miss it. The same happens with a multi-config generator for a configuration that is not built, chosen with `-C`.
-- What a change to the arguments (`PREFIX`, `LABELS`, `PROPERTIES`, `DISCOVERY_TIMEOUT`, `ALLOW_NO_ASSERTIONS`) does depends on the generator.
-  - The single-config Ninja and Makefile generators: the executable is linked again at the next build, which lists its tests again.
-  - Other generators, such as Visual Studio, Xcode and Ninja Multi-Config: the tests keep what they had until the executable is built again.
+- A change to the arguments (`PREFIX`, `LABELS`, `PROPERTIES`, `DISCOVERY_TIMEOUT`, `ALLOW_NO_ASSERTIONS`) takes effect at the next build, with every generator, without linking the executable again. Between the configure and that build, `<prefix>NOT_BUILT` stands in for the tests, as before the first build. Each function adds a target `<target>_naos_tests` for this, built by `all`; building the executable alone, with `--target <target>`, does not apply the change until the executable is linked again.
 - When listing fails, the build fails, with the reason and what to do in its message.
   - After the time limit: it says to raise `DISCOVERY_TIMEOUT`.
   - Otherwise: it tells what to do when a shared library (DLL) is not found ([shared library](../guides/shared-library.md)). On Windows, a missing DLL gives no output, only `Exit code 0xc0000135`; in that case the message names the cause outright.
