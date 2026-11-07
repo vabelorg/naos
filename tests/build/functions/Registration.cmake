@@ -10,8 +10,8 @@
 #    the tests do.
 #    With ALLOW_NO_ASSERTIONS, of either function, each test also runs --naos-allow-no-assertions,
 #    so that a test that runs no assertion passes; without it, it fails.
-# 3. With the single-config Ninja and Makefile generators, new arguments register the tests again at the next
-#    build, without a change to the executable.
+# 3. New arguments register the tests again at the next build, with every generator, without linking
+#    the executable again: between the configure and the build, <prefix>NOT_BUILT stands in for them.
 #
 # Defines: those of naos_selftest_add_project_case().
 
@@ -163,15 +163,21 @@ if(code EQUAL 0 OR NOT output MATCHES "strict\\.unchecked\\.runs[ .]*\\*\\*\\*Fa
 endif()
 
 # 3. New arguments, the executable unchanged.
-if(GENERATOR MATCHES "Ninja|Makefiles" AND NOT MULTI_CONFIG)
-    # The make of macOS (GNU make 3.81) compares times to the second: a parameter file rewritten in
-    # the second the executable was linked is not newer than it, and the executable is not linked
-    # again. Waiting a second keeps the test from depending on when within a second the build ended.
-    execute_process(COMMAND "${CMAKE_COMMAND}" -E sleep 1)
-    nested_reconfigure("${binary}" -D LISTED_PREFIX=second. -D LISTED_LABELS=l3)
-    nested_build("${binary}")
-    nested_ctest_json(json "${binary}")
-    expect_tests("${json}" second. "l3")
+test_index(i "${json}" first.listed.passes)
+string(JSON executable GET "${json}" tests ${i} command 0)
+file(TIMESTAMP "${executable}" linked_at "%s")
+nested_reconfigure("${binary}" -D LISTED_PREFIX=second. -D LISTED_LABELS=l3)
+nested_ctest_json(json "${binary}")
+test_names(names "${json}" "^(first|second)\\.")
+if(NOT names STREQUAL "second.NOT_BUILT")
+    message(FATAL_ERROR "after the configure with new arguments, before the build, the tests are '${names}', not second.NOT_BUILT")
+endif()
+nested_build("${binary}")
+nested_ctest_json(json "${binary}")
+expect_tests("${json}" second. "l3")
+file(TIMESTAMP "${executable}" linked_again_at "%s")
+if(NOT linked_again_at STREQUAL linked_at)
+    message(FATAL_ERROR "the build with new arguments linked ${executable} again")
 endif()
 
 message(STATUS "the tests are registered as docs/reference/cmake.md states")
