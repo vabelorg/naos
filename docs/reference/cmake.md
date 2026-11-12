@@ -56,6 +56,8 @@ Registers each test of an executable made with `add_executable()`, which must ca
 | `ALLOW_NO_ASSERTIONS` | Each test also runs with `--naos-allow-no-assertions`, so that a test that runs no assertion passes ([a test that runs no assertion](control.md#a-test-that-runs-no-assertion)) |
 
 - Only an executable target made in the same directory can be registered, and only once. Anything else (a library, a name with no target, a second registration), and `PROPERTIES` that are not name and value pairs, are errors at configure time.
+- Each value of `PROPERTIES` reaches the CTest tests as one argument, as `set_tests_properties()` takes it: a list written in it, and one that a generator expression gives, such as `ENVIRONMENT "$<TARGET_PROPERTY:config,TEST_ENV>"`, stay one value. A value cannot hold an unbalanced `[` or `]`, inside which CMake does not split a list: the properties after it become part of it.
+- Give labels with `LABELS`, not as a property: `LABELS` inside `PROPERTIES` is read as the keyword, and takes the properties after it as labels.
 - Each test becomes the CTest test `<prefix><suite>.<test>`, running `<exe> --naos-filter <suite>.<test>` with `SKIP_RETURN_CODE 77`; with `ALLOW_NO_ASSERTIONS`, `<exe> --naos-filter <suite>.<test> --naos-allow-no-assertions`.
 - A target with the property `CROSSCOMPILING_EMULATOR` is listed and run through the emulator.
 
