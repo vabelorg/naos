@@ -5,7 +5,8 @@
 #
 #   registration      Naos added with add_subdirectory(NAOS_SOURCE_DIR), and an executable whose
 #                     tests are registered with PREFIX, LABELS and PROPERTIES, from the variables
-#                     LISTED_PREFIX and LISTED_LABELS (labels separated by ','); and three
+#                     LISTED_PREFIX and LISTED_LABELS (labels separated by ','), PROPERTIES holding
+#                     a list given by a generator expression; and three
 #                     executables of a test that runs no assertion, registered with
 #                     ALLOW_NO_ASSERTIONS by each function (PREFIX added. and discovered.) and
 #                     without it (PREFIX strict.)
@@ -25,8 +26,11 @@ if(CASE STREQUAL "registration")
         SOURCES listed.c
         PREFIX "${LISTED_PREFIX}"
         LABELS ${labels}
-        PROPERTIES TIMEOUT 7 ENVIRONMENT "A=1;B=2"
+        PROPERTIES TIMEOUT 7 FIXTURES_REQUIRED "$<TARGET_PROPERTY:listed,NAOS_FIXTURES>"
+            ENVIRONMENT "A=1;B=2"
     )
+    # A list a generator expression gives, followed by another property, must stay one value.
+    set_property(TARGET listed PROPERTY NAOS_FIXTURES "f1;f2")
     naos_add_executable(unchecked_added SOURCES unchecked.c PREFIX added. ALLOW_NO_ASSERTIONS)
     add_executable(unchecked_discovered unchecked.c)
     target_link_libraries(unchecked_discovered PRIVATE Naos::naos)

@@ -46,14 +46,31 @@ endfunction()
 
 # Sets out to the content of the parameter file read by NaosDiscover.cmake. Every keyword is
 # required and takes one value, a list as one argument; the values may hold generator expressions.
+# PROPERTIES, <name> <value> pairs, is written one variable per name and per value, so that a value
+# keeps its own semicolons, also those a generator expression gives when the file is generated:
+# NAOS_PROPERTY_COUNT, then NAOS_PROPERTY_NAME_<i> and NAOS_PROPERTY_VALUE_<i> for i from 1.
 function(_naos_discovery_params out)
-    set(keywords TARGET EXECUTABLE EMULATOR PREFIX LABELS PROPERTIES DISCOVERY_TIMEOUT ARGS OUTPUT)
-    cmake_parse_arguments(PARSE_ARGV 1 arg "" "${keywords}" "")
+    set(keywords TARGET EXECUTABLE EMULATOR PREFIX LABELS DISCOVERY_TIMEOUT ARGS OUTPUT)
+    cmake_parse_arguments(PARSE_ARGV 1 arg "" "${keywords};PROPERTIES" "")
     set(content "")
     foreach(keyword IN LISTS keywords)
         _naos_quote(quoted "${arg_${keyword}}")
         string(APPEND content "set(NAOS_${keyword} ${quoted})\n")
     endforeach()
+    set(count 0)
+    set(is_value FALSE)
+    foreach(item IN LISTS arg_PROPERTIES)
+        _naos_quote(quoted "${item}")
+        if(is_value)
+            string(APPEND content "set(NAOS_PROPERTY_VALUE_${count} ${quoted})\n")
+            set(is_value FALSE)
+        else()
+            math(EXPR count "${count} + 1")
+            string(APPEND content "set(NAOS_PROPERTY_NAME_${count} ${quoted})\n")
+            set(is_value TRUE)
+        endif()
+    endforeach()
+    string(APPEND content "set(NAOS_PROPERTY_COUNT ${count})\n")
     set(${out} "${content}" PARENT_SCOPE)
 endfunction()
 

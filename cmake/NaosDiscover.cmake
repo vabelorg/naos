@@ -10,7 +10,9 @@
 #   NAOS_EMULATOR           command line run in front of it, or empty
 #   NAOS_PREFIX             prefix of the CTest names
 #   NAOS_LABELS             labels of the CTest tests, or empty
-#   NAOS_PROPERTIES         other properties of the CTest tests, <name> <value> pairs, or empty
+#   NAOS_PROPERTY_COUNT     number of the other properties of the CTest tests, 0 or more
+#   NAOS_PROPERTY_NAME_<i>  for i from 1 to the count, the name of a property
+#   NAOS_PROPERTY_VALUE_<i> and its value, a list as one value
 #   NAOS_DISCOVERY_TIMEOUT  limit of the listing, in seconds
 #   NAOS_ARGS               arguments given to each test after its --naos-filter, or empty
 #   NAOS_OUTPUT             the CTest file to write
@@ -88,7 +90,7 @@ if(NOT DEFINED NAOS_PARAMS)
 endif()
 include("${NAOS_PARAMS}")
 foreach(name IN ITEMS NAOS_TARGET NAOS_EXECUTABLE NAOS_EMULATOR NAOS_PREFIX NAOS_LABELS
-        NAOS_PROPERTIES NAOS_DISCOVERY_TIMEOUT NAOS_ARGS NAOS_OUTPUT)
+        NAOS_PROPERTY_COUNT NAOS_DISCOVERY_TIMEOUT NAOS_ARGS NAOS_OUTPUT)
     if(NOT DEFINED ${name})
         message(FATAL_ERROR "${NAOS_PARAMS} does not set ${name}")
     endif()
@@ -103,7 +105,15 @@ naos_list_tests(test_names)
 naos_quote_list(emulator_args NAOS_EMULATOR)
 naos_quote(executable "${NAOS_EXECUTABLE}")
 naos_quote_list(test_args NAOS_ARGS)
-naos_quote_list(property_args NAOS_PROPERTIES)
+# Each value is one argument, as given to set_tests_properties(): CTest splits a list value itself.
+set(property_args "")
+if(NAOS_PROPERTY_COUNT GREATER 0)
+    foreach(i RANGE 1 ${NAOS_PROPERTY_COUNT})
+        naos_quote(quoted_name "${NAOS_PROPERTY_NAME_${i}}")
+        naos_quote(quoted_value "${NAOS_PROPERTY_VALUE_${i}}")
+        string(APPEND property_args " ${quoted_name} ${quoted_value}")
+    endforeach()
+endif()
 if(NOT NAOS_LABELS STREQUAL "")
     naos_quote(quoted "${NAOS_LABELS}")
     string(APPEND property_args " LABELS ${quoted}")

@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- A value of `PROPERTIES` of `naos_add_executable()` and `naos_discover_tests()` that a generator expression gives as a list, such as `ENVIRONMENT "$<TARGET_PROPERTY:config,TEST_ENV>"`, stays one value. Its items after the first, and the properties after it, were lost without any error ([#42](https://github.com/vabelorg/naos/issues/42)).
 - `NAOS_CHECK_NOT_NULL` / `NAOS_REQUIRE_NOT_NULL` on memory not yet written, such as a block right after `malloc()`, no longer makes GCC warn `may be used uninitialized` (`-Wmaybe-uninitialized`), which stopped a build with `-Werror` ([#39](https://github.com/vabelorg/naos/issues/39)).
 - `*_NULL` and `*_NOT_NULL` take a function pointer without the warning of `-Wpedantic` on converting it to `void *`: they take any pointer ([#40](https://github.com/vabelorg/naos/issues/40)).
 

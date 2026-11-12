@@ -56,6 +56,8 @@ naos_discover_tests(<target>
 | `ALLOW_NO_ASSERTIONS` | 各テストを `--naos-allow-no-assertions` も付けて実行する。アサーションを実行しないテストが成功になる（[アサーションを実行しないテスト](control.md#アサーションを実行しないテスト)） |
 
 - 登録できるのは、同じディレクトリで作った実行ファイルターゲットだけで、1 つのターゲットにつき 1 回です。それ以外（ライブラリ、存在しない名前、2 回目の登録）や、`PROPERTIES` が名前と値の組になっていないときは、configure の時点でエラーになります。
+- `PROPERTIES` の各値は、`set_tests_properties()` に渡すのと同じく、1 つの引数として CTest のテストに届きます。値に書いたリストも、`ENVIRONMENT "$<TARGET_PROPERTY:config,TEST_ENV>"` のようにジェネレータ式がリストになる値も、1 つの値のままです。値には対になっていない `[` や `]` を含められません。CMake はその内側ではリストを区切らないため、後ろのプロパティがその値の一部になります。
+- ラベルはプロパティではなく `LABELS` で渡します。`PROPERTIES` の中の `LABELS` はキーワードとして読まれ、後ろのプロパティまでラベルになります。
 - 各テストは CTest のテスト `<prefix><suite>.<test>` になり、`SKIP_RETURN_CODE 77` を付けて `<exe> --naos-filter <suite>.<test>` を実行します。`ALLOW_NO_ASSERTIONS` があれば `<exe> --naos-filter <suite>.<test> --naos-allow-no-assertions` を実行します。
 - プロパティ `CROSSCOMPILING_EMULATOR` を持つターゲットは、そのエミュレータを通して列挙・実行します。
 
